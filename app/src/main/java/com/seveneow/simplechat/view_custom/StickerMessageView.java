@@ -2,8 +2,6 @@ package com.seveneow.simplechat.view_custom;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.view.LayoutInflater;
-import android.widget.LinearLayout;
 
 import com.seveneow.simplechat.R;
 
@@ -15,6 +13,8 @@ public class StickerMessageView extends MessageView {
 
   public StickerMessageView(Context context) {
     super(context);
+    layoutId = R.layout.sticker_message_view;
+    init();
   }
 
   public StickerMessageView(Context context, AttributeSet attrs) {
@@ -25,15 +25,8 @@ public class StickerMessageView extends MessageView {
     super(context, attrs, defStyleAttr);
   }
 
-  protected void init() {
-    LinearLayout viewContainer = (LinearLayout) rootView.findViewById(R.id.message_view_container);
-    layout = LayoutInflater.from(getContext()).inflate(R.layout.sticker_message_view, viewContainer, false);
-    viewContainer.removeAllViews();
-    viewContainer.addView(layout);
-  }
-
   protected void setView() {
-    //    TextView messageView = (TextView) layout.findViewById(R.id.xxx);
+    //    TextView messageView = (TextView) messageView.findViewById(R.id.xxx);
     //    messageView.setText(((TextMessage) message).getMessage());
     //    imageLayout.setOnClickListener(this);
   }

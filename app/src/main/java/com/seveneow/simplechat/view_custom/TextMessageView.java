@@ -2,8 +2,6 @@ package com.seveneow.simplechat.view_custom;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.view.LayoutInflater;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.seveneow.simplechat.R;
@@ -17,6 +15,8 @@ public class TextMessageView extends MessageView {
 
   public TextMessageView(Context context) {
     super(context);
+    layoutId = R.layout.text_message_view;
+    init();
   }
 
   public TextMessageView(Context context, AttributeSet attrs) {
@@ -27,12 +27,6 @@ public class TextMessageView extends MessageView {
     super(context, attrs, defStyleAttr);
   }
 
-  protected void init() {
-    LinearLayout viewContainer = (LinearLayout) rootView.findViewById(R.id.message_view_container);
-    layout = LayoutInflater.from(getContext()).inflate(R.layout.text_message_view, viewContainer, false);
-    viewContainer.removeAllViews();
-    viewContainer.addView(layout);
-  }
 
   protected void setView() {
     TextView messageView = (TextView) layout.findViewById(R.id.xxx);

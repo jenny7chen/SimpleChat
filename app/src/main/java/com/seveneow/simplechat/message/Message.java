@@ -11,12 +11,12 @@ public class Message {
   public static final int TYPE_FILE = 3;
 
   private int type = TYPE_TEXT;
-  private String messageId;
-  private String messageTime;
-  private String senderId;
-  private String receiverId;
+  private String messageId = null;
+  private String messageTime = null;
+  private String senderId = null;
+  private String receiverId = null;
 
-  public Message(int type){
+  public Message(int type) {
     this.type = type;
   }
 
@@ -54,5 +54,9 @@ public class Message {
 
   public void setReceiverId(String receiverId) {
     this.receiverId = receiverId;
+  }
+
+  public boolean isMe() {
+    return senderId == null;
   }
 }
