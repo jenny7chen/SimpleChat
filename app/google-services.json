@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "142668061974",
+    "firebase_url": "https://test-f0908.firebaseio.com",
+    "project_id": "test-f0908",
+    "storage_bucket": "test-f0908.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:142668061974:android:1bb37fc793ef825c",
+        "android_client_info": {
+          "package_name": "com.seveneow.simplechat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "142668061974-pjb7bbn3hlqstrre32kv014ruspturl8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDujhSmuFmOTlTOsTh3M1vzMi2uez6g7oo"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "142668061974-pjb7bbn3hlqstrre32kv014ruspturl8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
