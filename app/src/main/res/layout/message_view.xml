@@ -18,8 +18,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_toEndOf="@+id/photo"
-        android:layout_toRightOf="@+id/photo"
+        android:layout_toEndOf="@+id/avatar"
+        android:layout_toRightOf="@+id/avatar"
         android:text="01:23"
         android:textSize="12sp"/>
 

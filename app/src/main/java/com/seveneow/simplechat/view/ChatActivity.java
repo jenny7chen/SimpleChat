@@ -3,6 +3,7 @@ package com.seveneow.simplechat.view;
 import android.app.ActivityManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -35,9 +36,12 @@ public class ChatActivity extends MvpViewStateActivity<ChatMvpView, ChatPresente
 
     //set listener here
     recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-    progressBar = (ProgressBar) findViewById(R.id.progressBar) ;
+    progressBar = (ProgressBar) findViewById(R.id.progressBar);
     LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, true);
     recyclerView.setLayoutManager(linearLayoutManager);
+    DefaultItemAnimator animator = new DefaultItemAnimator();
+    animator.setAddDuration(250);
+    recyclerView.setItemAnimator(animator);
     adapter = new MessageListAdapter(this);
     recyclerView.setAdapter(adapter);
     setRetainInstance(true);//when using viewstate needs to turn this on
@@ -80,10 +84,12 @@ public class ChatActivity extends MvpViewStateActivity<ChatMvpView, ChatPresente
   @Override
   public void setData(List<Message> data, boolean isSingleMessage) {
     adapter.setData(data);
-    if (isSingleMessage)
+    if (isSingleMessage) {
       adapter.notifyItemInserted(0);
-    else
+    }
+    else {
       adapter.notifyDataSetChanged();
+    }
   }
 
   @Override

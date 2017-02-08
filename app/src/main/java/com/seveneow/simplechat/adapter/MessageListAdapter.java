@@ -99,7 +99,6 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
 
   public void setData(List<Message> data) {
     this.data = data;
-    notifyDataSetChanged();
   }
 
 
@@ -109,6 +108,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
     public Holder(View itemView) {
       super(itemView);
       itemView.setOnClickListener(this);
+      itemView.setOnLongClickListener(this);
     }
 
     @Override
