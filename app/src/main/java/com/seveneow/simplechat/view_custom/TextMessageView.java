@@ -5,7 +5,7 @@ import android.util.AttributeSet;
 import android.widget.TextView;
 
 import com.seveneow.simplechat.R;
-import com.seveneow.simplechat.message.TextMessage;
+import com.seveneow.simplechat.model.TextMessage;
 
 /**
  * Created by jennychen on 2017/1/24.
@@ -29,7 +29,7 @@ public class TextMessageView extends MessageView {
 
 
   protected void setView() {
-    TextView messageView = (TextView) layout.findViewById(R.id.xxx);
+    TextView messageView = (TextView) layout.findViewById(R.id.text);
     messageView.setText(((TextMessage) message).getMessage());
     //    imageLayout.setOnClickListener(this);
   }

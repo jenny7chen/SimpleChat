@@ -1,4 +1,4 @@
-package com.seveneow.simplechat.message;
+package com.seveneow.simplechat.model;
 
 public class FileMessage extends Message {
   private String url;

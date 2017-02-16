@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@color/editor_bg"
+                android:orientation="vertical"
+                android:paddingTop="1dp">
+
+    <EditText
+        android:id="@+id/editor_text"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_toLeftOf="@+id/send_buton"
+        android:layout_toStartOf="@+id/send_buton"
+        android:background="@android:color/white"
+        android:focusableInTouchMode="true"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"/>
+
+    <ImageView
+        android:id="@+id/send_buton"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:background="@color/editor_send_btn_bg"/>
+
+</RelativeLayout>

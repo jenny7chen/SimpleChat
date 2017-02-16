@@ -10,7 +10,8 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
-import com.seveneow.simplechat.message.Message;
+import com.seveneow.simplechat.model.Message;
+import com.seveneow.simplechat.utils.BaseActivity;
 import com.seveneow.simplechat.view_custom.ImageMessageView;
 import com.seveneow.simplechat.view_custom.MessageView;
 import com.seveneow.simplechat.view_custom.StickerMessageView;
@@ -113,17 +114,10 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
 
     @Override
     public void onClick(View v) {
-      //onClick event
-
-      //      Context context = v.getContext();
-      //      Intent intent = new Intent(context, VideoActivity.class);
-      //      intent.putExtra(VideoActivity.BUNDLE_VIDEO_SN, volume.videoSn);
-      //      context.startActivity(intent);
-      //
-      //      int gaAction = R.string.ga_action_volume;
-      //      Activity activity = scanForActivity(context);
-      //      if (activity != null)
-      //        ((BaseActivity) activity).gaSendEvent(R.string.ga_category_video, gaAction);
+      Context context = v.getContext();
+      Activity activity = scanForActivity(context);
+      if (activity != null)
+        ((BaseActivity) activity).hideSoftKeyboard();
     }
 
 

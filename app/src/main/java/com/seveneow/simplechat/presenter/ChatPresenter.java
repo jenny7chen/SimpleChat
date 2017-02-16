@@ -1,55 +1,54 @@
 package com.seveneow.simplechat.presenter;
 
 
-import android.os.Handler;
+import android.content.Intent;
 
-import com.hannesdorfmann.mosby.mvp.MvpBasePresenter;
-import com.seveneow.simplechat.message.ImageMessage;
-import com.seveneow.simplechat.message.Message;
-import com.seveneow.simplechat.message.StickerMessage;
-import com.seveneow.simplechat.message.TextMessage;
+import com.seveneow.simplechat.model.Message;
+import com.seveneow.simplechat.model.TextMessage;
+import com.seveneow.simplechat.utils.RoomManager;
+import com.seveneow.simplechat.service.FetchMessageService;
+import com.seveneow.simplechat.utils.BasePresenter;
+import com.seveneow.simplechat.utils.RxEvent;
 import com.seveneow.simplechat.view_interface.ChatMvpView;
 
 import java.util.ArrayList;
 
-public class ChatPresenter extends MvpBasePresenter<ChatMvpView> {
+public class ChatPresenter extends BasePresenter<ChatMvpView> {
   ArrayList<Message> messageList = new ArrayList<>();
+  private String roomId;
 
-  public void updateList() {
+  public void setRoomData(Intent intent) {
+    roomId = intent.getStringExtra("roomId");
+  }
+
+  public void sendMessage(String message) {
+    if (!isViewAttached())
+      return;
+
+    TextMessage text = new TextMessage();
+    text.setMessage(message);
+    text.setPending(true);
+    messageList.add(0, text);
+    getView().updatePendingData(messageList, true);
+    getView().showContent();
+
+    //send message
+    //TODO:bind service of sending message
+  }
+
+  public void fetchMessages() {
     if (!isViewAttached())
       return;
 
     getView().showLoading();
     //get data here using asynchttp lib
 
-    //depends on condition
-    if (getView().getData() != null)
-      return;
-
-    Handler handler = new Handler();
-    handler.postDelayed(() -> {
-      //test data onSuccess
-      TextMessage text = new TextMessage();
-      text.setMessage("123");
-      text.setSenderId("1");
-
-      ImageMessage image = new ImageMessage();
-      StickerMessage sticker = new StickerMessage();
-
-      messageList.add(text);
-      messageList.add(image);
-      messageList.add(sticker);
-
-      getView().setData(messageList, false);
-      getView().showContent();
-
-      //test data onFail
-      // getView().showError()
-    }, 1000);
-
+    Intent intent = new Intent();
+    intent.putExtra(FetchMessageService.PARAM_ROOM_ID, roomId);
+    getView().startService(FetchMessageService.class, intent);
   }
 
-  public void receiveMessage(String notificationMessage) {
+  public void onReceiveMessage(String notificationMessage) {
     if (!isViewAttached())
       return;
 
@@ -57,7 +56,30 @@ public class ChatPresenter extends MvpBasePresenter<ChatMvpView> {
     text.setMessage(notificationMessage);
     text.setSenderId("123");
     messageList.add(0, text);
-    getView().setData(messageList, true);
+    getView().updateData(messageList, true);
     getView().showContent();
+  }
+
+  public void onUpdatedMessages(String roomId) {
+    if (!isViewAttached())
+      return;
+
+    if (!this.roomId.equals(roomId)) {
+      return;
+    }
+
+    this.messageList = RoomManager.getInstance().getRoomById(roomId).getMessages();
+    getView().updateData(messageList, false);
+    getView().showContent();
+  }
+
+  @Override
+  public void onEvent(RxEvent event) {
+    if (event.id == RxEvent.EVENT_NOTIFICATION) {
+      onReceiveMessage((String) event.object);
+    }
+    else {
+      onUpdatedMessages((String) event.object);
+    }
   }
 }

@@ -1,14 +1,20 @@
 package com.seveneow.simplechat.presenter;
 
 
-import com.hannesdorfmann.mosby.mvp.MvpBasePresenter;
-import com.hannesdorfmann.mosby.mvp.MvpView;
-import com.seveneow.simplechat.message.Message;
+import com.seveneow.simplechat.utils.RoomManager;
+import com.seveneow.simplechat.utils.BasePresenter;
+import com.seveneow.simplechat.utils.RxEvent;
+import com.seveneow.simplechat.view_interface.BasicMvpView;
 
-import java.util.ArrayList;
+public class MainPresenter extends BasePresenter<BasicMvpView> {
 
-public class MainPresenter extends MvpBasePresenter<MvpView> {
-  ArrayList<Message> messageList = new ArrayList<>();
+  public void loadData() {
+    RoomManager.getInstance().addTestData();
 
+  }
 
+  @Override
+  public void onEvent(RxEvent event) {
+
+  }
 }

@@ -1,4 +1,4 @@
-package com.seveneow.simplechat.message;
+package com.seveneow.simplechat.model;
 
 /**
  * Created by jennychen on 2017/1/24.
@@ -13,8 +13,10 @@ public class Message {
   private int type = TYPE_TEXT;
   private String messageId = null;
   private String messageTime = null;
-  private String senderId = null;
+  private String senderId = "";
   private String receiverId = null;
+  private boolean isPending = false;
+  private boolean isShowSender = false;
 
   public Message(int type) {
     this.type = type;
@@ -57,6 +59,22 @@ public class Message {
   }
 
   public boolean isMe() {
-    return senderId == null;
+    return senderId == null || senderId.isEmpty();
+  }
+
+  public boolean isPending() {
+    return isPending;
+  }
+
+  public void setPending(boolean isPending) {
+    this.isPending = isPending;
+  }
+
+  public boolean isShowSender() {
+    return isShowSender;
+  }
+
+  public void setShowSender(boolean isShowSender) {
+    this.isShowSender = isShowSender;
   }
 }

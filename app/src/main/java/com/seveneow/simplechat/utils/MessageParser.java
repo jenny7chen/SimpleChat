@@ -1,8 +1,12 @@
-package com.seveneow.simplechat.message;
+package com.seveneow.simplechat.utils;
 
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import com.seveneow.simplechat.model.ImageMessage;
+import com.seveneow.simplechat.model.Message;
+import com.seveneow.simplechat.model.StickerMessage;
+import com.seveneow.simplechat.model.TextMessage;
 
 /**
  * Parse Json string to Message object

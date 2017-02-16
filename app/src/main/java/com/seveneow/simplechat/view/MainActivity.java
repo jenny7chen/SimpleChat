@@ -5,21 +5,27 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.widget.Button;
 
-import com.hannesdorfmann.mosby.mvp.MvpView;
-import com.hannesdorfmann.mosby.mvp.viewstate.MvpViewStateActivity;
 import com.hannesdorfmann.mosby.mvp.viewstate.ViewState;
 import com.seveneow.simplechat.R;
+import com.seveneow.simplechat.model.Message;
 import com.seveneow.simplechat.presenter.MainPresenter;
+import com.seveneow.simplechat.utils.BaseActivity;
+import com.seveneow.simplechat.view_interface.BasicMvpView;
 
-public class MainActivity extends MvpViewStateActivity<MvpView, MainPresenter> {
+import java.util.List;
+
+public class MainActivity extends BaseActivity<BasicMvpView, MainPresenter> implements BasicMvpView {
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
     Button enterButton = (Button) findViewById(R.id.button);
-    enterButton.setOnClickListener((View) -> startActivity(new Intent(this, ChatActivity.class)));
-    setRetainInstance(true);//when using viewstate needs to turn this on
+    enterButton.setOnClickListener((View) -> {
+      Intent intent = new Intent();
+      intent.putExtra("roomId", "123");
+      startActivity(ChatActivity.class, intent);
+    });
   }
 
   @NonNull
@@ -36,10 +42,35 @@ public class MainActivity extends MvpViewStateActivity<MvpView, MainPresenter> {
   @Override
   public void onNewViewStateInstance() {
     //entering at the first time
+    loadData();
+  }
+
+  @Override
+  public void showLoading() {
 
   }
 
-  public class MainViewState implements ViewState<MvpView> {
+  @Override
+  public void showContent() {
+
+  }
+
+  @Override
+  public void showError() {
+
+  }
+
+  @Override
+  public void loadData() {
+    presenter.loadData();
+  }
+
+  @Override
+  public List<Message> getData() {
+    return null;
+  }
+
+  public class MainViewState implements ViewState<BasicMvpView> {
     final int STATE_SHOW_CONTENT = 0;
 
     /**
@@ -47,7 +78,7 @@ public class MainActivity extends MvpViewStateActivity<MvpView, MainPresenter> {
      * We do that by calling the methods from the View interface (like the presenter does)
      */
     @Override
-    public void apply(MvpView view, boolean retained) {
+    public void apply(BasicMvpView view, boolean retained) {
 
     }
   }

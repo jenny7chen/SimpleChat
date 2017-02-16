@@ -1,4 +1,4 @@
-package com.seveneow.simplechat.message;
+package com.seveneow.simplechat.model;
 
 /**
  * Created by jennychen on 2017/1/24.

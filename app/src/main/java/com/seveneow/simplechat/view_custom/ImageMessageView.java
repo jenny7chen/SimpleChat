@@ -2,8 +2,12 @@ package com.seveneow.simplechat.view_custom;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.widget.ImageView;
 
+import com.nostra13.universalimageloader.core.ImageLoader;
 import com.seveneow.simplechat.R;
+import com.seveneow.simplechat.model.ImageMessage;
+import com.seveneow.simplechat.utils.Static;
 
 /**
  * Created by jennychen on 2017/1/24.
@@ -26,8 +30,7 @@ public class ImageMessageView extends MessageView {
   }
 
   protected void setView() {
-    //    TextView messageView = (TextView) messageView.findViewById(R.id.xxx);
-    //    messageView.setText(((TextMessage) message).getMessage());
-    //    imageLayout.setOnClickListener(this);
+    ImageView imageView = (ImageView) messageView.findViewById(R.id.image_view);
+    ImageLoader.getInstance().displayImage(((ImageMessage) message).getThumbnail(), imageView, Static.defaultDisplayImageOptions(R.mipmap.ic_launcher, true));
   }
 }

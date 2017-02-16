@@ -9,24 +9,22 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ProgressBar;
 
-import com.hannesdorfmann.mosby.mvp.viewstate.MvpViewStateActivity;
 import com.hannesdorfmann.mosby.mvp.viewstate.ViewState;
 import com.seveneow.simplechat.R;
 import com.seveneow.simplechat.adapter.MessageListAdapter;
-import com.seveneow.simplechat.message.Message;
+import com.seveneow.simplechat.model.Message;
 import com.seveneow.simplechat.presenter.ChatPresenter;
-import com.seveneow.simplechat.utils.RxEventBus;
+import com.seveneow.simplechat.utils.BaseActivity;
+import com.seveneow.simplechat.view_custom.MessageEditorView;
 import com.seveneow.simplechat.view_interface.ChatMvpView;
 
 import java.util.List;
 
-import io.reactivex.android.schedulers.AndroidSchedulers;
 
-
-public class ChatActivity extends MvpViewStateActivity<ChatMvpView, ChatPresenter>
-    implements ChatMvpView {
+public class ChatActivity extends BaseActivity<ChatMvpView, ChatPresenter> implements ChatMvpView {
   private RecyclerView recyclerView;
   private ProgressBar progressBar;
+  private MessageEditorView messageEditorView;
   private MessageListAdapter adapter;
 
   @Override
@@ -34,9 +32,9 @@ public class ChatActivity extends MvpViewStateActivity<ChatMvpView, ChatPresente
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_chat);
 
-    //set listener here
     recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
     progressBar = (ProgressBar) findViewById(R.id.progressBar);
+    messageEditorView = (MessageEditorView) findViewById(R.id.message_editor_view);
     LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, true);
     recyclerView.setLayoutManager(linearLayoutManager);
     DefaultItemAnimator animator = new DefaultItemAnimator();
@@ -44,8 +42,9 @@ public class ChatActivity extends MvpViewStateActivity<ChatMvpView, ChatPresente
     recyclerView.setItemAnimator(animator);
     adapter = new MessageListAdapter(this);
     recyclerView.setAdapter(adapter);
-    setRetainInstance(true);//when using viewstate needs to turn this on
-    RxEventBus.toObservable().observeOn(AndroidSchedulers.mainThread()).subscribe(notificationMessage -> presenter.receiveMessage((String) notificationMessage));
+    messageEditorView.setListener((message) -> {
+      presenter.sendMessage(message);
+    });
 
     ActivityManager am = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
     int memoryClass = am.getMemoryClass();
@@ -82,7 +81,7 @@ public class ChatActivity extends MvpViewStateActivity<ChatMvpView, ChatPresente
   }
 
   @Override
-  public void setData(List<Message> data, boolean isSingleMessage) {
+  public void updateData(List<Message> data, boolean isSingleMessage) {
     adapter.setData(data);
     if (isSingleMessage) {
       adapter.notifyItemInserted(0);
@@ -93,13 +92,19 @@ public class ChatActivity extends MvpViewStateActivity<ChatMvpView, ChatPresente
   }
 
   @Override
+  public void updatePendingData(List<Message> data, boolean isSingleMessage) {
+    updateData(data, isSingleMessage);
+    recyclerView.smoothScrollToPosition(0);
+  }
+
+  @Override
   public List<Message> getData() {
     return adapter == null ? null : adapter.getData();
   }
 
   @Override
   public void loadData() {
-    presenter.updateList();
+    presenter.fetchMessages();
   }
 
   @Override
@@ -109,6 +114,7 @@ public class ChatActivity extends MvpViewStateActivity<ChatMvpView, ChatPresente
 
   @Override
   public void onNewViewStateInstance() {
+    presenter.setRoomData(getIntent());
     loadData();
     //entering at the first time
   }
@@ -142,7 +148,7 @@ public class ChatActivity extends MvpViewStateActivity<ChatMvpView, ChatPresente
         break;
 
       case STATE_SHOW_CONTENT:
-        view.setData(messageList, false);
+        view.updateData(messageList, false);
         view.showContent();
         break;
       }

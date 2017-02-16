@@ -1,21 +1,11 @@
 package com.seveneow.simplechat.view_interface;
 
-import com.hannesdorfmann.mosby.mvp.MvpView;
-import com.seveneow.simplechat.message.Message;
+import com.seveneow.simplechat.model.Message;
 
 import java.util.List;
 
 
-public interface ChatMvpView extends MvpView {
-  public void showLoading();
-
-  public void showContent();
-
-  public void showError();
-
-  public void setData(List<Message> data, boolean isSingleMessage);
-
-  public void loadData();
-
-  public List<Message> getData();
+public interface ChatMvpView extends BasicMvpView {
+  public void updateData(List<Message> data, boolean isSingleMessage);
+  public void updatePendingData(List<Message> data, boolean isSingleMessage);
 }
