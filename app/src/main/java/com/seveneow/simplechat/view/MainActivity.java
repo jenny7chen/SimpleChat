@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.widget.Button;
 
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.hannesdorfmann.mosby.mvp.viewstate.ViewState;
 import com.seveneow.simplechat.R;
 import com.seveneow.simplechat.model.Message;
@@ -26,6 +27,8 @@ public class MainActivity extends BaseActivity<BasicMvpView, MainPresenter> impl
       intent.putExtra("roomId", "123");
       startActivity(ChatActivity.class, intent);
     });
+
+    FirebaseMessaging.getInstance().subscribeToTopic("123");
   }
 
   @NonNull

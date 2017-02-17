@@ -1,6 +1,9 @@
 package com.seveneow.simplechat.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 public class Room {
@@ -18,9 +21,9 @@ public class Room {
   private String photo;
   private String photoMd5;
   private ArrayList<String> memberIds;
-  private ArrayList<Message> messages;
+  private ConcurrentHashMap<String, Message> messages = new ConcurrentHashMap<>();
 
-  public void setId(String id){
+  public void setId(String id) {
     this.id = id;
   }
 
@@ -29,15 +32,29 @@ public class Room {
     return message.getMessageTime();
   }
 
-  public ArrayList<Message> getMessages() {
-    return messages == null ? new ArrayList<Message>() : messages;
+  public ConcurrentHashMap<String, Message> getMessages() {
+    return messages == null ? new ConcurrentHashMap<String, Message>() : messages;
   }
 
-  public void setMessages(ArrayList<Message> messages) {
-    this.messages = messages;
+  public ArrayList<Message> getShowMessages() {
+    return sortMessages(new ArrayList<>(getMessages().values()));
+  }
+
+  public void setMessages(ArrayList<Message> messageList) {
+    Iterator iterator = messageList.iterator();
+    while(iterator.hasNext()){
+      Message message = (Message) iterator.next();
+      this.getMessages().put(message.getMessageId(), message);
+    }
   }
 
   public boolean hasMembers() {
     return !(memberIds == null || memberIds.isEmpty());
   }
+
+  private ArrayList<Message> sortMessages(ArrayList<Message> roomList) {
+    Collections.sort(roomList, new Message.MessageComparator());
+    return roomList;
+  }
+
 }

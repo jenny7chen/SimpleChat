@@ -1,28 +1,30 @@
 package com.seveneow.simplechat.utils;
 
+import android.os.SystemClock;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 
 /**
  * Parse date string to display time
  */
 
 public class TimeParser {
-  public String getTimeStr(long milliseconds, String template) {
+  public static String getTimeStr(long milliseconds, String template) {
     Date date = new Date();
     date.setTime(milliseconds);
     return convertDateToStr(date, template);
   }
 
-  public String getTimeStr(String timeStr, String template) {
+  public static String getTimeStr(String timeStr, String template) {
     Date date = convertStrToDate(timeStr, template);
     return convertDateToStr(date, template);
   }
 
-  public String getTimeStr(Date date, String template){
+  public static String getTimeStr(Date date, String template){
     return convertDateToStr(date, template);
   }
 
@@ -31,15 +33,15 @@ public class TimeParser {
    * convert between date <-> String
    **/
 
-  private Date convertStrToDate(String dateString, String template) {
+  private static Date convertStrToDate(String dateString, String template) {
     return convertStrToDate(dateString, template, Locale.US);
   }
 
-  private String convertDateToStr(Date date, String template) {
+  private static String convertDateToStr(Date date, String template) {
     return convertDateToStr(date, template, Locale.US);
   }
 
-  private Date convertStrToDate(String dateString, String template, Locale locale) {
+  private static Date convertStrToDate(String dateString, String template, Locale locale) {
     SimpleDateFormat dateFormat = new SimpleDateFormat(template, locale);
     Date convertedDate = null;
     try {
@@ -51,10 +53,20 @@ public class TimeParser {
     return convertedDate;
   }
 
-  private String convertDateToStr(Date date, String template, Locale locale) {
+  private static String convertDateToStr(Date date, String template, Locale locale) {
     if (date == null)
       return "";
     SimpleDateFormat formatter = new SimpleDateFormat(template, locale);
+
+    //TODO: is this the only place need to set the time zone?
+    formatter.setTimeZone(TimeZone.getDefault());
     return formatter.format(date);
   }
+
+  public static String getCurrentTimeString(){
+    long machineUptimeMillis = SystemClock.elapsedRealtime() ;
+    return String.valueOf(machineUptimeMillis);
+  }
+
+
 }

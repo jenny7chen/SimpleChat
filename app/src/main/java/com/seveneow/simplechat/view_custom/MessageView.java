@@ -77,6 +77,11 @@ public abstract class MessageView extends RelativeLayout {
     TextView senderView = (TextView) messageView.findViewById(R.id.message_sender);
     senderView.setText(message.getSenderId());
     senderView.setVisibility(message.isShowSender() ? VISIBLE : GONE);
+
+    TextView leftTimeView = (TextView) messageView.findViewById(R.id.message_left_time);
+    TextView rightTimeView = (TextView) messageView.findViewById(R.id.message_right_time);
+    leftTimeView.setText(message.getMessageShowTime());
+    rightTimeView.setText(message.getMessageShowTime());
   }
 
   protected abstract void setView();

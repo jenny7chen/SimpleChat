@@ -1,6 +1,7 @@
 package com.seveneow.simplechat.view_custom;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.util.AttributeSet;
 import android.widget.TextView;
 
@@ -31,6 +32,12 @@ public class TextMessageView extends MessageView {
   protected void setView() {
     TextView messageView = (TextView) layout.findViewById(R.id.text);
     messageView.setText(((TextMessage) message).getMessage());
+    if (message.isPending()) {
+      messageView.setTextColor(Color.RED);
+    }
+    else {
+      messageView.setTextColor(Color.BLACK);
+    }
     //    imageLayout.setOnClickListener(this);
   }
 }

@@ -7,7 +7,9 @@ import com.seveneow.simplechat.model.ImageMessage;
 import com.seveneow.simplechat.model.Message;
 import com.seveneow.simplechat.model.StickerMessage;
 import com.seveneow.simplechat.model.TextMessage;
+import com.seveneow.simplechat.utils.DebugLog;
 import com.seveneow.simplechat.utils.RoomManager;
+import com.seveneow.simplechat.utils.TimeParser;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -44,16 +46,22 @@ public class FetchMessageService extends IntentService {
         "上帝呀，這些凡人怎麼都是十足的傻瓜！——《仲夏夜之夢》\n" +
         "The lunatic, the lover and the poet are of imagination all compact. (A Midsummer Night’s Dream 5.1)\n" +
         "瘋子、情人、詩人都是想像的產兒。——《仲夏夜之夢》");
-    text.setSenderId("haha");
+    text.setMessage("hello1");
+    text.setMessageTime(TimeParser.getCurrentTimeString());
+    text.setMessageId(text.getMessage() + text.getMessageTime());
+
     TextMessage text2 = new TextMessage();
     text2.setMessage("Hello");
     text2.setSenderId("haha");
-    ImageMessage image = new ImageMessage();
-    image.setThumbnail("https://images.pexels.com/photos/296878/pexels-photo-296878.jpeg?w=1260&h=750&auto=compress&cs=tinysrgb");
+    text2.setMessageTime(TimeParser.getCurrentTimeString());
+    text2.setMessageId(text2.getMessage() + text2.getMessageTime());
+
     StickerMessage sticker = new StickerMessage();
+    sticker.setMessageTime(TimeParser.getCurrentTimeString());
+    sticker.setMessageId(sticker.getStickerId() + sticker.getMessageTime());
+
     messageList.add(text);
     messageList.add(text2);
-    messageList.add(image);
     messageList.add(sticker);
     messageList.add(getTestImageMessage());
     messageList.add(getTestImageMessage());
@@ -68,8 +76,16 @@ public class FetchMessageService extends IntentService {
   }
 
   private ImageMessage getTestImageMessage() {
+    try {
+      Thread.sleep(200);
+    }
+    catch (InterruptedException e) {
+      DebugLog.printStackTrace(e);
+    }
     ImageMessage image = new ImageMessage();
     image.setThumbnail(getImageUrl());
+    image.setMessageTime(TimeParser.getCurrentTimeString());
+    image.setMessageId(image.getThumbnail() + image.getMessageTime());
     return image;
   }
 

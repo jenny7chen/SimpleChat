@@ -1,5 +1,10 @@
 package com.seveneow.simplechat.model;
 
+import com.seveneow.simplechat.utils.TimeFormat;
+import com.seveneow.simplechat.utils.TimeParser;
+
+import java.util.Comparator;
+
 /**
  * Created by jennychen on 2017/1/24.
  */
@@ -15,6 +20,7 @@ public class Message {
   private String messageTime = null;
   private String senderId = "";
   private String receiverId = null;
+  private String pendingId = null;
   private boolean isPending = false;
   private boolean isShowSender = false;
 
@@ -36,6 +42,10 @@ public class Message {
 
   public String getMessageTime() {
     return messageTime;
+  }
+
+  public String getMessageShowTime() {
+    return TimeParser.getTimeStr(Long.valueOf(messageTime), TimeFormat.CHAT_TIME_FORMAT);
   }
 
   public void setMessageTime(String messageTime) {
@@ -76,5 +86,20 @@ public class Message {
 
   public void setShowSender(boolean isShowSender) {
     this.isShowSender = isShowSender;
+  }
+
+  public String getPendingId() {
+    return pendingId;
+  }
+
+  public void setPendingId(String pendingId) {
+    this.pendingId = pendingId;
+  }
+
+  public static class MessageComparator implements Comparator<Message> {
+    @Override
+    public int compare(Message o1, Message o2) {
+      return o2.getMessageTime().compareTo(o1.getMessageTime());
+    }
   }
 }

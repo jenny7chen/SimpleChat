@@ -5,7 +5,7 @@ package com.seveneow.simplechat.model;
  */
 
 public class StickerMessage extends Message {
-  private String stickerId;
+  private String stickerId = "";
   private String stickerGroupId;
 
   public StickerMessage() {
