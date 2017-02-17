@@ -10,6 +10,7 @@ import com.seveneow.simplechat.model.TextMessage;
 import com.seveneow.simplechat.utils.RoomManager;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 
 public class FetchMessageService extends IntentService {
@@ -54,7 +55,35 @@ public class FetchMessageService extends IntentService {
     messageList.add(text2);
     messageList.add(image);
     messageList.add(sticker);
+    messageList.add(getTestImageMessage());
+    messageList.add(getTestImageMessage());
+    messageList.add(getTestImageMessage());
+    messageList.add(getTestImageMessage());
+    messageList.add(getTestImageMessage());
+    messageList.add(getTestImageMessage());
+    messageList.add(getTestImageMessage());
+    messageList.add(getTestImageMessage());
     RoomManager.getInstance().updateRoomMessages(roomId, messageList);
+
+  }
+
+  private ImageMessage getTestImageMessage() {
+    ImageMessage image = new ImageMessage();
+    image.setThumbnail(getImageUrl());
+    return image;
+  }
+
+  private String getImageUrl() {
+    Random r = new Random();
+    int i1 = r.nextInt(4);
+    String[] urls = {
+        "https://images.pexels.com/photos/286426/pexels-photo-286426.jpeg?w=1260&h=750&auto=compress&cs=tinysrgb",
+        "https://images.pexels.com/photos/25585/pexels-photo-25585.jpg?w=1260&h=750&auto=compress&cs=tinysrgb",
+        "https://images.pexels.com/photos/247470/pexels-photo-247470.jpeg?w=1260&h=750&auto=compress&cs=tinysrgb",
+        "https://images.pexels.com/photos/250389/pexels-photo-250389.jpeg?w=1260&h=750&auto=compress&cs=tinysrgb",
+        "https://images.pexels.com/photos/29682/pexels-photo-29682.jpg?w=1260&h=750&auto=compress&cs=tinysrgb"
+    };
+    return urls[i1];
 
   }
 }
