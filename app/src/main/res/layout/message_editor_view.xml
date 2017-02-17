@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
+                android:layout_height="wrap_content"
                 android:background="@color/editor_bg"
                 android:orientation="vertical"
                 android:paddingTop="1dp">
@@ -9,20 +9,26 @@
     <EditText
         android:id="@+id/editor_text"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_toLeftOf="@+id/send_buton"
         android:layout_toStartOf="@+id/send_buton"
         android:background="@android:color/white"
         android:focusableInTouchMode="true"
+        android:maxLines="5"
+        android:minHeight="50dp"
+        android:minLines="2"
         android:paddingLeft="15dp"
         android:paddingRight="15dp"/>
 
-    <ImageView
+    <RelativeLayout
         android:id="@+id/send_buton"
         android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/editor_text"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:background="@color/editor_send_btn_bg"/>
+        android:layout_alignTop="@+id/editor_text"
+        android:background="@color/editor_send_btn_bg"
+        android:minHeight="50dp"/>
 
 </RelativeLayout>

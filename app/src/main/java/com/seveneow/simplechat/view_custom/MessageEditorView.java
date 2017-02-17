@@ -37,7 +37,7 @@ public class MessageEditorView extends RelativeLayout {
   }
 
   private void initListeners() {
-    ImageView sendButton = (ImageView) findViewById(R.id.send_buton);
+    RelativeLayout sendButton = (RelativeLayout) findViewById(R.id.send_buton);
     EditText editText = (EditText) findViewById(R.id.editor_text);
     sendButton.setOnClickListener((view) -> {
       if (listener != null) {
@@ -59,14 +59,14 @@ public class MessageEditorView extends RelativeLayout {
     editText.setHint(hintText);
   }
 
-  public void setSendButtonImage(Bitmap bitmap) {
-    ImageView sendButton = (ImageView) findViewById(R.id.send_buton);
-    sendButton.setImageBitmap(bitmap);
-  }
+  //  public void setSendButtonImage(Bitmap bitmap) {
+  //    RelativeLayout sendButton = (RelativeLayout) findViewById(R.id.send_buton);
+  //    sendButton.setImageBitmap(bitmap);
+  //  }
 
   public void setSendButtonColor(int color) {
-    ImageView sendButton = (ImageView) findViewById(R.id.send_buton);
-    sendButton.setImageDrawable(new ColorDrawable(color));
+    RelativeLayout sendButton = (RelativeLayout) findViewById(R.id.send_buton);
+    sendButton.setBackgroundColor(color);
   }
 
   public interface MessageEditorListener {
