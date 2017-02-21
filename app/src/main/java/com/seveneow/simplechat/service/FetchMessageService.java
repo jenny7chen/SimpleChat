@@ -9,6 +9,8 @@ import com.seveneow.simplechat.model.StickerMessage;
 import com.seveneow.simplechat.model.TextMessage;
 import com.seveneow.simplechat.utils.DebugLog;
 import com.seveneow.simplechat.utils.RoomManager;
+import com.seveneow.simplechat.utils.RxEvent;
+import com.seveneow.simplechat.utils.RxEventBus;
 import com.seveneow.simplechat.utils.TimeParser;
 
 import java.util.ArrayList;
@@ -27,15 +29,21 @@ public class FetchMessageService extends IntentService {
     //do queries here
     String roomId = intent.getStringExtra(PARAM_ROOM_ID);
 
-    //get new message list
+    if (RoomManager.getInstance().getRoomById(roomId).getMessages().size() > 0) {
+      RxEvent event = new RxEvent();
+      event.id = RxEvent.EVENT_ROOM_MESSAGES_UPDATED;
+      event.object = roomId;
+      RxEventBus.send(event);
+      return;
+    }
+
+    //get new message list from database or server
     try {
       Thread.sleep(1000);
     }
     catch (InterruptedException e) {
 
     }
-
-    //
 
     //test data onSuccess
     ArrayList<Message> messageList = new ArrayList<Message>();
@@ -65,14 +73,7 @@ public class FetchMessageService extends IntentService {
     messageList.add(sticker);
     messageList.add(getTestImageMessage());
     messageList.add(getTestImageMessage());
-    messageList.add(getTestImageMessage());
-    messageList.add(getTestImageMessage());
-    messageList.add(getTestImageMessage());
-    messageList.add(getTestImageMessage());
-    messageList.add(getTestImageMessage());
-    messageList.add(getTestImageMessage());
     RoomManager.getInstance().updateRoomMessages(roomId, messageList);
-
   }
 
   private ImageMessage getTestImageMessage() {

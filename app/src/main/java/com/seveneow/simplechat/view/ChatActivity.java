@@ -112,7 +112,13 @@ public class ChatActivity extends BaseActivity<ChatMvpView, ChatPresenter> imple
 
   @Override
   public void updatePendingData(List<Message> data, boolean isSingleMessage) {
-    updateData(data, isSingleMessage);
+    if (isSingleMessage) {
+      adapter.notifyItemInserted(0);
+    }
+    else {
+      adapter.notifyDataSetChanged();
+    }
+    adapter.setData(data);
     ((LinearLayoutManager) recyclerView.getLayoutManager()).scrollToPositionWithOffset(0, 0);
   }
 

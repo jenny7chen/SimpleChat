@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorPrimary">#8ca3e1</color>
+    <color name="colorPrimaryDark">#718dda</color>
     <color name="colorAccent">#FF4081</color>
     <color name="editor_bg">#99ccff</color>
-    <color name="editor_send_btn_bg">#0066ff</color>
+    <color name="editor_send_btn_bg">#8ca3e1</color>
 </resources>

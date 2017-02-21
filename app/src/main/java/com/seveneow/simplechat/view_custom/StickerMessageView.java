@@ -25,7 +25,7 @@ public class StickerMessageView extends MessageView {
     super(context, attrs, defStyleAttr);
   }
 
-  protected void setView() {
+  protected void setTypeView() {
     //    TextView messageView = (TextView) messageView.findViewById(R.id.xxx);
     //    messageView.setText(((TextMessage) message).getMessage());
     //    imageLayout.setOnClickListener(this);

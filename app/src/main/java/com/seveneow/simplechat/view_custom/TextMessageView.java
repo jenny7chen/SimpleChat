@@ -29,14 +29,17 @@ public class TextMessageView extends MessageView {
   }
 
 
-  protected void setView() {
+  protected void setTypeView() {
     TextView messageView = (TextView) layout.findViewById(R.id.text);
     messageView.setText(((TextMessage) message).getMessage());
     if (message.isPending()) {
       messageView.setTextColor(Color.RED);
     }
-    else {
+    else if (message.isMe()) {
       messageView.setTextColor(Color.BLACK);
+    }
+    else {
+      messageView.setTextColor(Color.WHITE);
     }
     //    imageLayout.setOnClickListener(this);
   }

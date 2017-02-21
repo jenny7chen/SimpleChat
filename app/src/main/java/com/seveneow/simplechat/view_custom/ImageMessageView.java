@@ -9,9 +9,6 @@ import com.seveneow.simplechat.R;
 import com.seveneow.simplechat.model.ImageMessage;
 import com.seveneow.simplechat.utils.Static;
 
-/**
- * Created by jennychen on 2017/1/24.
- */
 
 public class ImageMessageView extends MessageView {
 
@@ -29,7 +26,7 @@ public class ImageMessageView extends MessageView {
     super(context, attrs, defStyleAttr);
   }
 
-  protected void setView() {
+  protected void setTypeView() {
     ImageView imageView = (ImageView) messageView.findViewById(R.id.image_view);
     ImageLoader.getInstance().displayImage(((ImageMessage) message).getThumbnail(), imageView, Static.defaultDisplayImageOptions(R.mipmap.ic_launcher, true));
   }
