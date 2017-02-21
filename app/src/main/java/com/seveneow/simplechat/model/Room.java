@@ -22,6 +22,7 @@ public class Room {
   private String photoMd5;
   private ArrayList<String> memberIds;
   private ConcurrentHashMap<String, Message> messages = new ConcurrentHashMap<>();
+  private ArrayList<Message> showMessages = new ArrayList<>();
 
   public void setId(String id) {
     this.id = id;
@@ -33,16 +34,18 @@ public class Room {
   }
 
   public ConcurrentHashMap<String, Message> getMessages() {
-    return messages == null ? new ConcurrentHashMap<String, Message>() : messages;
+    return messages == null ? new ConcurrentHashMap<>() : messages;
   }
 
   public ArrayList<Message> getShowMessages() {
-    return sortMessages(new ArrayList<>(getMessages().values()));
+    showMessages.clear();
+    showMessages.addAll(sortMessages(new ArrayList<>(getMessages().values())));
+    return showMessages;
   }
 
   public void setMessages(ArrayList<Message> messageList) {
     Iterator iterator = messageList.iterator();
-    while(iterator.hasNext()){
+    while (iterator.hasNext()) {
       Message message = (Message) iterator.next();
       this.getMessages().put(message.getMessageId(), message);
     }

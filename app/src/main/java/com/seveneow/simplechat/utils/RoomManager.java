@@ -69,8 +69,9 @@ public class RoomManager {
     }
 
     RxEvent event = new RxEvent();
-    event.id = RxEvent.EVENT_ROOM_MESSAGES_UPDATED;
-    event.object = roomId;
+    event.id = RxEvent.EVENT_ROOM_SINGLE_MESSAGES_UPDATED;
+    event.params = new String[]{roomId};
+    event.object = message;
     RxEventBus.send(event);
   }
 

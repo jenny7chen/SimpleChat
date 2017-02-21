@@ -11,7 +11,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 
 import com.hannesdorfmann.mosby.mvp.viewstate.ViewState;
 import com.seveneow.simplechat.R;
@@ -58,6 +57,7 @@ public class ChatActivity extends BaseActivity<ChatMvpView, ChatPresenter> imple
     animator.setAddDuration(250);
     recyclerView.setItemAnimator(animator);
     adapter = new MessageListAdapter(this);
+    adapter.setHasStableIds(true);
     recyclerView.setAdapter(adapter);
     messageEditorView.setListener((message) -> {
       presenter.sendMessage(message);
@@ -93,33 +93,28 @@ public class ChatActivity extends BaseActivity<ChatMvpView, ChatPresenter> imple
   }
 
   @Override
-  public void updateData(List<Message> data, boolean isSingleMessage) {
-    adapter.setData(data);
+  //combine the two TODO: move some logic to presenter
+  public void updateData(List<Message> data, boolean isSingleMessage, boolean isInsert) {
+    if (adapter.getData() == null)
+      adapter.setData(data);
     if (isSingleMessage) {
       boolean isAtBottom = ((LinearLayoutManager) recyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition() == 0;
-      adapter.notifyItemInserted(0);
+
+      if (isInsert)
+        adapter.notifyItemInserted(0);
+      else
+        adapter.notifyItemChanged(0);
+
       if (isAtBottom) {
         ((LinearLayoutManager) recyclerView.getLayoutManager()).scrollToPositionWithOffset(0, 0);
       }
-      else {
+      else if (!data.get(0).isMe()) {
         showSnackBar("您有新訊息");
       }
     }
     else {
       adapter.notifyDataSetChanged();
     }
-  }
-
-  @Override
-  public void updatePendingData(List<Message> data, boolean isSingleMessage) {
-    if (isSingleMessage) {
-      adapter.notifyItemInserted(0);
-    }
-    else {
-      adapter.notifyDataSetChanged();
-    }
-    adapter.setData(data);
-    ((LinearLayoutManager) recyclerView.getLayoutManager()).scrollToPositionWithOffset(0, 0);
   }
 
   @Override
@@ -182,7 +177,7 @@ public class ChatActivity extends BaseActivity<ChatMvpView, ChatPresenter> imple
         break;
 
       case STATE_SHOW_CONTENT:
-        view.updateData(messageList, false);
+        view.updateData(messageList, false, false);
         view.showContent();
         break;
       }

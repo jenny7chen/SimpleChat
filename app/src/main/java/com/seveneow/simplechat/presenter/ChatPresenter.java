@@ -9,6 +9,7 @@ import com.seveneow.simplechat.model.TextMessage;
 import com.seveneow.simplechat.service.FetchMessageService;
 import com.seveneow.simplechat.service.SendMessageService;
 import com.seveneow.simplechat.utils.BasePresenter;
+import com.seveneow.simplechat.utils.DebugLog;
 import com.seveneow.simplechat.utils.MessageGenerator;
 import com.seveneow.simplechat.utils.MessageParser;
 import com.seveneow.simplechat.utils.RoomManager;
@@ -34,8 +35,9 @@ public class ChatPresenter extends BasePresenter<ChatMvpView> {
       Message message = MessageGenerator.getPendingTextMessage(messageText);
       RoomManager.getInstance().addPendingMessage(roomId, message);
       messageList.add(0, message);
-      getView().updatePendingData(messageList, true);
+      getView().updateData(messageList, true, true);
       getView().showContent();
+
 
       //send message
       //TODO:bind service of sending message
@@ -66,19 +68,32 @@ public class ChatPresenter extends BasePresenter<ChatMvpView> {
       return;
     }
     messageList.add(0, message);
-    getView().updateData(messageList, true);
+    getView().updateData(messageList, true, true);
     getView().showContent();
   }
 
-  public void onMessagesUpdated(String roomId) {
+  public void onMessagesUpdated(String roomId, Message... messages) {
     if (!isViewAttached())
       return;
 
     if (!this.roomId.equals(roomId)) {
       return;
     }
+    boolean isWholeListUpdate = messages == null || messages.length == 0;
     this.messageList = RoomManager.getInstance().getRoomById(roomId).getShowMessages();
-    getView().updateData(messageList, false);
+
+    if (isWholeListUpdate) {
+      DebugLog.e("baaa", "whole list");
+      getView().updateData(messageList, false, false);
+      for (Message message : messageList) {
+        DebugLog.e("baa", "message = " + message.getMessageId());
+      }
+    }
+    else {
+      DebugLog.e("baaa", "single message");
+      getView().updateData(messageList, true, false);
+    }
+
     getView().showContent();
   }
 
@@ -89,6 +104,10 @@ public class ChatPresenter extends BasePresenter<ChatMvpView> {
     }
     else if (event.id == RxEvent.EVENT_ROOM_MESSAGES_UPDATED) {
       onMessagesUpdated((String) event.object);
+    }
+    else if (event.id == RxEvent.EVENT_ROOM_SINGLE_MESSAGES_UPDATED) {
+      onMessagesUpdated((String) event.params[0], (Message) event.object);
+
     }
     else {
       onMessagesAdded((String) event.params[0], (Message) event.object);

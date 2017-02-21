@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -12,22 +12,17 @@ import android.widget.Toast;
 
 import com.seveneow.simplechat.model.Message;
 import com.seveneow.simplechat.utils.BaseActivity;
-import com.seveneow.simplechat.view_custom.ImageMessageView;
 import com.seveneow.simplechat.view_custom.MessageView;
-import com.seveneow.simplechat.view_custom.StickerMessageView;
-import com.seveneow.simplechat.view_custom.TextMessageView;
 
 import java.util.List;
 
 
 public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.Holder> {
   private List<Message> data = null;
-  private LayoutInflater inflater;
   private Context context;
 
   public MessageListAdapter(Context context) {
     this.context = context;
-    inflater = LayoutInflater.from(context);
   }
 
   private static Activity scanForActivity(Context cont) {
@@ -45,27 +40,9 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
   public Holder onCreateViewHolder(ViewGroup parent, int viewType) {
     ViewGroup.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     View view;
-    switch (viewType) {
-    case Message.TYPE_TEXT:
-      view = new TextMessageView(context);
-      view.setLayoutParams(params);
-      return new Holder(view);
-
-    case Message.TYPE_IMAGE:
-      view = new ImageMessageView(context);
-      view.setLayoutParams(params);
-      return new Holder(view);
-
-    case Message.TYPE_STICKER:
-      view = new StickerMessageView(context);
-      view.setLayoutParams(params);
-      return new Holder(view);
-
-    default:
-      view = new TextMessageView(context);
-      view.setLayoutParams(params);
-      return new Holder(view);
-    }
+    view = new MessageView(context, viewType == 0);
+    view.setLayoutParams(params);
+    return new Holder(view);
   }
 
   @Override
@@ -86,12 +63,12 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
 
   @Override
   public int getItemViewType(int position) {
-    return data.get(position).getType();
+    return data.get(position).isMe() ? 0 : 1;
   }
 
   @Override
   public long getItemId(int position) {
-    return position;
+    return Long.valueOf(data.get(position).getMessageId());
   }
 
   public List<Message> getData() {

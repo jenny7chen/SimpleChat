@@ -6,7 +6,6 @@ import java.util.List;
 
 
 public interface ChatMvpView extends BasicMvpView {
-  public void updateData(List<Message> data, boolean isSingleMessage);
-  public void updatePendingData(List<Message> data, boolean isSingleMessage);
+  public void updateData(List<Message> data, boolean isSingleMessage, boolean isInsert);
   public void showSnackBar(String message);
 }

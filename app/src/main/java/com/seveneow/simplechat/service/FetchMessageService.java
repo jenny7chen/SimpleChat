@@ -40,40 +40,43 @@ public class FetchMessageService extends IntentService {
     //get new message list from database or server
     try {
       Thread.sleep(1000);
+      //test data onSuccess
+      ArrayList<Message> messageList = new ArrayList<Message>();
+      TextMessage text = new TextMessage();
+      text.setMessage("Things base and vile, holding no quantity, love can transpose to from and dignity: love looks not with the eyes, but with mind. (A Midsummer Night’s Dream 1.1)\n" +
+          "卑賤和劣行在愛情看來都不算數，都可以被轉化成美滿和莊嚴：愛情不用眼睛辨別，而是用心靈來判斷/愛用的不是眼睛，而是心。——《仲夏夜之夢》\n" +
+          "Lord, what fools these mortals be! (A Midsummer Night’s Dream 3.2)\n" +
+          "上帝呀，這些凡人怎麼都是十足的傻瓜！——《仲夏夜之夢》\n" +
+          "The lunatic, the lover and the poet are of imagination all compact. (A Midsummer Night’s Dream 5.1)\n" +
+          "瘋子、情人、詩人都是想像的產兒。——《仲夏夜之夢》");
+      text.setMessage("hello1");
+      text.setMessageTime(TimeParser.getCurrentTimeString());
+      text.setMessageId(text.getMessageTime());
+
+      Thread.sleep(10);
+      TextMessage text2 = new TextMessage();
+      text2.setMessage("Hello");
+      text2.setSenderId("haha");
+      text2.setMessageTime(TimeParser.getCurrentTimeString());
+      text2.setMessageId(text2.getMessageTime());
+      Thread.sleep(10);
+
+      StickerMessage sticker = new StickerMessage();
+      sticker.setMessageTime(TimeParser.getCurrentTimeString());
+      sticker.setMessageId(sticker.getMessageTime());
+      Thread.sleep(10);
+
+      messageList.add(text);
+      messageList.add(text2);
+      messageList.add(sticker);
+      messageList.add(getTestImageMessage());
+      messageList.add(getTestImageMessage());
+      RoomManager.getInstance().updateRoomMessages(roomId, messageList);
     }
     catch (InterruptedException e) {
 
     }
 
-    //test data onSuccess
-    ArrayList<Message> messageList = new ArrayList<Message>();
-    TextMessage text = new TextMessage();
-    text.setMessage("Things base and vile, holding no quantity, love can transpose to from and dignity: love looks not with the eyes, but with mind. (A Midsummer Night’s Dream 1.1)\n" +
-        "卑賤和劣行在愛情看來都不算數，都可以被轉化成美滿和莊嚴：愛情不用眼睛辨別，而是用心靈來判斷/愛用的不是眼睛，而是心。——《仲夏夜之夢》\n" +
-        "Lord, what fools these mortals be! (A Midsummer Night’s Dream 3.2)\n" +
-        "上帝呀，這些凡人怎麼都是十足的傻瓜！——《仲夏夜之夢》\n" +
-        "The lunatic, the lover and the poet are of imagination all compact. (A Midsummer Night’s Dream 5.1)\n" +
-        "瘋子、情人、詩人都是想像的產兒。——《仲夏夜之夢》");
-    text.setMessage("hello1");
-    text.setMessageTime(TimeParser.getCurrentTimeString());
-    text.setMessageId(text.getMessage() + text.getMessageTime());
-
-    TextMessage text2 = new TextMessage();
-    text2.setMessage("Hello");
-    text2.setSenderId("haha");
-    text2.setMessageTime(TimeParser.getCurrentTimeString());
-    text2.setMessageId(text2.getMessage() + text2.getMessageTime());
-
-    StickerMessage sticker = new StickerMessage();
-    sticker.setMessageTime(TimeParser.getCurrentTimeString());
-    sticker.setMessageId(sticker.getStickerId() + sticker.getMessageTime());
-
-    messageList.add(text);
-    messageList.add(text2);
-    messageList.add(sticker);
-    messageList.add(getTestImageMessage());
-    messageList.add(getTestImageMessage());
-    RoomManager.getInstance().updateRoomMessages(roomId, messageList);
   }
 
   private ImageMessage getTestImageMessage() {
@@ -86,7 +89,7 @@ public class FetchMessageService extends IntentService {
     ImageMessage image = new ImageMessage();
     image.setThumbnail(getImageUrl());
     image.setMessageTime(TimeParser.getCurrentTimeString());
-    image.setMessageId(image.getThumbnail() + image.getMessageTime());
+    image.setMessageId(image.getMessageTime());
     return image;
   }
 
