@@ -42,6 +42,7 @@ public class SendMessageService extends IntentService {
     String messageTempId = intent.getStringExtra(PARAM_MESSAGE_TEMP_ID);
     String messageTime = intent.getStringExtra(PARAM_MESSAGE_TIME);
     int messageType = intent.getIntExtra(PARAM_MESSAGE_TYPE, Message.TYPE_TEXT);
+    JsonObject sendObject = getSendObject(senderId, message, messageTempId, messageTime, messageType);
 
     SyncHttpClient client = new SyncHttpClient();
     client.setEnableRedirects(true);
@@ -52,22 +53,6 @@ public class SendMessageService extends IntentService {
     else {
       client.setLoggingEnabled(false);
     }
-
-    JsonObject jsonObject = new JsonObject();
-    jsonObject.addProperty("to", "/topics/123");
-    JsonObject messageObj = new JsonObject();
-    messageObj.addProperty("message", message);
-    messageObj.addProperty("message_type", messageType);
-    messageObj.addProperty("message_id", messageTime);
-    messageObj.addProperty("message_time", messageTime);
-    messageObj.addProperty("message_sender_id", "456");
-    messageObj.addProperty("message_temp_id", messageTempId);
-    JsonObject object = new JsonObject();
-    object.addProperty("message", messageObj.toString());
-    jsonObject.add("data", object);
-    jsonObject.addProperty("from", senderId);
-
-
     Header header = new BasicHeader("Authorization", "key=AAAAITet3RY:APA91bF1EOwJlTQ88tQCog4Z2ARSRc9aTR4JwNzGHn7Zt4zqkf097rICiWoTPK_nzneoTO4yb018grE2diFydA5BsR8TXIXoGH4H649MWGUJYlxLwS5x8sAdcvZnOkWbYvx477GvSspC");
     Header[] headers = {header};
     AsyncHttpResponseHandler responseHandler = new AsyncHttpResponseHandler() {
@@ -82,13 +67,11 @@ public class SendMessageService extends IntentService {
         Log.e("baaa", "onFailure statuscode = " + statusCode);
 
       }
-
     };
-
 
     StringEntity entity = null;
     try {
-      entity = new StringEntity(jsonObject.toString());
+      entity = new StringEntity(sendObject.toString());
     }
     catch (UnsupportedEncodingException e) {
       DebugLog.printStackTrace(e);
@@ -103,5 +86,22 @@ public class SendMessageService extends IntentService {
     intent.putExtra(SendMessageService.PARAM_MESSAGE_TEMP_ID, message.getPendingId());
     intent.putExtra(SendMessageService.PARAM_MESSAGE_TIME, message.getMessageTime());
     return intent;
+  }
+
+  public static JsonObject getSendObject(String senderId, String message, String messageTempId, String messageTime, int messageType) {
+    JsonObject jsonObject = new JsonObject();
+    jsonObject.addProperty("to", "/topics/123");
+    JsonObject messageObj = new JsonObject();
+    messageObj.addProperty("message", message);
+    messageObj.addProperty("message_type", messageType);
+    messageObj.addProperty("message_id", messageTime);
+    messageObj.addProperty("message_time", messageTime);
+    messageObj.addProperty("message_sender_id", "456");
+    messageObj.addProperty("message_temp_id", messageTempId);
+    JsonObject object = new JsonObject();
+    object.addProperty("message", messageObj.toString());
+    jsonObject.add("data", object);
+    jsonObject.addProperty("from", senderId);
+    return jsonObject;
   }
 }

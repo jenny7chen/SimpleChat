@@ -46,7 +46,7 @@ public class RoomManager {
     if (messages != null)
       room.setMessages(messages);
     RxEvent event = new RxEvent();
-    event.id = RxEvent.EVENT_ROOM_MESSAGES_UPDATE;
+    event.id = RxEvent.EVENT_ROOM_MESSAGES_UPDATED;
     event.object = roomId;
     RxEventBus.send(event);
   }
@@ -60,8 +60,6 @@ public class RoomManager {
       oldMessage.setPending(false);
       oldMessage.setPendingId("");
       oldMessage.setMessageTime(message.getMessageTime());
-
-      DebugLog.e("baaa", "update old pending message id = " + oldMessage.getMessageId());
     }
     else {
       oldMessage = room.getMessages().get(message.getMessageId());
@@ -71,8 +69,18 @@ public class RoomManager {
     }
 
     RxEvent event = new RxEvent();
-    event.id = RxEvent.EVENT_ROOM_MESSAGES_UPDATE;
+    event.id = RxEvent.EVENT_ROOM_MESSAGES_UPDATED;
     event.object = roomId;
+    RxEventBus.send(event);
+  }
+
+  public void addRoomSingleMessage(String roomId, Message message) {
+    Room room = getRoomById(roomId);
+    room.getMessages().put(message.getMessageId(), message);
+    RxEvent event = new RxEvent();
+    event.id = RxEvent.EVENT_ROOM_MESSAGES_ADDED;
+    event.params = new String[]{roomId};
+    event.object = message;
     RxEventBus.send(event);
   }
 

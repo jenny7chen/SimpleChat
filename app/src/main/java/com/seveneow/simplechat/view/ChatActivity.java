@@ -1,13 +1,17 @@
 package com.seveneow.simplechat.view;
 
 import android.app.ActivityManager;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 
 import com.hannesdorfmann.mosby.mvp.viewstate.ViewState;
 import com.seveneow.simplechat.R;
@@ -22,6 +26,7 @@ import java.util.List;
 
 
 public class ChatActivity extends BaseActivity<ChatMvpView, ChatPresenter> implements ChatMvpView {
+  private CoordinatorLayout snackBarLayout;
   private RecyclerView recyclerView;
   private ProgressBar progressBar;
   private MessageEditorView messageEditorView;
@@ -32,9 +37,21 @@ public class ChatActivity extends BaseActivity<ChatMvpView, ChatPresenter> imple
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_chat);
 
+    findViews();
+    initViews();
+    ActivityManager am = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+    int memoryClass = am.getMemoryClass();
+    //    Log.v("onCreate", "memoryClass:" + Integer.toString(memoryClass));
+  }
+
+  private void findViews() {
+    snackBarLayout = (CoordinatorLayout) findViewById(R.id.snackbar_layout);
     recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
     progressBar = (ProgressBar) findViewById(R.id.progressBar);
     messageEditorView = (MessageEditorView) findViewById(R.id.message_editor_view);
+  }
+
+  private void initViews() {
     LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, true);
     recyclerView.setLayoutManager(linearLayoutManager);
     DefaultItemAnimator animator = new DefaultItemAnimator();
@@ -45,12 +62,7 @@ public class ChatActivity extends BaseActivity<ChatMvpView, ChatPresenter> imple
     messageEditorView.setListener((message) -> {
       presenter.sendMessage(message);
     });
-
-    ActivityManager am = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
-    int memoryClass = am.getMemoryClass();
-    //    Log.v("onCreate", "memoryClass:" + Integer.toString(memoryClass));
   }
-
 
   @NonNull
   @Override
@@ -84,7 +96,14 @@ public class ChatActivity extends BaseActivity<ChatMvpView, ChatPresenter> imple
   public void updateData(List<Message> data, boolean isSingleMessage) {
     adapter.setData(data);
     if (isSingleMessage) {
+      boolean isAtBottom = ((LinearLayoutManager) recyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition() == 0;
       adapter.notifyItemInserted(0);
+      if (isAtBottom) {
+        ((LinearLayoutManager) recyclerView.getLayoutManager()).scrollToPositionWithOffset(0, 0);
+      }
+      else {
+        showSnackBar("您有新訊息");
+      }
     }
     else {
       adapter.notifyDataSetChanged();
@@ -94,7 +113,16 @@ public class ChatActivity extends BaseActivity<ChatMvpView, ChatPresenter> imple
   @Override
   public void updatePendingData(List<Message> data, boolean isSingleMessage) {
     updateData(data, isSingleMessage);
-    recyclerView.smoothScrollToPosition(0);
+    ((LinearLayoutManager) recyclerView.getLayoutManager()).scrollToPositionWithOffset(0, 0);
+  }
+
+  @Override
+  public void showSnackBar(String message) {
+    Snackbar snackbar = Snackbar
+        .make(snackBarLayout, message, Snackbar.LENGTH_INDEFINITE)
+        .setAction("檢視", (view) -> recyclerView.smoothScrollToPosition(0));
+    snackbar.getView().setBackgroundColor(Color.DKGRAY);
+    snackbar.show();
   }
 
   @Override

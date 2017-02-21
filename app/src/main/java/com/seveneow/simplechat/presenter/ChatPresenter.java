@@ -43,7 +43,7 @@ public class ChatPresenter extends BasePresenter<ChatMvpView> {
       //test use
       getView().startService(SendMessageService.class, SendMessageService.generateDataIntent((TextMessage) message));
 
-    }, 2);
+    }, 2); // set a delay for message sent
   }
 
   public void fetchMessages() {
@@ -58,24 +58,19 @@ public class ChatPresenter extends BasePresenter<ChatMvpView> {
     getView().startService(FetchMessageService.class, intent);
   }
 
-  public void onReceiveMessage(String notificationMessage) {
+  public void onMessagesAdded(String roomId, Message message) {
     if (!isViewAttached())
       return;
 
-    MessageParser parser = new MessageParser();
-    Message message = parser.parse(notificationMessage);
-
-    if (message.getSenderId().isEmpty()) {
-      RoomManager.getInstance().updateRoomSingleMessage(roomId, message);
+    if (!this.roomId.equals(roomId)) {
+      return;
     }
-    else {
-      messageList.add(0, message);
-      getView().updateData(messageList, true);
-      getView().showContent();
-    }
+    messageList.add(0, message);
+    getView().updateData(messageList, true);
+    getView().showContent();
   }
 
-  public void onUpdatedMessages(String roomId) {
+  public void onMessagesUpdated(String roomId) {
     if (!isViewAttached())
       return;
 
@@ -90,10 +85,31 @@ public class ChatPresenter extends BasePresenter<ChatMvpView> {
   @Override
   public void onEvent(RxEvent event) {
     if (event.id == RxEvent.EVENT_NOTIFICATION) {
-      onReceiveMessage((String) event.object);
+      onReceiveSocketMessage((String) event.object);
+    }
+    else if (event.id == RxEvent.EVENT_ROOM_MESSAGES_UPDATED) {
+      onMessagesUpdated((String) event.object);
     }
     else {
-      onUpdatedMessages((String) event.object);
+      onMessagesAdded((String) event.params[0], (Message) event.object);
+    }
+  }
+
+  public void onReceiveSocketMessage(String notificationMessage) {
+    if (!isViewAttached())
+      return;
+
+    MessageParser parser = new MessageParser();
+    Message message = parser.parse(notificationMessage);
+
+    if (message == null)
+      return;
+
+    if (message.getSenderId().isEmpty()) {
+      RoomManager.getInstance().updateRoomSingleMessage(roomId, message);
+    }
+    else {
+      RoomManager.getInstance().addRoomSingleMessage(roomId, message);
     }
   }
 }

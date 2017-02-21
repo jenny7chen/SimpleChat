@@ -17,6 +17,13 @@
             android:layout_height="match_parent"
             android:layout_above="@+id/message_editor_view"/>
 
+        <android.support.design.widget.CoordinatorLayout
+            android:id="@+id/snackbar_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/message_editor_view">
+        </android.support.design.widget.CoordinatorLayout>
+
         <com.seveneow.simplechat.view_custom.MessageEditorView
             android:id="@+id/message_editor_view"
             android:layout_width="match_parent"

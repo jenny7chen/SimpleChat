@@ -30,7 +30,7 @@ public class TimeParser {
 
 
   /**
-   * convert between date <-> String
+   * convert between date and String
    **/
 
   private static Date convertStrToDate(String dateString, String template) {
@@ -64,8 +64,8 @@ public class TimeParser {
   }
 
   public static String getCurrentTimeString(){
-    long machineUptimeMillis = SystemClock.elapsedRealtime() ;
-    return String.valueOf(machineUptimeMillis);
+    long timeMillis = System.currentTimeMillis();
+    return String.valueOf(timeMillis);
   }
 
 

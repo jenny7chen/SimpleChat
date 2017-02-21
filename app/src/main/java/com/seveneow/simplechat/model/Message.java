@@ -21,6 +21,7 @@ public class Message {
   private String senderId = "";
   private String receiverId = null;
   private String pendingId = null;
+  private String messageShowTime = "";
   private boolean isPending = false;
   private boolean isShowSender = false;
 
@@ -45,7 +46,11 @@ public class Message {
   }
 
   public String getMessageShowTime() {
-    return TimeParser.getTimeStr(Long.valueOf(messageTime), TimeFormat.CHAT_TIME_FORMAT);
+    if (messageShowTime != null && !messageShowTime.isEmpty())
+      return messageShowTime;
+
+    messageShowTime = TimeParser.getTimeStr(Long.valueOf(messageTime), TimeFormat.CHAT_TIME_FORMAT);
+    return messageShowTime;
   }
 
   public void setMessageTime(String messageTime) {
