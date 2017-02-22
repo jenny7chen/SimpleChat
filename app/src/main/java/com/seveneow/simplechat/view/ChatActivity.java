@@ -102,15 +102,15 @@ public class ChatActivity extends BaseActivity<ChatMvpView, ChatPresenter> imple
         adapter.notifyItemInserted(0);
         if (isAtBottom || updatedData.get(0).isFromMe())
           ((LinearLayoutManager) recyclerView.getLayoutManager()).scrollToPositionWithOffset(0, 0);
+        else if (!updatedData.get(0).isFromMe()) {
+          showSnackBar(getString(R.string.snack_got_new_message));
+        }
 
       }
       else {
         adapter.notifyItemRangeChanged(0, adapter.getItemCount(), updatedData.get(0));
         if (isAtBottom) {
           ((LinearLayoutManager) recyclerView.getLayoutManager()).scrollToPositionWithOffset(0, 0);
-        }
-        else if (!updatedData.get(0).isFromMe()) {
-          showSnackBar(getString(R.string.snack_got_new_message));
         }
       }
     }
