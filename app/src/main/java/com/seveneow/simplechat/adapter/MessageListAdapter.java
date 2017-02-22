@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.support.v7.widget.RecyclerView;
-import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -18,6 +17,9 @@ import java.util.List;
 
 
 public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.Holder> {
+  private static final int MESSAGE_FROM_ME = 0;
+  private static final int MESSAGE_FROM_OTHERS = 1;
+
   private List<Message> data = null;
   private Context context;
 
@@ -40,9 +42,25 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
   public Holder onCreateViewHolder(ViewGroup parent, int viewType) {
     ViewGroup.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
     View view;
-    view = new MessageView(context, viewType == 0);
+    view = new MessageView(context, viewType == MESSAGE_FROM_ME);
     view.setLayoutParams(params);
     return new Holder(view);
+  }
+
+  @Override
+  public void onBindViewHolder(Holder holder, int position, List<Object> payloads) {
+    if (payloads.isEmpty()) {
+      // payloads is empty, update the whole ViewHolder
+      onBindViewHolder(holder, position);
+    }
+    else {
+      //TODO: add partial update here
+      // when payloads is not empty, update view
+      Message message = (Message) payloads.get(0);
+      if (message.getMessageId().equals(holder.message.getMessageId())) {
+        onBindViewHolder(holder, position);
+      }
+    }
   }
 
   @Override
@@ -63,7 +81,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
 
   @Override
   public int getItemViewType(int position) {
-    return data.get(position).isMe() ? 0 : 1;
+    return data.get(position).isFromMe() ? MESSAGE_FROM_ME : MESSAGE_FROM_OTHERS;
   }
 
   @Override

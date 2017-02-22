@@ -14,9 +14,12 @@ import com.seveneow.simplechat.utils.MessageGenerator;
 import com.seveneow.simplechat.utils.MessageParser;
 import com.seveneow.simplechat.utils.RoomManager;
 import com.seveneow.simplechat.utils.RxEvent;
+import com.seveneow.simplechat.utils.TimeParser;
 import com.seveneow.simplechat.view_interface.ChatMvpView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class ChatPresenter extends BasePresenter<ChatMvpView> {
   ArrayList<Message> messageList = new ArrayList<>();
@@ -34,10 +37,6 @@ public class ChatPresenter extends BasePresenter<ChatMvpView> {
     handler.postDelayed(() -> {
       Message message = MessageGenerator.getPendingTextMessage(messageText);
       RoomManager.getInstance().addPendingMessage(roomId, message);
-      messageList.add(0, message);
-      getView().updateData(messageList, true, true);
-      getView().showContent();
-
 
       //send message
       //TODO:bind service of sending message
@@ -67,6 +66,7 @@ public class ChatPresenter extends BasePresenter<ChatMvpView> {
     if (!this.roomId.equals(roomId)) {
       return;
     }
+
     messageList.add(0, message);
     getView().updateData(messageList, true, true);
     getView().showContent();
@@ -83,15 +83,11 @@ public class ChatPresenter extends BasePresenter<ChatMvpView> {
     this.messageList = RoomManager.getInstance().getRoomById(roomId).getShowMessages();
 
     if (isWholeListUpdate) {
-      DebugLog.e("baaa", "whole list");
       getView().updateData(messageList, false, false);
-      for (Message message : messageList) {
-        DebugLog.e("baa", "message = " + message.getMessageId());
-      }
     }
     else {
-      DebugLog.e("baaa", "single message");
-      getView().updateData(messageList, true, false);
+      List<Message> updatedMessages = Arrays.asList(messages);
+      getView().updateData(updatedMessages, true, false);
     }
 
     getView().showContent();
@@ -128,6 +124,10 @@ public class ChatPresenter extends BasePresenter<ChatMvpView> {
       RoomManager.getInstance().updateRoomSingleMessage(roomId, message);
     }
     else {
+      //TODO: test use remove this later
+      message.setMessageTime(TimeParser.getCurrentTimeString());
+      message.setMessageId(message.getMessageTime());
+
       RoomManager.getInstance().addRoomSingleMessage(roomId, message);
     }
   }

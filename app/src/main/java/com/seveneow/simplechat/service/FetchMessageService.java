@@ -5,6 +5,7 @@ import android.content.Intent;
 
 import com.seveneow.simplechat.model.ImageMessage;
 import com.seveneow.simplechat.model.Message;
+import com.seveneow.simplechat.model.Room;
 import com.seveneow.simplechat.model.StickerMessage;
 import com.seveneow.simplechat.model.TextMessage;
 import com.seveneow.simplechat.utils.DebugLog;
@@ -28,8 +29,11 @@ public class FetchMessageService extends IntentService {
   protected void onHandleIntent(Intent intent) {
     //do queries here
     String roomId = intent.getStringExtra(PARAM_ROOM_ID);
+    Room room = RoomManager.getInstance().getRoomById(roomId);
+    if (room == null)
+      return;
 
-    if (RoomManager.getInstance().getRoomById(roomId).getMessages().size() > 0) {
+    if (room.getMessages().size() > 0) {
       RxEvent event = new RxEvent();
       event.id = RxEvent.EVENT_ROOM_MESSAGES_UPDATED;
       event.object = roomId;
@@ -39,7 +43,7 @@ public class FetchMessageService extends IntentService {
 
     //get new message list from database or server
     try {
-      Thread.sleep(1000);
+      Thread.sleep(800);
       //test data onSuccess
       ArrayList<Message> messageList = new ArrayList<Message>();
       TextMessage text = new TextMessage();

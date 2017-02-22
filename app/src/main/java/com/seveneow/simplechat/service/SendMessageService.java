@@ -58,14 +58,12 @@ public class SendMessageService extends IntentService {
     AsyncHttpResponseHandler responseHandler = new AsyncHttpResponseHandler() {
       @Override
       public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-        Log.e("baaa", "meesga send");
-
+        //callback of message sent
       }
 
       @Override
       public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-        Log.e("baaa", "onFailure statuscode = " + statusCode);
-
+        Log.e("baaa", "onFailure status code = " + statusCode);
       }
     };
 

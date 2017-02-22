@@ -73,7 +73,7 @@ public class Message {
     this.receiverId = receiverId;
   }
 
-  public boolean isMe() {
+  public boolean isFromMe() {
     return senderId == null || senderId.isEmpty();
   }
 

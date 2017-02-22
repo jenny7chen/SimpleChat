@@ -28,6 +28,11 @@ public class RoomManager {
 
 
   public Room getRoomById(String roomId) {
+
+    //TODO: remove later
+    if (roomMap.get(roomId) == null)
+      addTestData();
+
     return roomMap.get(roomId);
   }
 
@@ -39,6 +44,11 @@ public class RoomManager {
   public void addPendingMessage(String roomId, Message message) {
     Room room = getRoomById(roomId);
     room.getMessages().put(message.getPendingId(), message);
+    RxEvent event = new RxEvent();
+    event.id = RxEvent.EVENT_ROOM_MESSAGES_ADDED;
+    event.params = new String[]{roomId};
+    event.object = message;
+    RxEventBus.send(event);
   }
 
   public void updateRoomMessages(String roomId, ArrayList<Message> messages) {

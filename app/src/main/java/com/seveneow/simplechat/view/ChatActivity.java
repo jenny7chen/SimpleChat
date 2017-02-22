@@ -94,25 +94,29 @@ public class ChatActivity extends BaseActivity<ChatMvpView, ChatPresenter> imple
 
   @Override
   //combine the two TODO: move some logic to presenter
-  public void updateData(List<Message> data, boolean isSingleMessage, boolean isInsert) {
-    if (adapter.getData() == null)
-      adapter.setData(data);
+  public synchronized void updateData(List<Message> updatedData, boolean isSingleMessage, boolean isInsert) {
     if (isSingleMessage) {
       boolean isAtBottom = ((LinearLayoutManager) recyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition() == 0;
 
-      if (isInsert)
+      if (isInsert) {
         adapter.notifyItemInserted(0);
-      else
-        adapter.notifyItemChanged(0);
+        if (isAtBottom || updatedData.get(0).isFromMe())
+          ((LinearLayoutManager) recyclerView.getLayoutManager()).scrollToPositionWithOffset(0, 0);
 
-      if (isAtBottom) {
-        ((LinearLayoutManager) recyclerView.getLayoutManager()).scrollToPositionWithOffset(0, 0);
       }
-      else if (!data.get(0).isMe()) {
-        showSnackBar("您有新訊息");
+      else {
+        adapter.notifyItemRangeChanged(0, adapter.getItemCount(), updatedData.get(0));
+        if (isAtBottom) {
+          ((LinearLayoutManager) recyclerView.getLayoutManager()).scrollToPositionWithOffset(0, 0);
+        }
+        else if (!updatedData.get(0).isFromMe()) {
+          showSnackBar(getString(R.string.snack_got_new_message));
+        }
       }
     }
     else {
+      if (adapter.getData() == null)
+        adapter.setData(updatedData);
       adapter.notifyDataSetChanged();
     }
   }
@@ -121,7 +125,7 @@ public class ChatActivity extends BaseActivity<ChatMvpView, ChatPresenter> imple
   public void showSnackBar(String message) {
     Snackbar snackbar = Snackbar
         .make(snackBarLayout, message, Snackbar.LENGTH_INDEFINITE)
-        .setAction("檢視", (view) -> recyclerView.smoothScrollToPosition(0));
+        .setAction(getString(R.string.snack_check_got_message), (view) -> recyclerView.smoothScrollToPosition(0));
     snackbar.getView().setBackgroundColor(Color.DKGRAY);
     snackbar.show();
   }

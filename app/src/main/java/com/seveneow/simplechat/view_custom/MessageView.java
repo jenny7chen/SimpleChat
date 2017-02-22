@@ -33,6 +33,12 @@ public class MessageView extends RelativeLayout {
   public void setMessage(Message message) {
     this.message = message;
     setRootView();
+    if (message.isFromMe()) {
+      setMessageFromMeView();
+    }
+    else {
+      setMessageFromOthersView();
+    }
     setTypeView();
   }
 
@@ -43,19 +49,19 @@ public class MessageView extends RelativeLayout {
   }
 
   private void setViewWithAlignment(boolean isMe) {
-    findViewById(R.id.message_left_time).setVisibility(GONE);
-    findViewById(R.id.message_right_time).setVisibility(GONE);
+    findViewById(R.id.message_sent_time).setVisibility(GONE);
+    findViewById(R.id.message_got_time).setVisibility(GONE);
     findViewById(R.id.avatar).setVisibility(GONE);
     findViewById(R.id.message_sender).setVisibility(GONE);
 
     if (isMe) {
       setGravity(Gravity.END);
-      findViewById(R.id.message_left_time).setVisibility(VISIBLE);
+      findViewById(R.id.message_sent_time).setVisibility(VISIBLE);
       findViewById(R.id.message_view_container).setBackgroundColor(Color.parseColor("#f2f2f2"));
     }
     else {
       setGravity(Gravity.START);
-      findViewById(R.id.message_right_time).setVisibility(VISIBLE);
+      findViewById(R.id.message_got_time).setVisibility(VISIBLE);
       findViewById(R.id.avatar).setVisibility(VISIBLE);
       findViewById(R.id.message_sender).setVisibility(VISIBLE);
       findViewById(R.id.message_view_container).setBackgroundColor(Color.parseColor("#8ca3e1"));
@@ -66,11 +72,16 @@ public class MessageView extends RelativeLayout {
     TextView senderView = (TextView) findViewById(R.id.message_sender);
     senderView.setText(message.getSenderId());
     senderView.setVisibility(message.isShowSender() ? VISIBLE : GONE);
+  }
 
-    TextView leftTimeView = (TextView) findViewById(R.id.message_left_time);
-    TextView rightTimeView = (TextView) findViewById(R.id.message_right_time);
-    leftTimeView.setText(message.getMessageShowTime());
-    rightTimeView.setText(message.getMessageShowTime());
+  private void setMessageFromMeView() {
+    TextView sentMessageTimeView = (TextView) findViewById(R.id.message_sent_time);
+    sentMessageTimeView.setText(message.getMessageShowTime());
+  }
+
+  private void setMessageFromOthersView() {
+    TextView gotMessageTimeView = (TextView) findViewById(R.id.message_got_time);
+    gotMessageTimeView.setText(message.getMessageShowTime());
 
     CircleImageView circleImageView = (CircleImageView) findViewById(R.id.avatar);
     ImageLoader.getInstance().displayImage(UserManager.getInstance().getUserPhoto(message.getSenderId()), circleImageView, Static.defaultDisplayImageOptions(R.mipmap.ic_launcher, true));
@@ -89,7 +100,7 @@ public class MessageView extends RelativeLayout {
       if (message.isPending()) {
         textView.setTextColor(Color.RED);
       }
-      else if (message.isMe()) {
+      else if (message.isFromMe()) {
         textView.setTextColor(Color.BLACK);
       }
       else {
