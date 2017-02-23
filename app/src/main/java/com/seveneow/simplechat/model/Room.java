@@ -60,4 +60,65 @@ public class Room {
     return roomList;
   }
 
+
+  public int getType() {
+    return type;
+  }
+
+  public void setType(int type) {
+    this.type = type;
+  }
+
+  public String getId() {
+    return id;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+  public String getPhoto() {
+    return photo;
+  }
+
+  public void setPhoto(String photo) {
+    this.photo = photo;
+  }
+
+  public String getPhotoMd5() {
+    return photoMd5;
+  }
+
+  public void setPhotoMd5(String photoMd5) {
+    this.photoMd5 = photoMd5;
+  }
+
+  public ArrayList<String> getMemberIds() {
+    return memberIds;
+  }
+
+  public void setMemberIds(ArrayList<String> memberIds) {
+    this.memberIds = memberIds;
+  }
+
+  public void setMessages(ConcurrentHashMap<String, Message> messages) {
+    this.messages = messages;
+  }
+
+  public void setShowMessages(ArrayList<Message> showMessages) {
+    this.showMessages = showMessages;
+  }
+
 }

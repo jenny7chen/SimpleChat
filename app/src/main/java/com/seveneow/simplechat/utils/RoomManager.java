@@ -23,6 +23,7 @@ public class RoomManager {
   public void addTestData() {
     Room room = new Room();
     room.setId("123");
+    room.setName("金城武");
     roomMap.put("123", room);
   }
 

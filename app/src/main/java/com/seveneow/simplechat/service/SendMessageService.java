@@ -96,7 +96,7 @@ public class SendMessageService extends IntentService {
       encodedString = URLEncoder.encode(message, "UTF-8");
     }
     catch (UnsupportedEncodingException e) {
-      e.printStackTrace();
+      DebugLog.printStackTrace(e);
     }
     messageObj.addProperty("message", encodedString);
     messageObj.addProperty("message_type", messageType);

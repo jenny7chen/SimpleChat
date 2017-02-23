@@ -3,21 +3,18 @@ package com.seveneow.simplechat.utils;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.PersistableBundle;
-import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
-import com.hannesdorfmann.mosby.mvp.MvpPresenter;
 import com.hannesdorfmann.mosby.mvp.MvpView;
 import com.hannesdorfmann.mosby.mvp.viewstate.MvpViewStateActivity;
-import com.seveneow.simplechat.view_interface.BasicMvpView;
+import com.seveneow.simplechat.view_interface.BasicListMvpView;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 
 
 public abstract class BaseActivity<V extends MvpView, P extends BasePresenter<V>>
-    extends MvpViewStateActivity<V, P> implements BasicMvpView {
+    extends MvpViewStateActivity<V, P> implements BasicListMvpView {
 
 
   @Override

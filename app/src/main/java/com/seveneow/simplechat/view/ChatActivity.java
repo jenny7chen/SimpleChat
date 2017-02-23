@@ -15,7 +15,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 
-import com.google.gson.JsonObject;
 import com.hannesdorfmann.mosby.mvp.viewstate.ViewState;
 import com.seveneow.simplechat.R;
 import com.seveneow.simplechat.adapter.MessageListAdapter;
@@ -24,19 +23,16 @@ import com.seveneow.simplechat.model.TextMessage;
 import com.seveneow.simplechat.presenter.ChatPresenter;
 import com.seveneow.simplechat.service.SendMessageService;
 import com.seveneow.simplechat.utils.BaseActivity;
-import com.seveneow.simplechat.utils.DebugLog;
 import com.seveneow.simplechat.utils.MessageGenerator;
-import com.seveneow.simplechat.utils.RxEvent;
-import com.seveneow.simplechat.utils.RxEventBus;
-import com.seveneow.simplechat.utils.TimeParser;
 import com.seveneow.simplechat.view_custom.MessageEditorView;
-import com.seveneow.simplechat.view_interface.ChatMvpView;
+import com.seveneow.simplechat.view_interface.BasicListMvpView;
+import com.seveneow.simplechat.view_interface.ChatListMvpView;
 
 import java.util.List;
 import java.util.Random;
 
 
-public class ChatActivity extends BaseActivity<ChatMvpView, ChatPresenter> implements ChatMvpView {
+public class ChatActivity extends BaseActivity<ChatListMvpView, ChatPresenter> implements ChatListMvpView {
   private CoordinatorLayout snackBarLayout;
   private RecyclerView recyclerView;
   private ProgressBar progressBar;
@@ -76,6 +72,18 @@ public class ChatActivity extends BaseActivity<ChatMvpView, ChatPresenter> imple
     });
   }
 
+  @Override
+  public void onNewViewStateInstance() {
+    presenter.setRoomData(getIntent());
+    loadData();
+    //entering at the first time
+  }
+
+  @Override
+  public void setTitle(String titleText) {
+    getSupportActionBar().setTitle(titleText);
+  }
+
   @NonNull
   @Override
   public ChatPresenter createPresenter() {
@@ -105,37 +113,35 @@ public class ChatActivity extends BaseActivity<ChatMvpView, ChatPresenter> imple
   }
 
   @Override
-  public synchronized void updateData(List<Message> updatedData, boolean isSingleMessage, boolean isInsert) {
-    if (isSingleMessage) {
-      boolean isAtBottom = ((LinearLayoutManager) recyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition() == 0;
+  public void notifyChanged(int type, Object... params) {
+    if (adapter == null)
+      return;
 
-      if (isInsert) {
-        adapter.notifyItemInserted(0);
-        if (isAtBottom || updatedData.get(0).isFromMe())
-          ((LinearLayoutManager) recyclerView.getLayoutManager()).scrollToPositionWithOffset(0, 0);
-        else if (!updatedData.get(0).isFromMe()) {
-          showSnackBar(getString(R.string.snack_got_new_message));
-        }
-
-      }
-      else {
-        adapter.notifyItemRangeChanged(0, adapter.getItemCount(), updatedData.get(0));
-        if (isAtBottom) {
-          ((LinearLayoutManager) recyclerView.getLayoutManager()).scrollToPositionWithOffset(0, 0);
-        }
-      }
-    }
-    else {
-      if (adapter.getData() == null)
-        adapter.setData(updatedData);
+    if (type == BasicListMvpView.NOTIFY_ALL_DATA_CHANGED) {
       adapter.notifyDataSetChanged();
+    }
+    else if (type == BasicListMvpView.NOTIFY_DATA_INSERT) {
+      adapter.notifyItemInserted((int) params[0]);
+    }
+    else if (type == BasicListMvpView.NOTIFY_DATA_RANGE_CHANGED) {
+      adapter.notifyItemRangeChanged((int) params[0], (int) params[1], params[2]);
     }
   }
 
   @Override
-  public void showSnackBar(String message) {
+  public boolean listIsAtBottom() {
+    return ((LinearLayoutManager) recyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition() == 0;
+  }
+
+  @Override
+  public void scrollToBottom() {
+    ((LinearLayoutManager) recyclerView.getLayoutManager()).scrollToPositionWithOffset(0, 0);
+  }
+
+  @Override
+  public void showSnackBar(int messageId) {
     Snackbar snackbar = Snackbar
-        .make(snackBarLayout, message, Snackbar.LENGTH_INDEFINITE)
+        .make(snackBarLayout, getString(messageId), Snackbar.LENGTH_INDEFINITE)
         .setAction(getString(R.string.snack_check_got_message), (view) -> recyclerView.smoothScrollToPosition(0));
     snackbar.getView().setBackgroundColor(Color.DKGRAY);
     snackbar.show();
@@ -144,6 +150,19 @@ public class ChatActivity extends BaseActivity<ChatMvpView, ChatPresenter> imple
   @Override
   public List<Message> getData() {
     return adapter == null ? null : adapter.getData();
+  }
+
+  @Override
+  public int getItemCount() {
+    if (adapter == null)
+      return 0;
+    return adapter.getItemCount();
+  }
+
+  @Override
+  public void setDataToList(List<Message> messages) {
+    if (adapter != null)
+      adapter.setData(messages);
   }
 
   @Override
@@ -156,14 +175,7 @@ public class ChatActivity extends BaseActivity<ChatMvpView, ChatPresenter> imple
     return new ChatViewState();
   }
 
-  @Override
-  public void onNewViewStateInstance() {
-    presenter.setRoomData(getIntent());
-    loadData();
-    //entering at the first time
-  }
-
-  public class ChatViewState implements ViewState<ChatMvpView> {
+  public class ChatViewState implements ViewState<ChatListMvpView> {
     final int STATE_SHOW_CONTENT = 0;
     final int STATE_SHOW_LOADING = 1;
     final int STATE_SHOW_ERROR = 2;
@@ -180,7 +192,7 @@ public class ChatActivity extends BaseActivity<ChatMvpView, ChatPresenter> imple
      * We do that by calling the methods from the View interface (like the presenter does)
      */
     @Override
-    public void apply(ChatMvpView view, boolean retained) {
+    public void apply(ChatListMvpView view, boolean retained) {
 
       switch (state) {
       case STATE_SHOW_LOADING:
@@ -192,7 +204,7 @@ public class ChatActivity extends BaseActivity<ChatMvpView, ChatPresenter> imple
         break;
 
       case STATE_SHOW_CONTENT:
-        view.updateData(messageList, false, false);
+        presenter.updateData(messageList, false, false);
         view.showContent();
         break;
       }
