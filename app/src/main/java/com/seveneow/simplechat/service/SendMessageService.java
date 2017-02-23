@@ -13,6 +13,7 @@ import com.seveneow.simplechat.model.TextMessage;
 import com.seveneow.simplechat.utils.DebugLog;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 import cz.msebera.android.httpclient.Header;
 import cz.msebera.android.httpclient.entity.StringEntity;
@@ -77,9 +78,9 @@ public class SendMessageService extends IntentService {
     client.post(this, "https://fcm.googleapis.com/fcm/send", headers, entity, "application/json", responseHandler);
   }
 
-  public static Intent generateDataIntent(TextMessage message) {
+  public static Intent generateDataIntent(String senderId, TextMessage message) {
     Intent intent = new Intent();
-    intent.putExtra(SendMessageService.PARAM_SENDER_ID, "456");
+    intent.putExtra(SendMessageService.PARAM_SENDER_ID, senderId);
     intent.putExtra(SendMessageService.PARAM_MESSAGE, message.getMessage());
     intent.putExtra(SendMessageService.PARAM_MESSAGE_TEMP_ID, message.getPendingId());
     intent.putExtra(SendMessageService.PARAM_MESSAGE_TIME, message.getMessageTime());
@@ -90,16 +91,22 @@ public class SendMessageService extends IntentService {
     JsonObject jsonObject = new JsonObject();
     jsonObject.addProperty("to", "/topics/123");
     JsonObject messageObj = new JsonObject();
-    messageObj.addProperty("message", message);
+    String encodedString = message;
+    try {
+      encodedString = URLEncoder.encode(message, "UTF-8");
+    }
+    catch (UnsupportedEncodingException e) {
+      e.printStackTrace();
+    }
+    messageObj.addProperty("message", encodedString);
     messageObj.addProperty("message_type", messageType);
     messageObj.addProperty("message_id", messageTime);
     messageObj.addProperty("message_time", messageTime);
-    messageObj.addProperty("message_sender_id", "456");
+    messageObj.addProperty("message_sender_id", senderId);
     messageObj.addProperty("message_temp_id", messageTempId);
     JsonObject object = new JsonObject();
-    object.addProperty("message", messageObj.toString());
+    object.add("message", messageObj);
     jsonObject.add("data", object);
-    jsonObject.addProperty("from", senderId);
     return jsonObject;
   }
 }

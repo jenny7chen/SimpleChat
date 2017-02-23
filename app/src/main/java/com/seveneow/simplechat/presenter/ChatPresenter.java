@@ -42,7 +42,7 @@ public class ChatPresenter extends BasePresenter<ChatMvpView> {
       //TODO:bind service of sending message
 
       //test use
-      getView().startService(SendMessageService.class, SendMessageService.generateDataIntent((TextMessage) message));
+      getView().startService(SendMessageService.class, SendMessageService.generateDataIntent("456", (TextMessage) message));
 
     }, 2); // set a delay for message sent
   }

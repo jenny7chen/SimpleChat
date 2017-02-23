@@ -42,6 +42,8 @@ public class RoomManager {
   }
 
   public void addPendingMessage(String roomId, Message message) {
+    if (message == null)
+      return;
     Room room = getRoomById(roomId);
     room.getMessages().put(message.getPendingId(), message);
     RxEvent event = new RxEvent();

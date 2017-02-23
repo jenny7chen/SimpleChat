@@ -9,6 +9,10 @@ import com.seveneow.simplechat.model.Message;
 import com.seveneow.simplechat.model.StickerMessage;
 import com.seveneow.simplechat.model.TextMessage;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+
 /**
  * Parse Json string to Message object
  */
@@ -33,7 +37,14 @@ public class MessageParser {
     }
     if (messageType == Message.TYPE_TEXT) {
       TextMessage message = new TextMessage();
-      message.setMessage(messageObject.get("message").getAsString());
+      String messageText = messageObject.get("message").getAsString();
+      try {
+        messageText = URLDecoder.decode(messageText, "UTF-8");
+      }
+      catch (UnsupportedEncodingException e) {
+        DebugLog.printStackTrace(e);
+      }
+      message.setMessage(messageText);
       message.setMessageId(messageObject.get("message_id").getAsString());
       message.setMessageTime(messageObject.get("message_time").getAsString());
       message.setPendingId(messageObject.get("message_temp_id").getAsString());
