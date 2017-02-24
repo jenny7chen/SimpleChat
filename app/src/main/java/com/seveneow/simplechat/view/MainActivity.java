@@ -11,11 +11,11 @@ import com.seveneow.simplechat.R;
 import com.seveneow.simplechat.model.Message;
 import com.seveneow.simplechat.presenter.MainPresenter;
 import com.seveneow.simplechat.utils.BaseActivity;
-import com.seveneow.simplechat.view_interface.BasicListMvpView;
+import com.seveneow.simplechat.view_interface.BasicMvpView;
 
 import java.util.List;
 
-public class MainActivity extends BaseActivity<BasicListMvpView, MainPresenter> implements BasicListMvpView {
+public class MainActivity extends BaseActivity<BasicMvpView, MainPresenter> implements BasicMvpView {
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -73,7 +73,7 @@ public class MainActivity extends BaseActivity<BasicListMvpView, MainPresenter> 
     return null;
   }
 
-  public class MainViewState implements ViewState<BasicListMvpView> {
+  public class MainViewState implements ViewState<BasicMvpView> {
     final int STATE_SHOW_CONTENT = 0;
 
     /**
@@ -81,7 +81,7 @@ public class MainActivity extends BaseActivity<BasicListMvpView, MainPresenter> 
      * We do that by calling the methods from the View interface (like the presenter does)
      */
     @Override
-    public void apply(BasicListMvpView view, boolean retained) {
+    public void apply(BasicMvpView view, boolean retained) {
 
     }
   }

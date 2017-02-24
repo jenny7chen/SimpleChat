@@ -38,6 +38,10 @@
             android:name=".service.SendMessageService"
             android:enabled="true"/>
 
+        <service
+            android:name=".service.SaveDBRequestService"
+            android:enabled="true"/>
+
     </application>
 
 </manifest>

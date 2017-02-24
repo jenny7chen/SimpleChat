@@ -11,6 +11,8 @@ public class IMFirebaseMessagingService extends FirebaseMessagingService {
   @Override
   public void onMessageReceived(RemoteMessage remoteMessage) {
     super.onMessageReceived(remoteMessage);
+    DebugLog.e("baaa", "receive message = " + remoteMessage.toString());
+
     // Check if message contains a data payload.
     if (remoteMessage.getData().get("message") != null) {
       DebugLog.e("baaa", "receive message = " + remoteMessage.getData().get("message"));

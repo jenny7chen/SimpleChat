@@ -9,12 +9,13 @@ import android.view.inputmethod.InputMethodManager;
 import com.hannesdorfmann.mosby.mvp.MvpView;
 import com.hannesdorfmann.mosby.mvp.viewstate.MvpViewStateActivity;
 import com.seveneow.simplechat.view_interface.BasicListMvpView;
+import com.seveneow.simplechat.view_interface.BasicMvpView;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 
 
 public abstract class BaseActivity<V extends MvpView, P extends BasePresenter<V>>
-    extends MvpViewStateActivity<V, P> implements BasicListMvpView {
+    extends MvpViewStateActivity<V, P> implements BasicMvpView {
 
 
   @Override

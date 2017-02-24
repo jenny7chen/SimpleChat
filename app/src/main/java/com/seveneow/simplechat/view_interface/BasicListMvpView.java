@@ -8,22 +8,10 @@ import com.seveneow.simplechat.model.Message;
 import java.util.List;
 
 
-public interface BasicListMvpView extends MvpView {
+public interface BasicListMvpView extends BasicMvpView {
   int NOTIFY_ALL_DATA_CHANGED = 0;
   int NOTIFY_DATA_INSERT = 1;
   int NOTIFY_DATA_RANGE_CHANGED = 2;
-
-  public void showLoading();
-
-  public void showContent();
-
-  public void showError();
-
-  public void loadData();
-
-  public List<Message> getData();
-
-  public void startService(Class serviceClass, Intent intent);
 
   public boolean listIsAtBottom();
 
