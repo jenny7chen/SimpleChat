@@ -37,7 +37,7 @@ public class MessageEditorView extends RelativeLayout {
   }
 
   private void initListeners() {
-    RelativeLayout sendButton = (RelativeLayout) findViewById(R.id.send_buton);
+    RelativeLayout sendButton = (RelativeLayout) findViewById(R.id.send_button);
     EditText editText = (EditText) findViewById(R.id.editor_text);
     sendButton.setOnClickListener((view) -> {
       if (listener != null) {
@@ -65,7 +65,7 @@ public class MessageEditorView extends RelativeLayout {
   //  }
 
   public void setSendButtonColor(int color) {
-    RelativeLayout sendButton = (RelativeLayout) findViewById(R.id.send_buton);
+    RelativeLayout sendButton = (RelativeLayout) findViewById(R.id.send_button);
     sendButton.setBackgroundColor(color);
   }
 
