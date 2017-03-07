@@ -1,9 +1,13 @@
 package com.seveneow.simplechat.model;
 
+import android.support.annotation.CallSuper;
+
 import com.seveneow.simplechat.utils.TimeFormat;
 import com.seveneow.simplechat.utils.TimeParser;
 
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by jennychen on 2017/1/24.
@@ -22,8 +26,12 @@ public class Message {
   private String receiverId = null;
   private String pendingId = null;
   private String messageShowTime = "";
+  private String roomId = null;
   private boolean isPending = false;
   private boolean isShowSender = false;
+
+  public Message() {
+  }
 
   public Message(int type) {
     this.type = type;
@@ -39,6 +47,14 @@ public class Message {
 
   public void setMessageId(String messageId) {
     this.messageId = messageId;
+  }
+
+  public String getRoomId() {
+    return roomId;
+  }
+
+  public void setRoomId(String roomId) {
+    this.roomId = roomId;
   }
 
   public String getMessageTime() {
@@ -106,5 +122,19 @@ public class Message {
     public int compare(Message o1, Message o2) {
       return o2.getMessageTime().compareTo(o1.getMessageTime());
     }
+  }
+
+  @CallSuper
+  public Map<String, Object> toMap() {
+    HashMap<String, Object> result = new HashMap<>();
+    result.put("type", type);
+    result.put("messageId", messageId);
+    result.put("messageTime", messageTime);
+    result.put("senderId", receiverId);
+    result.put("pendingId", pendingId);
+    result.put("isPending", isPending);
+    result.put("isShowSender", isShowSender);
+    result.put("roomId", roomId);
+    return result;
   }
 }

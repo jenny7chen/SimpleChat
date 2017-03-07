@@ -16,6 +16,7 @@ import com.seveneow.simplechat.utils.MessageParser;
 import com.seveneow.simplechat.utils.RoomManager;
 import com.seveneow.simplechat.utils.RxEvent;
 import com.seveneow.simplechat.utils.TimeParser;
+import com.seveneow.simplechat.view_interface.BasicListMvpView;
 import com.seveneow.simplechat.view_interface.ChatListMvpView;
 
 import java.util.ArrayList;
@@ -30,6 +31,18 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
     roomId = intent.getStringExtra("roomId");
     Room room = RoomManager.getInstance().getRoomById(roomId);
     getView().setTitle(room.getName());
+  }
+
+  public void fetchMessages() {
+    if (!isViewAttached())
+      return;
+
+    getView().showLoading();
+    //get data here using asynchttp lib
+
+    Intent intent = new Intent();
+    intent.putExtra(FetchMessageService.PARAM_ROOM_ID, roomId);
+    getView().startService(FetchMessageService.class, intent);
   }
 
   public void sendMessage(String messageText) {
@@ -48,18 +61,6 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
       getView().startService(SendMessageService.class, SendMessageService.generateDataIntent("456", (TextMessage) message));
 
     }, 2); // set a delay for message sent
-  }
-
-  public void fetchMessages() {
-    if (!isViewAttached())
-      return;
-
-    getView().showLoading();
-    //get data here using asynchttp lib
-
-    Intent intent = new Intent();
-    intent.putExtra(FetchMessageService.PARAM_ROOM_ID, roomId);
-    getView().startService(FetchMessageService.class, intent);
   }
 
   public void onMessagesAdded(String roomId, Message message) {
@@ -99,7 +100,7 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
   @Override
   public void onEvent(RxEvent event) {
     if (event.id == RxEvent.EVENT_NOTIFICATION) {
-      onReceiveSocketMessage((String) event.object);
+      onReceiveNotificationMessage((String) event.object);
     }
     else if (event.id == RxEvent.EVENT_ROOM_MESSAGES_UPDATED) {
       onMessagesUpdated((String) event.object);
@@ -108,17 +109,24 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
       onMessagesUpdated((String) event.params[0], (Message) event.object);
 
     }
-    else {
+    else if (event.id == RxEvent.EVENT_ROOM_MESSAGES_ADDED) {
       onMessagesAdded((String) event.params[0], (Message) event.object);
     }
   }
 
-  public void onReceiveSocketMessage(String notificationMessage) {
+  public void onReceiveNotificationMessage(String notificationMessage) {
     if (!isViewAttached())
       return;
 
     MessageParser parser = new MessageParser();
     Message message = parser.parse(notificationMessage);
+
+    onReceiveMessage(message);
+  }
+
+  public void onReceiveMessage(Message message) {
+    if (!isViewAttached())
+      return;
 
     if (message == null)
       return;
@@ -150,7 +158,7 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
         }
       }
       else {
-        getView().notifyChanged(ChatListMvpView.NOTIFY_DATA_RANGE_CHANGED, 0, getView().getItemCount(), updatedData.get(0));
+        getView().notifyChanged(BasicListMvpView.NOTIFY_DATA_RANGE_CHANGED, 0, getView().getItemCount(), updatedData.get(0));
         if (isAtBottom) {
           getView().scrollToBottom();
         }
@@ -158,8 +166,9 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
     }
     else {
       if (getView().getData() == null)
-        getView().setDataToList(updatedData);
-      getView().notifyChanged(ChatListMvpView.NOTIFY_ALL_DATA_CHANGED);
+        getView().setDataToList((List<Object>) (Object) updatedData);
+      getView().notifyChanged(BasicListMvpView.NOTIFY_ALL_DATA_CHANGED);
     }
   }
+
 }

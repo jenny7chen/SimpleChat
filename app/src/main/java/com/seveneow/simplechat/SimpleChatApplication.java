@@ -7,6 +7,7 @@ import com.nostra13.universalimageloader.cache.memory.impl.WeakMemoryCache;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.utils.StorageUtils;
+import com.seveneow.simplechat.utils.FDBManager;
 import com.seveneow.simplechat.utils.Static;
 
 import java.io.File;
@@ -28,5 +29,6 @@ public class SimpleChatApplication extends Application{
     configBuilder.diskCache(new LimitedAgeDiskCache(cacheDir, 86400 /* 1 day */));
 
     ImageLoader.getInstance().init(configBuilder.build());
+    FDBManager.init();
   }
 }

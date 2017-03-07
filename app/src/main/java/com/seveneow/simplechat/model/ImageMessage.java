@@ -1,8 +1,7 @@
 package com.seveneow.simplechat.model;
 
-/**
- * Created by jennychen on 2017/1/24.
- */
+import java.util.Map;
+
 
 public class ImageMessage extends FileMessage {
   private String thumbnail;
@@ -17,5 +16,11 @@ public class ImageMessage extends FileMessage {
 
   public void setThumbnail(String thumbnail) {
     this.thumbnail = thumbnail;
+  }
+
+  public Map<String, Object> toMap() {
+    Map<String, Object> map = super.toMap();
+    map.put("thumbnail", thumbnail);
+    return map;
   }
 }

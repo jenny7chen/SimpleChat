@@ -13,6 +13,7 @@ class Queries {
   private static final String COLUMN_MESSAGE_ID = "_MESSAGE_ID";
   private static final String COLUMN_MESSAGE_TIME = "_MESSAGE_TIME";
   private static final String COLUMN_MESSAGE_TEXT = "_MESSAGE_TEXT";
+  private static final String COLUMN_MESSAGE_SENDER_ID = "_MESSAGE_SENDER_ID";
 
 
   static final String CREATE_USER_TABLE = "CREATE TABLE IF NOT EXISTS User" + "( " +
@@ -24,6 +25,7 @@ class Queries {
   static final String CREATE_MESSAGE_TABLE = "CREATE TABLE IF NOT EXISTS Message" + "( " +
       COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
       COLUMN_MESSAGE_ID + " INTEGER PRIMARY KEY, " +
+      COLUMN_MESSAGE_SENDER_ID + " INTEGER, " +
       COLUMN_MESSAGE_TIME + " VARCHAR(50), " +
       COLUMN_MESSAGE_TEXT + " TEXT" +
       ");";

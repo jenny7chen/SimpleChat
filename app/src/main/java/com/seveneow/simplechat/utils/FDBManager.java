@@ -7,16 +7,18 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.MutableData;
 import com.google.firebase.database.Transaction;
+import com.google.firebase.database.ValueEventListener;
 import com.seveneow.simplechat.model.Message;
 import com.seveneow.simplechat.model.Post;
 import com.seveneow.simplechat.model.Room;
 import com.seveneow.simplechat.model.User;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 
-public class FDBActionManager {
+public class FDBManager {
   private static DatabaseReference databaseRef;
 
   public static void init() {
@@ -24,12 +26,69 @@ public class FDBActionManager {
     database.setPersistenceEnabled(true);
     databaseRef = database.getReference("database");
     databaseRef.keepSynced(true);
+    initRoomList();
   }
 
-  public static void initListeners(){
+  private static void initRoomList() {
+    databaseRef.child("users").child(Static.userId).child("rooms").addListenerForSingleValueEvent(new ValueEventListener() {
+      @Override
+      public void onDataChange(DataSnapshot dataSnapshot) {
+        ArrayList<String> roomIdList = new ArrayList(((HashMap) dataSnapshot.getValue()).keySet());
+        DebugLog.e("Baa", "roomList = " + roomIdList);
+        if (roomIdList == null)
+          return;
+        for (String roomId : roomIdList) {
+          FDBManager.addRoomEventListener(new RoomEventListener(roomId));
+          addRoom(roomId);
+          initRoomMessages(roomId);
+        }
+      }
 
-    eventListener = new RoomEventListener(roomId);
-    FDBActionManager.addRoomEventListener(eventListener);
+      @Override
+      public void onCancelled(DatabaseError databaseError) {
+
+      }
+    });
+  }
+
+  private static void addRoom(String roomId) {
+    databaseRef.child("rooms").child(roomId).addListenerForSingleValueEvent(new ValueEventListener() {
+      @Override
+      public void onDataChange(DataSnapshot dataSnapshot) {
+        Room room = (Room) dataSnapshot.getValue(Room.class);
+        if (room == null)
+          return;
+        RoomManager.getInstance().addRoom(room);
+      }
+
+      @Override
+      public void onCancelled(DatabaseError databaseError) {
+        DebugLog.e("ba", databaseError.getMessage());
+
+      }
+    });
+  }
+
+  private static void initRoomMessages(String roomId) {
+    ArrayList<Message> roomMessages = new ArrayList<>();
+    databaseRef.child("messages").child("roomId").addListenerForSingleValueEvent(new ValueEventListener() {
+      @Override
+      public void onDataChange(DataSnapshot dataSnapshot) {
+        if (dataSnapshot.getChildren() == null)
+          return;
+        for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+          Message message = postSnapshot.getValue(Message.class);
+          roomMessages.add(message);
+        }
+        RoomManager.getInstance().updateRoomMessages(roomId, roomMessages);
+      }
+
+      @Override
+      public void onCancelled(DatabaseError databaseError) {
+        DebugLog.e("la", databaseError.getMessage());
+
+      }
+    });
   }
 
   public static void createUser(User user) {

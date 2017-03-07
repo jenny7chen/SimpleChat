@@ -1,5 +1,7 @@
 package com.seveneow.simplechat.model;
 
+import java.util.Map;
+
 public class FileMessage extends Message {
   private String url;
   private String md5;
@@ -46,4 +48,12 @@ public class FileMessage extends Message {
     this.size = size;
   }
 
+  public Map<String, Object> toMap() {
+    Map<String, Object> map = super.toMap();
+    map.put("url", url);
+    map.put("md5", md5);
+    map.put("name", name);
+    map.put("size", size);
+    return map;
+  }
 }

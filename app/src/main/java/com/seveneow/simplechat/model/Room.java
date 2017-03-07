@@ -20,9 +20,21 @@ public class Room {
   private String description;
   private String photo;
   private String photoMd5;
-  private ArrayList<String> memberIds;
+  private ArrayList<String> members;
   private ConcurrentHashMap<String, Message> messages = new ConcurrentHashMap<>();
   private ArrayList<Message> showMessages = new ArrayList<>();
+  private ArrayList<Post> posts = new ArrayList<>();
+
+  public Room() {
+
+  }
+
+  public Room(String name, String photo, ArrayList<String> members, ArrayList<Post> posts) {
+    this.name = name;
+    this.photo = photo;
+    this.members = members;
+    this.posts = posts;
+  }
 
   public void setId(String id) {
     this.id = id;
@@ -52,7 +64,7 @@ public class Room {
   }
 
   public boolean hasMembers() {
-    return !(memberIds == null || memberIds.isEmpty());
+    return !(members == null || members.isEmpty());
   }
 
   private ArrayList<Message> sortMessages(ArrayList<Message> roomList) {
@@ -105,12 +117,12 @@ public class Room {
     this.photoMd5 = photoMd5;
   }
 
-  public ArrayList<String> getMemberIds() {
-    return memberIds;
+  public ArrayList<String> getMembers() {
+    return members;
   }
 
-  public void setMemberIds(ArrayList<String> memberIds) {
-    this.memberIds = memberIds;
+  public void setMembers(ArrayList<String> members) {
+    this.members = members;
   }
 
   public void setMessages(ConcurrentHashMap<String, Message> messages) {

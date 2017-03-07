@@ -1,5 +1,7 @@
 package com.seveneow.simplechat.model;
 
+import java.util.Map;
+
 /**
  * Created by jennychen on 2017/1/24.
  */
@@ -28,4 +30,11 @@ public class StickerMessage extends Message {
     this.stickerGroupId = stickerGroupId;
   }
 
+  @Override
+  public Map<String, Object> toMap() {
+    Map<String, Object> map = super.toMap();
+    map.put("stickerId", stickerId);
+    map.put("stickerGroupId", stickerGroupId);
+    return map;
+  }
 }
