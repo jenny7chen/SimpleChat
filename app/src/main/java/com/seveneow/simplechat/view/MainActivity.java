@@ -1,32 +1,41 @@
 package com.seveneow.simplechat.view;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.widget.Button;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.hannesdorfmann.mosby.mvp.viewstate.ViewState;
 import com.seveneow.simplechat.R;
+import com.seveneow.simplechat.adapter.RoomListAdapter;
 import com.seveneow.simplechat.model.Message;
+import com.seveneow.simplechat.model.Room;
 import com.seveneow.simplechat.presenter.MainPresenter;
 import com.seveneow.simplechat.utils.BaseActivity;
+import com.seveneow.simplechat.view_interface.BasicListMvpView;
 import com.seveneow.simplechat.view_interface.BasicMvpView;
 
 import java.util.List;
 
-public class MainActivity extends BaseActivity<BasicMvpView, MainPresenter> implements BasicMvpView {
+public class MainActivity extends BaseActivity<BasicListMvpView, MainPresenter> implements BasicListMvpView {
+  private RecyclerView recyclerView;
+  private RoomListAdapter adapter;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
-    Button enterButton = (Button) findViewById(R.id.button);
-    enterButton.setOnClickListener((View) -> {
-      Intent intent = new Intent();
-      intent.putExtra("roomId", "123");
-      startActivity(ChatActivity.class, intent);
-    });
+    recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+    LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+    recyclerView.setLayoutManager(linearLayoutManager);
+    DefaultItemAnimator animator = new DefaultItemAnimator();
+    animator.setAddDuration(250);
+    recyclerView.setItemAnimator(animator);
+    adapter = new RoomListAdapter(this);
+    adapter.setHasStableIds(true);
+    recyclerView.setAdapter(adapter);
 
     FirebaseMessaging.getInstance().subscribeToTopic("123");
   }
@@ -71,6 +80,32 @@ public class MainActivity extends BaseActivity<BasicMvpView, MainPresenter> impl
   @Override
   public List<Message> getData() {
     return null;
+  }
+
+  @Override
+  public boolean listIsAtBottom() {
+    return ((LinearLayoutManager) recyclerView.getLayoutManager()).findFirstCompletelyVisibleItemPosition() == getData().size() - 1;
+  }
+
+  @Override
+  public void scrollToBottom() {
+    ((LinearLayoutManager) recyclerView.getLayoutManager()).scrollToPositionWithOffset(getData().size() - 1, 0);
+  }
+
+  @Override
+  public void setDataToList(List<Object> data) {
+    if (adapter != null)
+      adapter.setData((List<Room>) (Object) data);
+  }
+
+  @Override
+  public void notifyChanged(int type, Object... params) {
+
+  }
+
+  @Override
+  public int getItemCount() {
+    return 0;
   }
 
   public class MainViewState implements ViewState<BasicMvpView> {

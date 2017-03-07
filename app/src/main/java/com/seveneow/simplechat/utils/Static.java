@@ -14,6 +14,9 @@ import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
 public class Static {
   private static DisplayImageOptions imageOptions;
 
+  //TODO: test use
+  public static final String userId = "456";
+
   public static DisplayImageOptions defaultDisplayImageOptions(int loadingImageRes, boolean fadeInDisplayer) {
     if (imageOptions != null)
       return imageOptions;

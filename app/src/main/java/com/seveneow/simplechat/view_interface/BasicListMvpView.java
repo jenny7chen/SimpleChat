@@ -1,10 +1,5 @@
 package com.seveneow.simplechat.view_interface;
 
-import android.content.Intent;
-
-import com.hannesdorfmann.mosby.mvp.MvpView;
-import com.seveneow.simplechat.model.Message;
-
 import java.util.List;
 
 
@@ -17,7 +12,7 @@ public interface BasicListMvpView extends BasicMvpView {
 
   public void scrollToBottom();
 
-  public void setDataToList(List<Message> messages);
+  public void setDataToList(List<Object> messages);
 
   public void notifyChanged(int type, Object... params);
 

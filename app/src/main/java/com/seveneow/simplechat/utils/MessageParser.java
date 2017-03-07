@@ -32,7 +32,7 @@ public class MessageParser {
     String messageSenderId = messageObject.get("message_sender_id").getAsString();
 
     //TODO:Test data, if sender id is from myself
-    if (messageSenderId.equals("456")) {
+    if (messageSenderId.equals(Static.userId)) {
       messageSenderId = "";
     }
     if (messageType == Message.TYPE_TEXT) {
@@ -69,9 +69,12 @@ public class MessageParser {
     return null;
   }
 
-  public Message parse() {
-    //parse database cursor to message object
-    return new Message(Message.TYPE_TEXT);
+  public Message parse(Message message) {
+    //TODO:Test data, if sender id is from myself
+    if (message.getSenderId().equals(Static.userId)) {
+      message.setSenderId("");
+    }
+    return message;
   }
 
   private int getMessageType(JsonObject jsonObject) {

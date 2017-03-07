@@ -27,6 +27,15 @@ public class RoomManager {
     roomMap.put("123", room);
   }
 
+  public void addAllRooms(ArrayList<Room> rooms) {
+    for (Room room : rooms) {
+      roomMap.put(room.getId(), room);
+    }
+  }
+
+  public void addRoom(Room room) {
+      roomMap.put(room.getId(), room);
+  }
 
   public Room getRoomById(String roomId) {
 

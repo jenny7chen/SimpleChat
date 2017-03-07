@@ -25,14 +25,14 @@ import cz.msebera.android.httpclient.message.BasicHeader;
  * TODO: Test use, remove this after using socket connection
  */
 
-public class SendMessageService extends IntentService {
+public class SendMessagesService extends IntentService {
   public static final String PARAM_SENDER_ID = "sender_id";
   public static final String PARAM_MESSAGE = "message";
   public static final String PARAM_MESSAGE_TYPE = "message_type";
   public static final String PARAM_MESSAGE_TEMP_ID = "message_temp_id";
   public static final String PARAM_MESSAGE_TIME = "message_time";
 
-  public SendMessageService() {
+  public SendMessagesService() {
     super("SendMessageService");
   }
 
@@ -80,10 +80,10 @@ public class SendMessageService extends IntentService {
 
   public static Intent generateDataIntent(String senderId, TextMessage message) {
     Intent intent = new Intent();
-    intent.putExtra(SendMessageService.PARAM_SENDER_ID, senderId);
-    intent.putExtra(SendMessageService.PARAM_MESSAGE, message.getMessage());
-    intent.putExtra(SendMessageService.PARAM_MESSAGE_TEMP_ID, message.getPendingId());
-    intent.putExtra(SendMessageService.PARAM_MESSAGE_TIME, message.getMessageTime());
+    intent.putExtra(SendMessagesService.PARAM_SENDER_ID, senderId);
+    intent.putExtra(SendMessagesService.PARAM_MESSAGE, message.getMessage());
+    intent.putExtra(SendMessagesService.PARAM_MESSAGE_TEMP_ID, message.getPendingId());
+    intent.putExtra(SendMessagesService.PARAM_MESSAGE_TIME, message.getMessageTime());
     return intent;
   }
 

@@ -160,9 +160,9 @@ public class ChatActivity extends BaseActivity<ChatListMvpView, ChatPresenter> i
   }
 
   @Override
-  public void setDataToList(List<Message> messages) {
+  public void setDataToList(List<Object> messages) {
     if (adapter != null)
-      adapter.setData(messages);
+      adapter.setData((List<Message>) (Object) messages);
   }
 
   @Override
