@@ -100,7 +100,8 @@ public class MainActivity extends BaseActivity<BasicListMvpView, MainPresenter> 
 
   @Override
   public void notifyChanged(int type, Object... params) {
-
+    if (adapter != null)
+      adapter.notifyDataSetChanged();
   }
 
   @Override

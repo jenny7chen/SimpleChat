@@ -37,6 +37,10 @@ public class Message {
     this.type = type;
   }
 
+  public void setType(int type){
+    this.type = type;
+  }
+
   public int getType() {
     return type;
   }
@@ -129,10 +133,9 @@ public class Message {
     HashMap<String, Object> result = new HashMap<>();
     result.put("type", type);
     result.put("messageId", messageId);
-    result.put("messageTime", messageTime);
+    result.put("timestamp", Long.valueOf(messageTime));
     result.put("senderId", receiverId);
     result.put("pendingId", pendingId);
-    result.put("isPending", isPending);
     result.put("isShowSender", isShowSender);
     result.put("roomId", roomId);
     return result;

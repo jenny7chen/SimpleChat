@@ -19,6 +19,8 @@ public class IMFirebaseMessagingService extends FirebaseMessagingService {
 
       RxEvent event = new RxEvent();
       event.id = RxEvent.EVENT_NOTIFICATION;
+
+      //TODO: add room id
       event.object = remoteMessage.getData().get("message");
       RxEventBus.send(event);
     }
@@ -30,6 +32,8 @@ public class IMFirebaseMessagingService extends FirebaseMessagingService {
       RxEvent event = new RxEvent();
       event.id = RxEvent.EVENT_NOTIFICATION;
       event.object = remoteMessage.getNotification().getBody();
+      //TODO: add room id
+
       RxEventBus.send(event);
     }
   }

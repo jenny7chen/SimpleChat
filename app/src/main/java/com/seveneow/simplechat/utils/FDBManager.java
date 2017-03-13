@@ -1,5 +1,11 @@
 package com.seveneow.simplechat.utils;
 
+import android.support.annotation.NonNull;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -33,13 +39,14 @@ public class FDBManager {
     databaseRef.child("users").child(Static.userId).child("rooms").addListenerForSingleValueEvent(new ValueEventListener() {
       @Override
       public void onDataChange(DataSnapshot dataSnapshot) {
-        ArrayList<String> roomIdList = new ArrayList(((HashMap) dataSnapshot.getValue()).keySet());
+        ArrayList<String> roomIdList = new ArrayList<String>();
+        for (DataSnapshot roomId : dataSnapshot.getChildren()) {
+          roomIdList.add(roomId.getKey());
+        }
         DebugLog.e("Baa", "roomList = " + roomIdList);
-        if (roomIdList == null)
-          return;
         for (String roomId : roomIdList) {
-          FDBManager.addRoomEventListener(new RoomEventListener(roomId));
           addRoom(roomId);
+          FDBManager.addRoomEventListener(roomId, new RoomEventListener(roomId));
           initRoomMessages(roomId);
         }
       }
@@ -55,9 +62,10 @@ public class FDBManager {
     databaseRef.child("rooms").child(roomId).addListenerForSingleValueEvent(new ValueEventListener() {
       @Override
       public void onDataChange(DataSnapshot dataSnapshot) {
-        Room room = (Room) dataSnapshot.getValue(Room.class);
-        if (room == null)
+        Room room = new RoomParser().parse(dataSnapshot);
+        if (room == null) {
           return;
+        }
         RoomManager.getInstance().addRoom(room);
       }
 
@@ -71,13 +79,15 @@ public class FDBManager {
 
   private static void initRoomMessages(String roomId) {
     ArrayList<Message> roomMessages = new ArrayList<>();
-    databaseRef.child("messages").child("roomId").addListenerForSingleValueEvent(new ValueEventListener() {
+    databaseRef.child("messages").child(roomId).orderByChild("timestamp").limitToLast(100).addListenerForSingleValueEvent(new ValueEventListener() {
       @Override
       public void onDataChange(DataSnapshot dataSnapshot) {
         if (dataSnapshot.getChildren() == null)
           return;
         for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-          Message message = postSnapshot.getValue(Message.class);
+          Message message = new MessageParser().parse(postSnapshot);
+          if (message == null)
+            continue;
           roomMessages.add(message);
         }
         RoomManager.getInstance().updateRoomMessages(roomId, roomMessages);
@@ -91,6 +101,14 @@ public class FDBManager {
     });
   }
 
+  public static void createRoom(Room room) {
+    String roomId = databaseRef.child("rooms").push().getKey();
+    Map<String, Object> pushValues = room.toMap();
+    Map<String, Object> childUpdates = new HashMap<>();
+    childUpdates.put("/rooms/" + roomId, pushValues);
+    databaseRef.updateChildren(childUpdates);
+  }
+
   public static void createUser(User user) {
     String userId = databaseRef.child("users").push().getKey();
     databaseRef.child("users").child(userId).setValue(user);
@@ -102,7 +120,17 @@ public class FDBManager {
 
     Map<String, Object> childUpdates = new HashMap<>();
     childUpdates.put("/messages/" + roomId + "/" + key, pushValues);
-    databaseRef.updateChildren(childUpdates);
+    databaseRef.updateChildren(childUpdates).addOnSuccessListener((Void) -> {
+      message.setPending(false);
+      RxEvent event = new RxEvent();
+      event.id = RxEvent.EVENT_DATA_UPDATE_NOTIFICATION;
+      event.params = new String[]{roomId};
+      event.object = message;
+      RxEventBus.send(event);
+
+    }).addOnFailureListener((Exception) -> {
+      //TODO: update failure status on list
+    });
   }
 
 
@@ -178,11 +206,11 @@ public class FDBManager {
 
   }
 
-  public static void addRoomEventListener(ChildEventListener childEventListener) {
-    databaseRef.addChildEventListener(childEventListener);
+  public static void addRoomEventListener(String roomId, ChildEventListener childEventListener) {
+    databaseRef.child("messages").child(roomId).addChildEventListener(childEventListener);
   }
 
-  public static void removeRoomEventListener(ChildEventListener childEventListener) {
-    databaseRef.removeEventListener(childEventListener);
+  public static void removeRoomEventListener(String roomId, ChildEventListener childEventListener) {
+    databaseRef.child("messages").child(roomId).removeEventListener(childEventListener);
   }
 }

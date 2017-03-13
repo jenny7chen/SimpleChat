@@ -88,7 +88,7 @@ public class RoomListAdapter extends RecyclerView.Adapter<RoomListAdapter.Holder
 
   @Override
   public long getItemId(int position) {
-    return Long.valueOf(data.get(position).getId());
+    return data.get(position).getId().hashCode();
   }
 
   public List<Room> getData() {

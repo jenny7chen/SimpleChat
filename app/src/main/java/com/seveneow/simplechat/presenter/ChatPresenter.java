@@ -11,6 +11,7 @@ import com.seveneow.simplechat.model.TextMessage;
 import com.seveneow.simplechat.service.FetchMessageService;
 import com.seveneow.simplechat.service.SendMessageService;
 import com.seveneow.simplechat.utils.BasePresenter;
+import com.seveneow.simplechat.utils.FDBManager;
 import com.seveneow.simplechat.utils.MessageGenerator;
 import com.seveneow.simplechat.utils.MessageParser;
 import com.seveneow.simplechat.utils.RoomManager;
@@ -58,7 +59,8 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
       //TODO:bind service of sending message
 
       //test use
-      getView().startService(SendMessageService.class, SendMessageService.generateDataIntent("456", (TextMessage) message));
+      FDBManager.sendMessage(roomId, message);
+      //      getView().startService(SendMessageService.class, SendMessageService.generateDataIntent("456", (TextMessage) message));
 
     }, 2); // set a delay for message sent
   }
@@ -100,7 +102,11 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
   @Override
   public void onEvent(RxEvent event) {
     if (event.id == RxEvent.EVENT_NOTIFICATION) {
-      onReceiveNotificationMessage((String) event.object);
+
+      onReceiveNotificationMessage((String) event.params[0], (String) event.object);
+    }
+    else if (event.id == RxEvent.EVENT_DATA_UPDATE_NOTIFICATION) {
+      onReceiveNotificationMessage((String) event.params[0], (Message) event.object);
     }
     else if (event.id == RxEvent.EVENT_ROOM_MESSAGES_UPDATED) {
       onMessagesUpdated((String) event.object);
@@ -114,12 +120,25 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
     }
   }
 
-  public void onReceiveNotificationMessage(String notificationMessage) {
+  public void onReceiveNotificationMessage(String roomId, String notificationMessage) {
     if (!isViewAttached())
+      return;
+
+    if (!roomId.equals(this.roomId))
       return;
 
     MessageParser parser = new MessageParser();
     Message message = parser.parse(notificationMessage);
+
+    onReceiveMessage(message);
+  }
+
+  public void onReceiveNotificationMessage(String roomId, Message message) {
+    if (!isViewAttached())
+      return;
+
+    if (!roomId.equals(this.roomId))
+      return;
 
     onReceiveMessage(message);
   }
@@ -136,8 +155,8 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
     }
     else {
       //TODO: test use remove this later
-      message.setMessageTime(TimeParser.getCurrentTimeString());
-      message.setMessageId(message.getMessageTime());
+//      message.setMessageTime(TimeParser.getCurrentTimeString());
+//      message.setMessageId(message.getMessageTime());
 
       RoomManager.getInstance().addRoomSingleMessage(roomId, message);
     }

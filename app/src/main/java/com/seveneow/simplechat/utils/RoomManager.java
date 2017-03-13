@@ -34,7 +34,7 @@ public class RoomManager {
   }
 
   public void addRoom(Room room) {
-      roomMap.put(room.getId(), room);
+    roomMap.put(room.getId(), room);
   }
 
   public Room getRoomById(String roomId) {

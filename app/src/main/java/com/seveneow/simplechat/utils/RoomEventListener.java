@@ -15,14 +15,17 @@ public class RoomEventListener implements ChildEventListener {
 
   @Override
   public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-    Message message = dataSnapshot.getValue(Message.class);
+    DebugLog.e("baaa", dataSnapshot.toString() + " string = " + s);
+    Message message = new MessageParser().parse(dataSnapshot);
 
     if (message == null) {
       DebugLog.e("ba", "message data is null");
       return;
     }
+
+    message.setPending(false);
     RxEvent event = new RxEvent();
-    event.id = RxEvent.EVENT_ROOM_MESSAGES_ADDED;
+    event.id = RxEvent.EVENT_DATA_UPDATE_NOTIFICATION;
     event.params = new String[]{roomId};
     event.object = message;
     RxEventBus.send(event);
@@ -30,14 +33,16 @@ public class RoomEventListener implements ChildEventListener {
 
   @Override
   public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-    Message message = dataSnapshot.getValue(Message.class);
+    Message message = new MessageParser().parse(dataSnapshot);
 
     if (message == null) {
       DebugLog.e("la", "message data is null");
       return;
     }
+
+    message.setPending(false);
     RxEvent event = new RxEvent();
-    event.id = RxEvent.EVENT_ROOM_SINGLE_MESSAGES_UPDATED;
+    event.id = RxEvent.EVENT_DATA_UPDATE_NOTIFICATION;
     event.params = new String[]{roomId};
     event.object = message;
     RxEventBus.send(event);

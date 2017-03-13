@@ -1,8 +1,12 @@
 package com.seveneow.simplechat.model;
 
+import android.support.annotation.CallSuper;
+
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -41,7 +45,11 @@ public class Room {
   }
 
   public String getLatestMessageTime() {
-    Message message = messages.get(0);
+    if (getShowMessages().size() == 0)
+      return "0";
+    Message message = getShowMessages().get(0);
+    if (message == null)
+      return "0";
     return message.getMessageTime();
   }
 
@@ -133,4 +141,25 @@ public class Room {
     this.showMessages = showMessages;
   }
 
+  @CallSuper
+  public Map<String, Object> toMap() {
+    HashMap<String, Object> result = new HashMap<>();
+    result.put("type", type);
+    result.put("name", name);
+    result.put("photo", photo);
+    result.put("no_of_users", members.size());
+    HashMap<String, Boolean> memberMap = new HashMap<String, Boolean>();
+    if (members != null)
+      for (String memberId : members) {
+        memberMap.put(memberId, true);
+      }
+    HashMap<String, Boolean> postMap = new HashMap<String, Boolean>();
+    if (posts != null)
+      for (Post post : posts) {
+        postMap.put(post.getId(), true);
+      }
+    result.put("members", memberMap);
+    result.put("posts", postMap);
+    return result;
+  }
 }
