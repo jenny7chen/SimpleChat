@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import com.seveneow.simplechat.model.Message;
 import com.seveneow.simplechat.utils.BaseActivity;
+import com.seveneow.simplechat.utils.Static;
 import com.seveneow.simplechat.view_custom.MessageView;
 
 import java.util.List;
@@ -81,12 +82,15 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
 
   @Override
   public int getItemViewType(int position) {
-    return data.get(position).isFromMe() ? MESSAGE_FROM_ME : MESSAGE_FROM_OTHERS;
+    return Static.isMessageFromMe(data.get(position)) ? MESSAGE_FROM_ME : MESSAGE_FROM_OTHERS;
   }
 
   @Override
   public long getItemId(int position) {
-    return data.get(position).getMessageId().hashCode();
+    if (data.get(position).getMessageId() != null)
+      return data.get(position).getMessageId().hashCode();
+    else
+      return data.get(position).getPendingId().hashCode();
   }
 
   public List<Message> getData() {

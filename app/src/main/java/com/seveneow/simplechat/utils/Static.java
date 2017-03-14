@@ -6,6 +6,7 @@ import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
+import com.seveneow.simplechat.model.Message;
 
 /**
  * Created by jennychen on 2017/2/16.
@@ -36,5 +37,9 @@ public class Static {
     }
     imageOptions = optionsBuilder.build();
     return imageOptions;
+  }
+
+  public static boolean isMessageFromMe(Message message){
+    return message.getSenderId() == null || message.getSenderId().isEmpty() || userId.equals(message.getSenderId());
   }
 }

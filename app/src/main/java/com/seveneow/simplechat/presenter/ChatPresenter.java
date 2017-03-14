@@ -7,16 +7,15 @@ import android.os.Handler;
 import com.seveneow.simplechat.R;
 import com.seveneow.simplechat.model.Message;
 import com.seveneow.simplechat.model.Room;
-import com.seveneow.simplechat.model.TextMessage;
 import com.seveneow.simplechat.service.FetchMessageService;
-import com.seveneow.simplechat.service.SendMessageService;
 import com.seveneow.simplechat.utils.BasePresenter;
+import com.seveneow.simplechat.utils.DebugLog;
 import com.seveneow.simplechat.utils.FDBManager;
 import com.seveneow.simplechat.utils.MessageGenerator;
 import com.seveneow.simplechat.utils.MessageParser;
 import com.seveneow.simplechat.utils.RoomManager;
 import com.seveneow.simplechat.utils.RxEvent;
-import com.seveneow.simplechat.utils.TimeParser;
+import com.seveneow.simplechat.utils.Static;
 import com.seveneow.simplechat.view_interface.BasicListMvpView;
 import com.seveneow.simplechat.view_interface.ChatListMvpView;
 
@@ -30,6 +29,7 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
 
   public void setRoomData(Intent intent) {
     roomId = intent.getStringExtra("roomId");
+    DebugLog.e("baaa", "enter room : " + roomId);
     Room room = RoomManager.getInstance().getRoomById(roomId);
     getView().setTitle(room.getName());
   }
@@ -103,63 +103,43 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
   public void onEvent(RxEvent event) {
     if (event.id == RxEvent.EVENT_NOTIFICATION) {
 
-      onReceiveNotificationMessage((String) event.params[0], (String) event.object);
+      onReceiveMessage((String) event.params[0], (String) event.object);
     }
     else if (event.id == RxEvent.EVENT_DATA_UPDATE_NOTIFICATION) {
-      onReceiveNotificationMessage((String) event.params[0], (Message) event.object);
+      onReceiveMessage((String) event.params[0], (Message) event.object);
     }
     else if (event.id == RxEvent.EVENT_ROOM_MESSAGES_UPDATED) {
       onMessagesUpdated((String) event.object);
     }
     else if (event.id == RxEvent.EVENT_ROOM_SINGLE_MESSAGES_UPDATED) {
       onMessagesUpdated((String) event.params[0], (Message) event.object);
-
     }
     else if (event.id == RxEvent.EVENT_ROOM_MESSAGES_ADDED) {
       onMessagesAdded((String) event.params[0], (Message) event.object);
     }
   }
 
-  public void onReceiveNotificationMessage(String roomId, String notificationMessage) {
-    if (!isViewAttached())
-      return;
-
-    if (!roomId.equals(this.roomId))
-      return;
-
+  public void onReceiveMessage(String roomId, String notificationMessage) {
     MessageParser parser = new MessageParser();
     Message message = parser.parse(notificationMessage);
 
-    onReceiveMessage(message);
+    onReceiveMessage(roomId, message);
   }
 
-  public void onReceiveNotificationMessage(String roomId, Message message) {
+  /**
+   * when received message from web or other users client or got messages by init listener
+   */
+  public void onReceiveMessage(String roomId, Message message) {
     if (!isViewAttached())
       return;
 
     if (!roomId.equals(this.roomId))
-      return;
-
-    onReceiveMessage(message);
-  }
-
-  public void onReceiveMessage(Message message) {
-    if (!isViewAttached())
       return;
 
     if (message == null)
       return;
 
-    if (message.getSenderId().isEmpty()) {
-      RoomManager.getInstance().updateRoomSingleMessage(roomId, message);
-    }
-    else {
-      //TODO: test use remove this later
-//      message.setMessageTime(TimeParser.getCurrentTimeString());
-//      message.setMessageId(message.getMessageTime());
-
-      RoomManager.getInstance().addRoomSingleMessage(roomId, message);
-    }
+    RoomManager.getInstance().addMessage(roomId, message);
   }
 
   public synchronized void updateData(List<Message> updatedData, boolean isSingleMessage, boolean isInsert) {
@@ -170,9 +150,9 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
       boolean isAtBottom = getView().listIsAtBottom();
       if (isInsert) {
         getView().notifyChanged(ChatListMvpView.NOTIFY_DATA_INSERT, 0);
-        if (isAtBottom || updatedData.get(0).isFromMe())
+        if (isAtBottom || Static.isMessageFromMe(updatedData.get(0)))
           getView().scrollToBottom();
-        else if (!updatedData.get(0).isFromMe()) {
+        else if (!Static.isMessageFromMe(updatedData.get(0))) {
           getView().showSnackBar(R.string.snack_got_new_message);
         }
       }

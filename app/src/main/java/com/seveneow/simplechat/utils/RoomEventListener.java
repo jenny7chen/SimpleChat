@@ -15,7 +15,6 @@ public class RoomEventListener implements ChildEventListener {
 
   @Override
   public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-    DebugLog.e("baaa", dataSnapshot.toString() + " string = " + s);
     Message message = new MessageParser().parse(dataSnapshot);
 
     if (message == null) {
@@ -23,7 +22,10 @@ public class RoomEventListener implements ChildEventListener {
       return;
     }
 
-    message.setPending(false);
+    if (message.isPending()) {
+      return;
+    }
+
     RxEvent event = new RxEvent();
     event.id = RxEvent.EVENT_DATA_UPDATE_NOTIFICATION;
     event.params = new String[]{roomId};
@@ -40,7 +42,6 @@ public class RoomEventListener implements ChildEventListener {
       return;
     }
 
-    message.setPending(false);
     RxEvent event = new RxEvent();
     event.id = RxEvent.EVENT_DATA_UPDATE_NOTIFICATION;
     event.params = new String[]{roomId};

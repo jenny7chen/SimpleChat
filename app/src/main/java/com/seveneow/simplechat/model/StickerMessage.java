@@ -14,6 +14,13 @@ public class StickerMessage extends Message {
     super(TYPE_STICKER);
   }
 
+  public StickerMessage(Message message) {
+    super(message);
+    this.stickerId = ((StickerMessage) message).getStickerId();
+    this.stickerGroupId = ((StickerMessage) message).getStickerGroupId();
+    this.setType(TYPE_STICKER);
+  }
+
   public String getStickerId() {
     return stickerId;
   }

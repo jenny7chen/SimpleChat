@@ -13,6 +13,12 @@ public class TextMessage extends Message {
     super(TYPE_TEXT);
   }
 
+  public TextMessage(Message message) {
+    super(message);
+    this.message = ((TextMessage) message).getMessage();
+    this.setType(TYPE_TEXT);
+  }
+
   public String getMessage() {
     return message;
   }

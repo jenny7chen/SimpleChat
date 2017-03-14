@@ -10,7 +10,7 @@ import java.util.LinkedHashMap;
 
 public class RoomManager {
   private static RoomManager roomManager = new RoomManager();
-  private LinkedHashMap<String, Room> roomMap = new LinkedHashMap<>();
+  private static LinkedHashMap<String, Room> roomMap = new LinkedHashMap<>();
 
   private RoomManager() {
 
@@ -20,17 +20,16 @@ public class RoomManager {
     return roomManager;
   }
 
-  public void addTestData() {
-    Room room = new Room();
-    room.setId("123");
-    room.setName("金城武");
-    roomMap.put("123", room);
-  }
-
   public void addAllRooms(ArrayList<Room> rooms) {
     for (Room room : rooms) {
       roomMap.put(room.getId(), room);
     }
+  }
+
+  public boolean hasRoomData(){
+    if (roomMap == null)
+      roomMap = new LinkedHashMap<>();
+    return roomMap.size() > 0;
   }
 
   public void addRoom(Room room) {
@@ -38,11 +37,6 @@ public class RoomManager {
   }
 
   public Room getRoomById(String roomId) {
-
-    //TODO: remove later
-    if (roomMap.get(roomId) == null)
-      addTestData();
-
     return roomMap.get(roomId);
   }
 
@@ -73,37 +67,35 @@ public class RoomManager {
     RxEventBus.send(event);
   }
 
-  public void updateRoomSingleMessage(String roomId, Message message) {
+  public void addMessage(String roomId, Message message) {
     Room room = getRoomById(roomId);
+    RxEvent event = new RxEvent();
     Message oldMessage = room.getMessages().get(message.getPendingId());
 
-    if (oldMessage != null) {
-      oldMessage.setMessageId(message.getMessageId());
-      oldMessage.setPending(false);
-      oldMessage.setPendingId("");
-      oldMessage.setMessageTime(message.getMessageTime());
+    if (Static.isMessageFromMe(message) && oldMessage != null) {
+      room.getMessages().remove(message.getPendingId());
+      room.getMessages().put(message.getMessageId(), message);
+      event.id = RxEvent.EVENT_ROOM_MESSAGES_UPDATED;
+      event.object = roomId;
+      DebugLog.e("baaa", " 1");
     }
-    else {
-      oldMessage = room.getMessages().get(message.getMessageId());
-      if (oldMessage != null) {
-        room.getMessages().put(message.getMessageId(), message);
+    else if (message.getMessageId() != null) {
+      if (room.getMessages().containsKey(message.getMessageId())) {
+        event.id = RxEvent.EVENT_ROOM_SINGLE_MESSAGES_UPDATED;
+        event.object = message;
+        DebugLog.e("baaa", " 2");
+
       }
+      else {
+        event.id = RxEvent.EVENT_ROOM_MESSAGES_ADDED;
+        event.object = message;
+        DebugLog.e("baaa", " 3");
+
+      }
+      room.getMessages().put(message.getMessageId(), message);
     }
 
-    RxEvent event = new RxEvent();
-    event.id = RxEvent.EVENT_ROOM_SINGLE_MESSAGES_UPDATED;
     event.params = new String[]{roomId};
-    event.object = message;
-    RxEventBus.send(event);
-  }
-
-  public void addRoomSingleMessage(String roomId, Message message) {
-    Room room = getRoomById(roomId);
-    room.getMessages().put(message.getMessageId(), message);
-    RxEvent event = new RxEvent();
-    event.id = RxEvent.EVENT_ROOM_MESSAGES_ADDED;
-    event.params = new String[]{roomId};
-    event.object = message;
     RxEventBus.send(event);
   }
 
@@ -115,7 +107,7 @@ public class RoomManager {
   private class RoomComparator implements Comparator<Room> {
     @Override
     public int compare(Room o1, Room o2) {
-      return o1.getLatestMessageTime().compareTo(o2.getLatestMessageTime());
+      return o2.getLatestMessageTime().compareTo(o1.getLatestMessageTime());
     }
   }
 }

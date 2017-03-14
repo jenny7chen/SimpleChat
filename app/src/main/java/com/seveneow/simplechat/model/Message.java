@@ -2,6 +2,7 @@ package com.seveneow.simplechat.model;
 
 import android.support.annotation.CallSuper;
 
+import com.seveneow.simplechat.utils.Static;
 import com.seveneow.simplechat.utils.TimeFormat;
 import com.seveneow.simplechat.utils.TimeParser;
 
@@ -35,6 +36,18 @@ public class Message {
 
   public Message(int type) {
     this.type = type;
+  }
+
+  public Message(Message message){
+    this.messageId = message.getMessageId();
+    this.type = message.getType();
+    this.messageTime = message.getMessageTime();
+    this.senderId = message.getSenderId();
+    this.receiverId = message.getReceiverId();
+    this.pendingId = message.getPendingId();
+    this.roomId = message.getRoomId();
+    this.isPending = message.isPending();
+    this.isShowSender = message.isShowSender();
   }
 
   public void setType(int type){
@@ -93,10 +106,6 @@ public class Message {
     this.receiverId = receiverId;
   }
 
-  public boolean isFromMe() {
-    return senderId == null || senderId.isEmpty();
-  }
-
   public boolean isPending() {
     return isPending;
   }
@@ -132,9 +141,9 @@ public class Message {
   public Map<String, Object> toMap() {
     HashMap<String, Object> result = new HashMap<>();
     result.put("type", type);
-    result.put("messageId", messageId);
     result.put("timestamp", Long.valueOf(messageTime));
     result.put("senderId", receiverId);
+    result.put("isPending", isPending);
     result.put("pendingId", pendingId);
     result.put("isShowSender", isShowSender);
     result.put("roomId", roomId);

@@ -69,14 +69,6 @@ public class MessageParser {
     return null;
   }
 
-  public Message parse(Message message) {
-    //TODO:Test data, if sender id is from myself
-    if (message.getSenderId().equals(Static.userId)) {
-      message.setSenderId("");
-    }
-    return message;
-  }
-
   private int getMessageType(JsonObject jsonObject) {
     return jsonObject.get("message_type").getAsInt();
   }

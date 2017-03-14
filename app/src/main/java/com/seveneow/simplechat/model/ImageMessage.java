@@ -10,6 +10,13 @@ public class ImageMessage extends FileMessage {
     super(TYPE_IMAGE);
   }
 
+
+  public ImageMessage(Message message) {
+    super(message);
+    this.thumbnail = ((ImageMessage)message).getThumbnail();
+    this.setType(TYPE_IMAGE);
+  }
+
   public String getThumbnail() {
     return thumbnail;
   }

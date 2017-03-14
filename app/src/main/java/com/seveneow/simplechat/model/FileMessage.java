@@ -8,8 +8,17 @@ public class FileMessage extends Message {
   private String name;
   private String size;
 
-  public FileMessage(){
+  public FileMessage() {
     super(Message.TYPE_FILE);
+  }
+
+  public FileMessage(Message message) {
+    super(message);
+    this.url = ((FileMessage)message).getUrl();
+    this.md5 = ((FileMessage)message).getMd5();
+    this.name = ((FileMessage)message).getName();
+    this.size = ((FileMessage)message).getSize();
+    this.setType(TYPE_IMAGE);
   }
 
   public FileMessage(int type) {

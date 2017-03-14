@@ -1,11 +1,5 @@
 package com.seveneow.simplechat.utils;
 
-import android.support.annotation.NonNull;
-
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -33,6 +27,13 @@ public class FDBManager {
     databaseRef = database.getReference("database");
     databaseRef.keepSynced(true);
     initRoomList();
+  }
+
+  public static void checkDataInit() {
+    RoomManager.getInstance().hasRoomData();
+    if (RoomManager.getInstance().hasRoomData()) {
+      initRoomList();
+    }
   }
 
   private static void initRoomList() {
@@ -121,16 +122,31 @@ public class FDBManager {
     Map<String, Object> childUpdates = new HashMap<>();
     childUpdates.put("/messages/" + roomId + "/" + key, pushValues);
     databaseRef.updateChildren(childUpdates).addOnSuccessListener((Void) -> {
+      //inform message sent, need pending id for layout update
       message.setPending(false);
+      message.setMessageId(key);
       RxEvent event = new RxEvent();
       event.id = RxEvent.EVENT_DATA_UPDATE_NOTIFICATION;
       event.params = new String[]{roomId};
       event.object = message;
       RxEventBus.send(event);
 
+      //update message pending status
+      Message messageSend = MessageGenerator.copyMessage(message);
+      messageSend.setPendingId("");
+      FDBManager.updateMessageSentStatus(roomId, messageSend);
+
     }).addOnFailureListener((Exception) -> {
       //TODO: update failure status on list
     });
+  }
+
+  public static void updateMessageSentStatus(String roomId, Message message) {
+    Map<String, Object> pushValues = message.toMap();
+
+    Map<String, Object> childUpdates = new HashMap<>();
+    childUpdates.put("/messages/" + roomId + "/" + message.getMessageId(), pushValues);
+    databaseRef.updateChildren(childUpdates).addOnFailureListener((Exception) -> updateMessageSentStatus(roomId, message));
   }
 
 

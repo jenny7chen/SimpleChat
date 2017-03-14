@@ -33,7 +33,7 @@ public class MessageView extends RelativeLayout {
   public void setMessage(Message message) {
     this.message = message;
     setRootView();
-    if (message.isFromMe()) {
+    if (Static.isMessageFromMe(message)) {
       setMessageFromMeView();
     }
     else {
@@ -100,7 +100,7 @@ public class MessageView extends RelativeLayout {
       if (message.isPending()) {
         textView.setTextColor(Color.RED);
       }
-      else if (message.isFromMe()) {
+      else if (Static.isMessageFromMe(message)) {
         textView.setTextColor(Color.BLACK);
       }
       else {
