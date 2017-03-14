@@ -31,7 +31,7 @@ public class FDBManager {
 
   public static void checkDataInit() {
     RoomManager.getInstance().hasRoomData();
-    if (RoomManager.getInstance().hasRoomData()) {
+    if (!RoomManager.getInstance().hasRoomData()) {
       initRoomList();
     }
   }
