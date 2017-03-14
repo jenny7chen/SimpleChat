@@ -23,6 +23,7 @@ import com.seveneow.simplechat.model.TextMessage;
 import com.seveneow.simplechat.presenter.ChatPresenter;
 import com.seveneow.simplechat.service.SendMessageService;
 import com.seveneow.simplechat.utils.BaseActivity;
+import com.seveneow.simplechat.utils.FDBManager;
 import com.seveneow.simplechat.utils.MessageGenerator;
 import com.seveneow.simplechat.view_custom.MessageEditorView;
 import com.seveneow.simplechat.view_interface.BasicListMvpView;
@@ -223,8 +224,7 @@ public class ChatActivity extends BaseActivity<ChatListMvpView, ChatPresenter> i
 
     //TODO: for test use
     if (item.getItemId() == R.id.add_message) {
-      TextMessage testMessage = (TextMessage) MessageGenerator.getPendingTextMessage(getRandomMessage());
-      startService(SendMessageService.class, SendMessageService.generateDataIntent("123", testMessage));
+      presenter.sendMessage(getRandomMessage());
     }
     return super.onOptionsItemSelected(item);
   }

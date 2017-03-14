@@ -24,7 +24,6 @@ public class Message {
   private String messageId = null;
   private String messageTime = null;
   private String senderId = "";
-  private String receiverId = null;
   private String pendingId = null;
   private String messageShowTime = "";
   private String roomId = null;
@@ -43,7 +42,6 @@ public class Message {
     this.type = message.getType();
     this.messageTime = message.getMessageTime();
     this.senderId = message.getSenderId();
-    this.receiverId = message.getReceiverId();
     this.pendingId = message.getPendingId();
     this.roomId = message.getRoomId();
     this.isPending = message.isPending();
@@ -98,14 +96,6 @@ public class Message {
     this.senderId = senderId;
   }
 
-  public String getReceiverId() {
-    return receiverId;
-  }
-
-  public void setReceiverId(String receiverId) {
-    this.receiverId = receiverId;
-  }
-
   public boolean isPending() {
     return isPending;
   }
@@ -142,7 +132,7 @@ public class Message {
     HashMap<String, Object> result = new HashMap<>();
     result.put("type", type);
     result.put("timestamp", Long.valueOf(messageTime));
-    result.put("senderId", receiverId);
+    result.put("senderId", senderId);
     result.put("isPending", isPending);
     result.put("pendingId", pendingId);
     result.put("isShowSender", isShowSender);

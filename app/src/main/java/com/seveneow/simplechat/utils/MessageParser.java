@@ -84,10 +84,6 @@ public class MessageParser {
     int messageType = getMessageType(messageSnapShot);
     String senderId = (String) messageSnapShot.child("sender_id").getValue();
 
-    if (senderId == null || Static.userId.equals(senderId)) {
-      senderId = "";
-    }
-
     Message message = null;
 
     if (messageType == Message.TYPE_TEXT) {
@@ -116,7 +112,6 @@ public class MessageParser {
     message.setMessageId(messageSnapShot.getKey());
     message.setType(messageType);
     message.setSenderId(senderId);
-    message.setReceiverId((String) messageSnapShot.child("receiver_id").getValue());
     message.setMessageTime((String.valueOf((long) messageSnapShot.child("timestamp").getValue())));
 
     if (messageSnapShot.hasChild("isPending"))
