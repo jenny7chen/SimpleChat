@@ -45,6 +45,8 @@ public class RoomManager {
   }
 
   public ArrayList<Room> getAllRooms() {
+    if(roomMap == null)
+      roomMap = new LinkedHashMap<>();
     ArrayList<Room> roomList = new ArrayList<>(roomMap.values());
     return sort(roomList);
   }

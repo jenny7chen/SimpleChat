@@ -13,8 +13,6 @@ import com.seveneow.simplechat.model.Post;
 import com.seveneow.simplechat.model.Room;
 import com.seveneow.simplechat.model.User;
 import com.seveneow.simplechat.presenter.ChatPresenter;
-import com.seveneow.simplechat.presenter.MainPresenter;
-import com.seveneow.simplechat.view_interface.BasicMvpView;
 
 import java.util.ArrayList;
 import java.util.HashMap;

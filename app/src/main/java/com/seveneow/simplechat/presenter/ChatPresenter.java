@@ -41,12 +41,17 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
 
     getView().showLoading();
     //get data here using asynchttp lib
-    FDBManager.initRoomMessages(roomId, this);
+    messageList = RoomManager.getInstance().getRoomById(roomId).getShowMessages();
+    if (messageList.size() == 0) {
+      FDBManager.initRoomMessages(roomId, this);
+    }else{
+      getView().showContent();
+    }
     FDBManager.addRoomEventListener(roomId, new MessageEventListener(roomId, this));
 
-//    Intent intent = new Intent();
-//    intent.putExtra(FetchMessageService.PARAM_ROOM_ID, roomId);
-//    getView().startService(FetchMessageService.class, intent);
+    //    Intent intent = new Intent();
+    //    intent.putExtra(FetchMessageService.PARAM_ROOM_ID, roomId);
+    //    getView().startService(FetchMessageService.class, intent);
   }
 
   public void sendMessage(String messageText) {
@@ -126,7 +131,7 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
     }
   }
 
-  private void onMessagesInit(){
+  private void onMessagesInit() {
     FDBManager.addRoomEventListener(roomId, new MessageEventListener(roomId, this));
   }
 
