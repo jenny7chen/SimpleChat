@@ -2,7 +2,6 @@ package com.seveneow.simplechat.model;
 
 import android.support.annotation.CallSuper;
 
-import com.seveneow.simplechat.utils.Static;
 import com.seveneow.simplechat.utils.TimeFormat;
 import com.seveneow.simplechat.utils.TimeParser;
 
@@ -21,12 +20,13 @@ public class Message {
   public static final int TYPE_FILE = 3;
 
   private int type = TYPE_TEXT;
-  private String messageId = null;
-  private String messageTime = null;
+  private String id = null;
+  private String time = null;
   private String senderId = "";
   private String pendingId = null;
-  private String messageShowTime = "";
+  private String showTime = "";
   private String roomId = null;
+  private String showText = "";
   private boolean isPending = false;
   private boolean isShowSender = false;
 
@@ -37,10 +37,10 @@ public class Message {
     this.type = type;
   }
 
-  public Message(Message message){
-    this.messageId = message.getMessageId();
+  public Message(Message message) {
+    this.id = message.getId();
     this.type = message.getType();
-    this.messageTime = message.getMessageTime();
+    this.time = message.getTime();
     this.senderId = message.getSenderId();
     this.pendingId = message.getPendingId();
     this.roomId = message.getRoomId();
@@ -48,7 +48,7 @@ public class Message {
     this.isShowSender = message.isShowSender();
   }
 
-  public void setType(int type){
+  public void setType(int type) {
     this.type = type;
   }
 
@@ -56,12 +56,12 @@ public class Message {
     return type;
   }
 
-  public String getMessageId() {
-    return messageId;
+  public String getId() {
+    return id;
   }
 
-  public void setMessageId(String messageId) {
-    this.messageId = messageId;
+  public void setId(String id) {
+    this.id = id;
   }
 
   public String getRoomId() {
@@ -72,20 +72,20 @@ public class Message {
     this.roomId = roomId;
   }
 
-  public String getMessageTime() {
-    return messageTime;
+  public String getTime() {
+    return time;
   }
 
-  public String getMessageShowTime() {
-    if (messageShowTime != null && !messageShowTime.isEmpty())
-      return messageShowTime;
+  public String getShowTime() {
+    if (showTime != null && !showTime.isEmpty())
+      return showTime;
 
-    messageShowTime = TimeParser.getTimeStr(Long.valueOf(messageTime), TimeFormat.CHAT_TIME_FORMAT);
-    return messageShowTime;
+    showTime = TimeParser.getTimeStr(Long.valueOf(time), TimeFormat.CHAT_TIME_FORMAT);
+    return showTime;
   }
 
-  public void setMessageTime(String messageTime) {
-    this.messageTime = messageTime;
+  public void setTime(String time) {
+    this.time = time;
   }
 
   public String getSenderId() {
@@ -120,10 +120,20 @@ public class Message {
     this.pendingId = pendingId;
   }
 
+
+  public String getShowText() {
+    return showText;
+  }
+
+  public void setShowText(String showText) {
+    this.showText = showText;
+  }
+
+
   public static class MessageComparator implements Comparator<Message> {
     @Override
     public int compare(Message o1, Message o2) {
-      return o2.getMessageTime().compareTo(o1.getMessageTime());
+      return o2.getTime().compareTo(o1.getTime());
     }
   }
 
@@ -131,8 +141,8 @@ public class Message {
   public Map<String, Object> toMap() {
     HashMap<String, Object> result = new HashMap<>();
     result.put("type", type);
-    result.put("timestamp", Long.valueOf(messageTime));
-    result.put("senderId", senderId);
+    result.put("timestamp", Long.valueOf(time));
+    result.put("sender_id", senderId);
     result.put("isPending", isPending);
     result.put("pendingId", pendingId);
     result.put("isShowSender", isShowSender);

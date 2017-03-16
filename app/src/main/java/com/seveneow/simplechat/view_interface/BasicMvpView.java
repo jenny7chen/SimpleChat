@@ -21,4 +21,6 @@ public interface BasicMvpView extends MvpView {
 
   public void startService(Class serviceClass, Intent intent);
 
+  public String getStringFromResource(int id, String... parameter);
+
 }

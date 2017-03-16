@@ -37,6 +37,7 @@ public class MainActivity extends BaseActivity<BasicListMvpView, MainPresenter> 
     adapter.setHasStableIds(true);
     recyclerView.setAdapter(adapter);
 
+    //TODO: test
     FirebaseMessaging.getInstance().subscribeToTopic("123");
   }
 
@@ -100,8 +101,18 @@ public class MainActivity extends BaseActivity<BasicListMvpView, MainPresenter> 
 
   @Override
   public void notifyChanged(int type, Object... params) {
-    if (adapter != null)
+    if (adapter == null)
+      return;
+
+    if (type == BasicListMvpView.NOTIFY_ALL_DATA_CHANGED) {
       adapter.notifyDataSetChanged();
+    }
+    else if (type == BasicListMvpView.NOTIFY_DATA_INSERT) {
+      adapter.notifyItemInserted((int) params[0]);
+    }
+    else if (type == BasicListMvpView.NOTIFY_DATA_RANGE_CHANGED) {
+      adapter.notifyItemRangeChanged((int) params[0], (int) params[1], params[2]);
+    }
   }
 
   @Override

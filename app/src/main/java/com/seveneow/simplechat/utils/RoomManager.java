@@ -34,6 +34,10 @@ public class RoomManager {
 
   public void addRoom(Room room) {
     roomMap.put(room.getId(), room);
+    RxEvent event = new RxEvent();
+    event.id = RxEvent.EVENT_ROOM_LIST_UPDATE;
+    event.object = room;
+    RxEventBus.send(event);
   }
 
   public Room getRoomById(String roomId) {
@@ -76,12 +80,12 @@ public class RoomManager {
 
     if (Static.isMessageFromMe(message) && oldMessage != null) {
       room.getMessages().remove(message.getPendingId());
-      room.getMessages().put(message.getMessageId(), message);
+      room.getMessages().put(message.getId(), message);
       event.id = RxEvent.EVENT_ROOM_MESSAGES_UPDATED;
       event.object = roomId;
     }
-    else if (message.getMessageId() != null) {
-      if (room.getMessages().containsKey(message.getMessageId())) {
+    else if (message.getId() != null) {
+      if (room.getMessages().containsKey(message.getId())) {
         event.id = RxEvent.EVENT_ROOM_SINGLE_MESSAGES_UPDATED;
         event.object = message;
 
@@ -91,7 +95,7 @@ public class RoomManager {
         event.object = message;
 
       }
-      room.getMessages().put(message.getMessageId(), message);
+      room.getMessages().put(message.getId(), message);
     }
 
     event.params = new String[]{roomId};

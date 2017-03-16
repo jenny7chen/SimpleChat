@@ -14,10 +14,6 @@ import com.seveneow.simplechat.utils.Static;
 
 import java.io.File;
 
-/**
- * Created by jennychen on 2017/2/16.
- */
-
 public class SimpleChatApplication extends Application implements Application.ActivityLifecycleCallbacks{
   @Override
   public void onCreate() {
@@ -37,7 +33,6 @@ public class SimpleChatApplication extends Application implements Application.Ac
 
   @Override
   public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
-    FDBManager.checkDataInit();
   }
 
   @Override

@@ -11,6 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 
 public class Room {
+  public static final int TYPE_NONE = 0;
   public static final int TYPE_GROUP = 1;
   public static final int TYPE_BOARD = 2;
   public static final int TYPE_USER = 3;
@@ -28,6 +29,8 @@ public class Room {
   private ConcurrentHashMap<String, Message> messages = new ConcurrentHashMap<>();
   private ArrayList<Message> showMessages = new ArrayList<>();
   private ArrayList<Post> posts = new ArrayList<>();
+  private String latestMessageShowText = "";
+  private String latestMessageShowTime = "";
 
   public Room() {
 
@@ -50,8 +53,26 @@ public class Room {
     Message message = getShowMessages().get(0);
     if (message == null)
       return "0";
-    return message.getMessageTime();
+    return message.getTime();
   }
+
+  public String getLatestMessageShowTime() {
+    return latestMessageShowTime;
+  }
+
+  public String getLatestMessageShowText() {
+    return latestMessageShowText;
+  }
+
+
+  public void setLatestMessageShowText(String latestMessageShowText) {
+    this.latestMessageShowText = latestMessageShowText;
+  }
+
+  public void setLatestMessageShowTime(String latestMessageShowTime) {
+    this.latestMessageShowTime = latestMessageShowTime;
+  }
+
 
   public ConcurrentHashMap<String, Message> getMessages() {
     return messages == null ? new ConcurrentHashMap<>() : messages;
@@ -67,7 +88,7 @@ public class Room {
     Iterator iterator = messageList.iterator();
     while (iterator.hasNext()) {
       Message message = (Message) iterator.next();
-      this.getMessages().put(message.getMessageId(), message);
+      this.getMessages().put(message.getId(), message);
     }
   }
 
@@ -147,7 +168,6 @@ public class Room {
     result.put("type", type);
     result.put("name", name);
     result.put("photo", photo);
-    result.put("no_of_users", members.size());
     HashMap<String, Boolean> memberMap = new HashMap<String, Boolean>();
     if (members != null)
       for (String memberId : members) {

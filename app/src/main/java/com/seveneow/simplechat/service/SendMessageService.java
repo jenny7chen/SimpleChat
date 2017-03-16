@@ -83,7 +83,7 @@ public class SendMessageService extends IntentService {
     intent.putExtra(SendMessageService.PARAM_SENDER_ID, senderId);
     intent.putExtra(SendMessageService.PARAM_MESSAGE, message.getMessage());
     intent.putExtra(SendMessageService.PARAM_MESSAGE_TEMP_ID, message.getPendingId());
-    intent.putExtra(SendMessageService.PARAM_MESSAGE_TIME, message.getMessageTime());
+    intent.putExtra(SendMessageService.PARAM_MESSAGE_TIME, message.getTime());
     return intent;
   }
 

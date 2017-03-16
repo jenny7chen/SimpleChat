@@ -2,24 +2,14 @@ package com.seveneow.simplechat.service;
 
 import android.app.IntentService;
 import android.content.Intent;
-import android.util.Log;
 
 import com.google.gson.JsonObject;
-import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.loopj.android.http.SyncHttpClient;
-import com.seveneow.simplechat.BuildConfig;
 import com.seveneow.simplechat.model.Message;
 import com.seveneow.simplechat.model.TextMessage;
 import com.seveneow.simplechat.utils.DebugLog;
-import com.seveneow.simplechat.utils.FDBManager;
-import com.seveneow.simplechat.utils.MessageGenerator;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-
-import cz.msebera.android.httpclient.Header;
-import cz.msebera.android.httpclient.entity.StringEntity;
-import cz.msebera.android.httpclient.message.BasicHeader;
 
 /**
  * Created by jennychen on 2017/2/16.
@@ -57,7 +47,7 @@ public class SendMessagesService extends IntentService {
     intent.putExtra(SendMessagesService.PARAM_SENDER_ID, senderId);
     intent.putExtra(SendMessagesService.PARAM_MESSAGE, message.getMessage());
     intent.putExtra(SendMessagesService.PARAM_MESSAGE_TEMP_ID, message.getPendingId());
-    intent.putExtra(SendMessagesService.PARAM_MESSAGE_TIME, message.getMessageTime());
+    intent.putExtra(SendMessagesService.PARAM_MESSAGE_TIME, message.getTime());
     return intent;
   }
 

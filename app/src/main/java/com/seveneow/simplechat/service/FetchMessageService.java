@@ -54,20 +54,20 @@ public class FetchMessageService extends IntentService {
           "The lunatic, the lover and the poet are of imagination all compact. (A Midsummer Night’s Dream 5.1)\n" +
           "瘋子、情人、詩人都是想像的產兒。——《仲夏夜之夢》");
       text.setMessage("hello1");
-      text.setMessageTime(TimeParser.getCurrentTimeString());
-      text.setMessageId(text.getMessageTime());
+      text.setTime(TimeParser.getCurrentTimeString());
+      text.setId(text.getTime());
 
       Thread.sleep(10);
       TextMessage text2 = new TextMessage();
       text2.setMessage("Hello");
       text2.setSenderId("haha");
-      text2.setMessageTime(TimeParser.getCurrentTimeString());
-      text2.setMessageId(text2.getMessageTime());
+      text2.setTime(TimeParser.getCurrentTimeString());
+      text2.setId(text2.getTime());
       Thread.sleep(10);
 
       StickerMessage sticker = new StickerMessage();
-      sticker.setMessageTime(TimeParser.getCurrentTimeString());
-      sticker.setMessageId(sticker.getMessageTime());
+      sticker.setTime(TimeParser.getCurrentTimeString());
+      sticker.setId(sticker.getTime());
       Thread.sleep(10);
 
       messageList.add(text);
@@ -92,8 +92,8 @@ public class FetchMessageService extends IntentService {
     }
     ImageMessage image = new ImageMessage();
     image.setThumbnail(getImageUrl());
-    image.setMessageTime(TimeParser.getCurrentTimeString());
-    image.setMessageId(image.getMessageTime());
+    image.setTime(TimeParser.getCurrentTimeString());
+    image.setId(image.getTime());
     return image;
   }
 

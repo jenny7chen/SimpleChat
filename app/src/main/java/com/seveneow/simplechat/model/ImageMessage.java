@@ -1,5 +1,6 @@
 package com.seveneow.simplechat.model;
 
+
 import java.util.Map;
 
 

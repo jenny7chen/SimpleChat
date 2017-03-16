@@ -5,10 +5,12 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.seveneow.simplechat.R;
 import com.seveneow.simplechat.model.ImageMessage;
 import com.seveneow.simplechat.model.Message;
 import com.seveneow.simplechat.model.StickerMessage;
 import com.seveneow.simplechat.model.TextMessage;
+import com.seveneow.simplechat.model.User;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -18,8 +20,10 @@ import java.net.URLDecoder;
  */
 
 public class MessageParser {
+  BasePresenter presenter;
 
-  public MessageParser() {
+  public MessageParser(BasePresenter presenter) {
+    this.presenter = presenter;
   }
 
   public Message parse(String jsonStr) {
@@ -31,10 +35,6 @@ public class MessageParser {
     int messageType = getMessageType(messageObject);
     String messageSenderId = messageObject.get("message_sender_id").getAsString();
 
-    //TODO:Test data, if sender id is from myself
-    if (messageSenderId.equals(Static.userId)) {
-      messageSenderId = "";
-    }
     if (messageType == Message.TYPE_TEXT) {
       TextMessage message = new TextMessage();
       String messageText = messageObject.get("message").getAsString();
@@ -45,8 +45,8 @@ public class MessageParser {
         DebugLog.printStackTrace(e);
       }
       message.setMessage(messageText);
-      message.setMessageId(messageObject.get("message_id").getAsString());
-      message.setMessageTime(messageObject.get("message_time").getAsString());
+      message.setId(messageObject.get("message_id").getAsString());
+      message.setTime(messageObject.get("message_time").getAsString());
       message.setPendingId(messageObject.get("message_temp_id").getAsString());
       message.setSenderId(messageSenderId);
       return message;
@@ -55,9 +55,9 @@ public class MessageParser {
     else if (messageType == Message.TYPE_IMAGE) {
       ImageMessage message = new ImageMessage();
       message.setThumbnail(messageObject.get("message").getAsString());
-      message.setMessageId(messageObject.get("message_id").getAsString());
+      message.setId(messageObject.get("message_id").getAsString());
       message.setPendingId(messageObject.get("message_temp_id").getAsString());
-      message.setMessageTime(messageObject.get("message_time").getAsString());
+      message.setTime(messageObject.get("message_time").getAsString());
       message.setSenderId(messageSenderId);
       return message;
 
@@ -83,6 +83,7 @@ public class MessageParser {
 
     int messageType = getMessageType(messageSnapShot);
     String senderId = (String) messageSnapShot.child("sender_id").getValue();
+    User sender = UserManager.getInstance().getUser(senderId);
 
     Message message = null;
 
@@ -97,22 +98,26 @@ public class MessageParser {
         DebugLog.printStackTrace(e);
       }
       ((TextMessage) message).setMessage(messageText);
+      message.setShowText(messageText);
 
     }
     else if (messageType == Message.TYPE_IMAGE) {
       message = new ImageMessage();
       ((ImageMessage) message).setThumbnail((String) messageSnapShot.child("thumbnail").getValue());
+      message.setShowText(presenter.getString(R.string.message_show_text_image, sender.getName()));
 
     }
     else if (messageType == Message.TYPE_STICKER) {
       message = new StickerMessage();
+      message.setShowText(presenter.getString(R.string.message_show_text_sticker, sender.getName()));
+
       return message;
     }
 
-    message.setMessageId(messageSnapShot.getKey());
+    message.setId(messageSnapShot.getKey());
     message.setType(messageType);
     message.setSenderId(senderId);
-    message.setMessageTime((String.valueOf((long) messageSnapShot.child("timestamp").getValue())));
+    message.setTime((String.valueOf((long) messageSnapShot.child("timestamp").getValue())));
 
     if (messageSnapShot.hasChild("isPending"))
       message.setPending((boolean) messageSnapShot.child("isPending").getValue());

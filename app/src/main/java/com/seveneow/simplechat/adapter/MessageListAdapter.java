@@ -58,7 +58,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
       //TODO: add partial update here
       // when payloads is not empty, update view
       Message message = (Message) payloads.get(0);
-      if (message.getMessageId().equals(holder.message.getMessageId())) {
+      if (message.getId().equals(holder.message.getId())) {
         onBindViewHolder(holder, position);
       }
     }
@@ -87,8 +87,8 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
 
   @Override
   public long getItemId(int position) {
-    if (data.get(position).getMessageId() != null)
-      return data.get(position).getMessageId().hashCode();
+    if (data.get(position).getId() != null)
+      return data.get(position).getId().hashCode();
     else
       return data.get(position).getPendingId().hashCode();
   }

@@ -11,6 +11,7 @@ import com.seveneow.simplechat.service.FetchMessageService;
 import com.seveneow.simplechat.utils.BasePresenter;
 import com.seveneow.simplechat.utils.DebugLog;
 import com.seveneow.simplechat.utils.FDBManager;
+import com.seveneow.simplechat.utils.MessageEventListener;
 import com.seveneow.simplechat.utils.MessageGenerator;
 import com.seveneow.simplechat.utils.MessageParser;
 import com.seveneow.simplechat.utils.RoomManager;
@@ -40,10 +41,12 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
 
     getView().showLoading();
     //get data here using asynchttp lib
+    FDBManager.initRoomMessages(roomId, this);
+    FDBManager.addRoomEventListener(roomId, new MessageEventListener(roomId, this));
 
-    Intent intent = new Intent();
-    intent.putExtra(FetchMessageService.PARAM_ROOM_ID, roomId);
-    getView().startService(FetchMessageService.class, intent);
+//    Intent intent = new Intent();
+//    intent.putExtra(FetchMessageService.PARAM_ROOM_ID, roomId);
+//    getView().startService(FetchMessageService.class, intent);
   }
 
   public void sendMessage(String messageText) {
@@ -107,6 +110,7 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
     }
     else if (event.id == RxEvent.EVENT_DATA_UPDATE_NOTIFICATION) {
       onReceiveMessage((String) event.params[0], (Message) event.object);
+      DebugLog.e("baaa", "on receive message");
     }
     else if (event.id == RxEvent.EVENT_ROOM_MESSAGES_UPDATED) {
       onMessagesUpdated((String) event.object);
@@ -117,10 +121,17 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
     else if (event.id == RxEvent.EVENT_ROOM_MESSAGES_ADDED) {
       onMessagesAdded((String) event.params[0], (Message) event.object);
     }
+    else if (event.id == RxEvent.EVENT_ROOM_MESSAGE_INIT) {
+      onMessagesInit();
+    }
+  }
+
+  private void onMessagesInit(){
+    FDBManager.addRoomEventListener(roomId, new MessageEventListener(roomId, this));
   }
 
   public void onReceiveMessage(String roomId, String notificationMessage) {
-    MessageParser parser = new MessageParser();
+    MessageParser parser = new MessageParser(this);
     Message message = parser.parse(notificationMessage);
 
     onReceiveMessage(roomId, message);

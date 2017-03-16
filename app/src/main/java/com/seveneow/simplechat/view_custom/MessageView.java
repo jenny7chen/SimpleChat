@@ -76,12 +76,12 @@ public class MessageView extends RelativeLayout {
 
   private void setMessageFromMeView() {
     TextView sentMessageTimeView = (TextView) findViewById(R.id.message_sent_time);
-    sentMessageTimeView.setText(message.getMessageShowTime());
+    sentMessageTimeView.setText(message.getShowTime());
   }
 
   private void setMessageFromOthersView() {
     TextView gotMessageTimeView = (TextView) findViewById(R.id.message_got_time);
-    gotMessageTimeView.setText(message.getMessageShowTime());
+    gotMessageTimeView.setText(message.getShowTime());
 
     CircleImageView circleImageView = (CircleImageView) findViewById(R.id.avatar);
     ImageLoader.getInstance().displayImage(UserManager.getInstance().getUserPhoto(message.getSenderId()), circleImageView, Static.defaultDisplayImageOptions(R.mipmap.ic_launcher, true));

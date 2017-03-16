@@ -9,11 +9,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.nostra13.universalimageloader.core.ImageLoader;
 import com.seveneow.simplechat.R;
 import com.seveneow.simplechat.model.Room;
+import com.seveneow.simplechat.utils.DebugLog;
+import com.seveneow.simplechat.utils.Static;
 import com.seveneow.simplechat.view.ChatActivity;
 
 import java.util.List;
@@ -50,7 +54,7 @@ public class RoomListAdapter extends RecyclerView.Adapter<RoomListAdapter.Holder
 
   @Override
   public void onBindViewHolder(Holder holder, int position, List<Object> payloads) {
-    if (payloads.isEmpty()) {
+    if (payloads == null || payloads.isEmpty()) {
       // payloads is empty, update the whole ViewHolder
       onBindViewHolder(holder, position);
     }
@@ -69,8 +73,20 @@ public class RoomListAdapter extends RecyclerView.Adapter<RoomListAdapter.Holder
     Room room = data.get(position);
     holder.room = room;
     View view = holder.itemView;
-    TextView textView = (TextView) view.findViewById(R.id.room_name_view);
-    textView.setText(room.getName());
+    if (room.getType() == Room.TYPE_NONE) {
+      DebugLog.e("Baaa", "set gone name = " + room.getName());
+      view.setVisibility(View.GONE);
+    }
+    else {
+      DebugLog.e("Baaa", "set visible name = " + room.getName());
+      view.setVisibility(View.VISIBLE);
+    }
+    TextView nameView = (TextView) view.findViewById(R.id.name_view);
+    nameView.setText(room.getName());
+    TextView textView = (TextView) view.findViewById(R.id.text_view);
+    textView.setText(room.getLatestMessageShowText());
+    ImageView imageView = (ImageView) view.findViewById(R.id.avatar);
+    ImageLoader.getInstance().displayImage(room.getPhoto(), imageView, Static.defaultDisplayImageOptions(R.mipmap.ic_launcher, true));
   }
 
   @Override

@@ -12,8 +12,8 @@ public class MessageGenerator {
     TextMessage text = new TextMessage();
     text.setMessage(message);
     text.setPending(true);
-    text.setMessageTime(String.valueOf(TimeParser.getCurrentTimeString()));
-    text.setPendingId(text.getMessageTime());
+    text.setTime(String.valueOf(TimeParser.getCurrentTimeString()));
+    text.setPendingId(text.getTime());
     text.setSenderId(Static.userId);
     return text;
   }
