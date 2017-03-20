@@ -2,6 +2,7 @@ package com.seveneow.simplechat.utils;
 
 import com.seveneow.simplechat.model.Message;
 import com.seveneow.simplechat.model.Room;
+import com.seveneow.simplechat.presenter.ChatPresenter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,22 +46,22 @@ public class RoomManager {
   }
 
   public ArrayList<Room> getAllRooms() {
-    if(roomMap == null)
+    if (roomMap == null)
       roomMap = new LinkedHashMap<>();
     ArrayList<Room> roomList = new ArrayList<>(roomMap.values());
     return sort(roomList);
   }
 
-  public void addPendingMessage(String roomId, Message message) {
-    if (message == null)
-      return;
-    Room room = getRoomById(roomId);
-    room.getMessages().put(message.getPendingId(), message);
-    RxEvent event = new RxEvent();
-    event.id = RxEvent.EVENT_ROOM_MESSAGES_ADDED;
-    event.params = new String[]{roomId};
-    event.object = message;
-    RxEventBus.send(event);
+  public void checkRoomMessageInit(String roomId, ChatPresenter presenter) {
+    if (getRoomById(roomId) == null || getRoomById(roomId).getMessages().size() == 0) {
+      FDBManager.initRoomMessages(roomId, presenter);
+    }
+    else {
+      RxEvent event = new RxEvent();
+      event.id = RxEvent.EVENT_ROOM_MESSAGES_UPDATED;
+      event.object = roomId;
+      RxEventBus.send(event);
+    }
   }
 
   public void updateRoomMessages(String roomId, ArrayList<Message> messages) {
@@ -78,26 +79,20 @@ public class RoomManager {
     RxEvent event = new RxEvent();
     Message oldMessage = null;
     if (message.getPendingId() != null)
-      oldMessage = room.getMessages().get(message.getPendingId());
+      oldMessage = room.getMessages().get(message.getId());
 
-    if (Static.isMessageFromMe(message) && oldMessage != null) {
-      room.getMessages().remove(message.getPendingId());
-      room.getMessages().put(message.getId(), message);
-      event.id = RxEvent.EVENT_ROOM_MESSAGES_UPDATED;
-      event.object = roomId;
-    }
-    else if (message.getId() != null) {
+    if (message.getId() != null) {
       if (room.getMessages().containsKey(message.getId())) {
         event.id = RxEvent.EVENT_ROOM_SINGLE_MESSAGES_UPDATED;
         event.object = message;
-
+        room.getMessages().get(message.getId()).updateMessage(message);
       }
       else {
         event.id = RxEvent.EVENT_ROOM_MESSAGES_ADDED;
         event.object = message;
+        room.getMessages().put(message.getId(), message);
 
       }
-      room.getMessages().put(message.getId(), message);
     }
 
     event.params = new String[]{roomId};

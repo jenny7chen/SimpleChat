@@ -4,6 +4,8 @@ import com.google.firebase.database.DataSnapshot;
 import com.seveneow.simplechat.model.Room;
 import com.seveneow.simplechat.model.User;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 
 /**
@@ -33,8 +35,16 @@ public class RoomParser {
 
     if(roomSnapShot.hasChild("latest_message")){
       DataSnapshot latestMessageSnapShot = roomSnapShot.child("latest_message");
-      room.setLatestMessageShowTime(TimeParser.getTimeStr(((String)latestMessageSnapShot.child("timestamp").getValue()),TimeFormat.CHAT_TIME_FORMAT));
-      room.setLatestMessageShowText((((String) latestMessageSnapShot.child("show_text").getValue())));
+      room.setLatestMessageShowTime(TimeParser.getTimeStr(String.valueOf(latestMessageSnapShot.child("timestamp").getValue()),TimeFormat.CHAT_TIME_FORMAT));
+
+      String showText = (String) latestMessageSnapShot.child("show_text").getValue();
+      try {
+        showText = URLDecoder.decode(showText, "UTF-8");
+      }
+      catch (UnsupportedEncodingException e) {
+        DebugLog.printStackTrace(e);
+      }
+      room.setLatestMessageShowText(showText);
     }
 
     if (type == Room.TYPE_USER) {

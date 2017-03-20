@@ -3,6 +3,7 @@ package com.seveneow.simplechat.presenter;
 
 import android.content.Intent;
 import android.os.Handler;
+import android.util.Log;
 
 import com.seveneow.simplechat.R;
 import com.seveneow.simplechat.model.Message;
@@ -41,12 +42,8 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
 
     getView().showLoading();
     //get data here using asynchttp lib
-    messageList = RoomManager.getInstance().getRoomById(roomId).getShowMessages();
-    if (messageList.size() == 0) {
-      FDBManager.initRoomMessages(roomId, this);
-    }else{
-      getView().showContent();
-    }
+    //TODO: check this if room manager has room messages data
+    RoomManager.getInstance().checkRoomMessageInit(roomId, this);
     FDBManager.addRoomEventListener(roomId, new MessageEventListener(roomId, this));
 
     //    Intent intent = new Intent();
@@ -61,13 +58,14 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
     Handler handler = new Handler();
     handler.postDelayed(() -> {
       Message message = MessageGenerator.getPendingTextMessage(messageText);
-      RoomManager.getInstance().addPendingMessage(roomId, message);
+      message.setId(FDBManager.getMessagePushKey(roomId));
+      RoomManager.getInstance().addMessage(roomId, message);
+      FDBManager.sendMessage(message.getId(), roomId, message);
 
       //send message
       //TODO:bind service of sending message
 
       //test use
-      FDBManager.sendMessage(roomId, message);
       //      getView().startService(SendMessageService.class, SendMessageService.generateDataIntent("456", (TextMessage) message));
 
     }, 2); // set a delay for message sent
@@ -115,7 +113,6 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
     }
     else if (event.id == RxEvent.EVENT_DATA_UPDATE_NOTIFICATION) {
       onReceiveMessage((String) event.params[0], (Message) event.object);
-      DebugLog.e("baaa", "on receive message");
     }
     else if (event.id == RxEvent.EVENT_ROOM_MESSAGES_UPDATED) {
       onMessagesUpdated((String) event.object);

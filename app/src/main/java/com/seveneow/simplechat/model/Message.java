@@ -48,6 +48,16 @@ public class Message {
     this.isShowSender = message.isShowSender();
   }
 
+  public void updateMessage(Message message){
+    this.type = message.getType();
+    this.time = message.getTime();
+    this.senderId = message.getSenderId();
+    this.pendingId = message.getPendingId();
+    this.roomId = message.getRoomId();
+    this.isPending = message.isPending();
+    this.isShowSender = message.isShowSender();
+  }
+
   public void setType(int type) {
     this.type = type;
   }

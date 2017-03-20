@@ -33,6 +33,10 @@ public class FDBManager {
     RoomManager.getInstance().hasRoomData();
     if (!RoomManager.getInstance().hasRoomData()) {
       getUserRoomList();
+    }else{
+      RxEvent event = new RxEvent();
+      event.id = RxEvent.EVENT_ROOM_LIST_UPDATE;
+      RxEventBus.send(event);
     }
   }
 
@@ -109,41 +113,44 @@ public class FDBManager {
     databaseRef.child("users").child(userId).setValue(user);
   }
 
-  public static void sendMessage(String roomId, Message message) {
-    String key = databaseRef.child("messages").child(roomId).push().getKey();
-    Map<String, Object> pushValues = message.toMap();
+  public static String getMessagePushKey(String roomId){
+    return databaseRef.child("messages").child(roomId).push().getKey();
+  }
+
+  public static String sendMessage(String key, String roomId, Message message) {
+    Message messageSend = MessageGenerator.copyMessage(message);
+
+    Map<String, Object> roomPushValues = new HashMap<>();
+    roomPushValues.put("show_text", message.getShowText());
+    roomPushValues.put("timestamp", message.getTime());
+
+    messageSend.setPending(false);
+    messageSend.setPendingId("");
+    Map<String, Object> pushValues = messageSend.toMap();
 
     Map<String, Object> childUpdates = new HashMap<>();
     childUpdates.put("/messages/" + roomId + "/" + key, pushValues);
+    childUpdates.put("/rooms/" + roomId + "/latest_message/", roomPushValues);
     databaseRef.updateChildren(childUpdates).addOnSuccessListener((Void) -> {
       //inform message sent, need pending id for layout update
       message.setPending(false);
-      message.setId(key);
       RxEvent event = new RxEvent();
       event.id = RxEvent.EVENT_DATA_UPDATE_NOTIFICATION;
       event.params = new String[]{roomId};
       event.object = message;
       RxEventBus.send(event);
 
-      //update message pending status
-      Message messageSend = MessageGenerator.copyMessage(message);
-      messageSend.setPendingId("");
-      FDBManager.updateMessageSentStatus(roomId, messageSend);
-//      FDBManager.updateRoomLatestMessage(roomId, messageSend);
+      Room room = RoomManager.getInstance().getRoomById(roomId);
+      room.setLatestMessageShowText(message.getShowText());
+      RxEvent roomEvent = new RxEvent();
+      roomEvent.id = RxEvent.EVENT_ROOM_LIST_UPDATE;
+      RxEventBus.send(event);
 
     }).addOnFailureListener((Exception) -> {
       //TODO: update failure status on list
     });
+    return key;
   }
-
-  public static void updateMessageSentStatus(String roomId, Message message) {
-    Map<String, Object> pushValues = message.toMap();
-
-    Map<String, Object> childUpdates = new HashMap<>();
-    childUpdates.put("/messages/" + roomId + "/" + message.getId(), pushValues);
-    databaseRef.updateChildren(childUpdates).addOnFailureListener((Exception) -> updateMessageSentStatus(roomId, message));
-  }
-
 
   /**
    * transaction working with data that could be corrupted by concurrent modifications

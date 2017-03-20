@@ -24,7 +24,7 @@ public class MessageEventListener implements ChildEventListener {
       return;
     }
 
-    if (message.isPending()) {
+    if (message.getPendingId() != null) {
       return;
     }
 

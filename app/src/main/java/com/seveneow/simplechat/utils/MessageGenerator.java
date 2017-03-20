@@ -6,6 +6,9 @@ import com.seveneow.simplechat.model.Message;
 import com.seveneow.simplechat.model.StickerMessage;
 import com.seveneow.simplechat.model.TextMessage;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 
 public class MessageGenerator {
   public static Message getPendingTextMessage(String message) {
@@ -15,6 +18,13 @@ public class MessageGenerator {
     text.setTime(String.valueOf(TimeParser.getCurrentTimeString()));
     text.setPendingId(text.getTime());
     text.setSenderId(Static.userId);
+    try {
+      text.setShowText(URLEncoder.encode(message, "UTF-8"));
+    }
+    catch (UnsupportedEncodingException e) {
+      e.printStackTrace();
+      text.setShowText(message);
+    }
     return text;
   }
 
