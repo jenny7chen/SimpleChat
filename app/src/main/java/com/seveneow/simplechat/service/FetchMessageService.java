@@ -3,15 +3,16 @@ package com.seveneow.simplechat.service;
 import android.app.IntentService;
 import android.content.Intent;
 
+import com.seveneow.simplechat.database.DBHelper;
 import com.seveneow.simplechat.model.ImageMessage;
 import com.seveneow.simplechat.model.Message;
 import com.seveneow.simplechat.model.Room;
-import com.seveneow.simplechat.model.StickerMessage;
-import com.seveneow.simplechat.model.TextMessage;
 import com.seveneow.simplechat.utils.DebugLog;
+import com.seveneow.simplechat.utils.FDBManager;
+import com.seveneow.simplechat.utils.MessageParser;
 import com.seveneow.simplechat.utils.RoomManager;
-import com.seveneow.simplechat.utils.RxEvent;
-import com.seveneow.simplechat.utils.RxEventBus;
+import com.seveneow.simplechat.utils.RxEventSender;
+import com.seveneow.simplechat.utils.Static;
 import com.seveneow.simplechat.utils.TimeParser;
 
 import java.util.ArrayList;
@@ -27,61 +28,66 @@ public class FetchMessageService extends IntentService {
 
   @Override
   protected void onHandleIntent(Intent intent) {
-    //do queries here
     String roomId = intent.getStringExtra(PARAM_ROOM_ID);
     Room room = RoomManager.getInstance().getRoomById(roomId);
     if (room == null)
       return;
 
-    if (room.getMessages().size() > 0) {
-      RxEvent event = new RxEvent();
-      event.id = RxEvent.EVENT_ROOM_MESSAGES_UPDATED;
-      event.object = roomId;
-      RxEventBus.send(event);
+    //check if save to DB is in processing, if it's running, need to wait until data saving finished.
+    while (Static.isMyServiceRunning(this, SaveDBRequestService.class)) {
+      try {
+        Thread.sleep(100);
+      }
+      catch (InterruptedException e) {
+        e.printStackTrace();
+      }
+    }
+
+    //get new message list from database
+    ArrayList<Message> messages = DBHelper.getInstance(this).getRoomMessages(new MessageParser(this), roomId, Static.DB_PASS);
+    if (messages.size() > 0) {
+      DebugLog.e("FetchMessageService", "has db message return ");
+      RoomManager.getInstance().updateRoomMessages(roomId, messages);
+      RxEventSender.notifyRoomMessagesUpdated(roomId);
+      RxEventSender.notifyRoomMessagesInited(roomId);
       return;
     }
 
-    //get new message list from database or server
-    try {
-      Thread.sleep(800);
-      //test data onSuccess
-      ArrayList<Message> messageList = new ArrayList<Message>();
-      TextMessage text = new TextMessage();
-      text.setMessage("Things base and vile, holding no quantity, love can transpose to from and dignity: love looks not with the eyes, but with mind. (A Midsummer Night’s Dream 1.1)\n" +
-          "卑賤和劣行在愛情看來都不算數，都可以被轉化成美滿和莊嚴：愛情不用眼睛辨別，而是用心靈來判斷/愛用的不是眼睛，而是心。——《仲夏夜之夢》\n" +
-          "Lord, what fools these mortals be! (A Midsummer Night’s Dream 3.2)\n" +
-          "上帝呀，這些凡人怎麼都是十足的傻瓜！——《仲夏夜之夢》\n" +
-          "The lunatic, the lover and the poet are of imagination all compact. (A Midsummer Night’s Dream 5.1)\n" +
-          "瘋子、情人、詩人都是想像的產兒。——《仲夏夜之夢》");
-      text.setMessage("hello1");
-      text.setTime(TimeParser.getCurrentTimeString());
-      text.setId(text.getTime());
-
-      Thread.sleep(10);
-      TextMessage text2 = new TextMessage();
-      text2.setMessage("Hello");
-      text2.setSenderId("haha");
-      text2.setTime(TimeParser.getCurrentTimeString());
-      text2.setId(text2.getTime());
-      Thread.sleep(10);
-
-      StickerMessage sticker = new StickerMessage();
-      sticker.setTime(TimeParser.getCurrentTimeString());
-      sticker.setId(sticker.getTime());
-      Thread.sleep(10);
-
-      messageList.add(text);
-      messageList.add(text2);
-      messageList.add(sticker);
-      messageList.add(getTestImageMessage());
-      messageList.add(getTestImageMessage());
-      RoomManager.getInstance().updateRoomMessages(roomId, messageList);
-    }
-    catch (InterruptedException e) {
-
-    }
-
+    FDBManager.initRoomMessages(roomId, this);
   }
+
+//  private void getMessagesFromServer(String roomId) {
+//    FDBManager.initRoomMessages(roomId);
+//
+//    String url = "https://" + Static.FIREBASE_PROJECT_ID + ".firebaseio-demo.com/messages/" + roomId + ".json";
+//    SyncHttpClient client = new SyncHttpClient();
+//    client.setEnableRedirects(true);
+//
+//    if (BuildConfig.DEBUG) {
+//      client.setLoggingLevel(Log.ERROR);
+//    }
+//    else {
+//      client.setLoggingEnabled(false);
+//    }
+//    Header header = new BasicHeader("Authorization", "key=AAAAITet3RY:APA91bF1EOwJlTQ88tQCog4Z2ARSRc9aTR4JwNzGHn7Zt4zqkf097rICiWoTPK_nzneoTO4yb018grE2diFydA5BsR8TXIXoGH4H649MWGUJYlxLwS5x8sAdcvZnOkWbYvx477GvSspC");
+//    Header[] headers = {header};
+//    RequestParams requestParams = new RequestParams();
+//    requestParams.setContentEncoding("UTF-8");
+//    AsyncHttpResponseHandler responseHandler = new AsyncHttpResponseHandler() {
+//      @Override
+//      public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+//        JsonElement jsonElement = new JsonParser().parse(new String(responseBody));
+//        DebugLog.e("baaa", "result = " + jsonElement.toString());
+//      }
+//
+//      @Override
+//      public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+//        Log.e("baaa", "onFailure status code = " + statusCode);
+//      }
+//    };
+//    client.get(this, url, requestParams, responseHandler);
+//  }
+
 
   private ImageMessage getTestImageMessage() {
     try {

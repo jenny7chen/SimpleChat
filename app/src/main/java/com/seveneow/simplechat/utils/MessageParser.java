@@ -1,11 +1,16 @@
 package com.seveneow.simplechat.utils;
 
 
+import android.content.Context;
+
 import com.google.firebase.database.DataSnapshot;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.seveneow.simplechat.R;
+import com.seveneow.simplechat.database.DBHelper;
+import com.seveneow.simplechat.database.MessageTable;
+import com.seveneow.simplechat.model.FileMessage;
 import com.seveneow.simplechat.model.ImageMessage;
 import com.seveneow.simplechat.model.Message;
 import com.seveneow.simplechat.model.StickerMessage;
@@ -21,9 +26,14 @@ import java.net.URLDecoder;
 
 public class MessageParser {
   BasePresenter presenter;
+  Context context;
 
   public MessageParser(BasePresenter presenter) {
     this.presenter = presenter;
+  }
+
+  public MessageParser(Context context) {
+    this.context = context;
   }
 
   public Message parse(String jsonStr) {
@@ -47,7 +57,6 @@ public class MessageParser {
       message.setMessage(messageText);
       message.setId(messageObject.get("message_id").getAsString());
       message.setTime(messageObject.get("message_time").getAsString());
-      message.setPendingId(messageObject.get("message_temp_id").getAsString());
       message.setSenderId(messageSenderId);
       return message;
 
@@ -56,7 +65,6 @@ public class MessageParser {
       ImageMessage message = new ImageMessage();
       message.setThumbnail(messageObject.get("message").getAsString());
       message.setId(messageObject.get("message_id").getAsString());
-      message.setPendingId(messageObject.get("message_temp_id").getAsString());
       message.setTime(messageObject.get("message_time").getAsString());
       message.setSenderId(messageSenderId);
       return message;
@@ -104,12 +112,18 @@ public class MessageParser {
     else if (messageType == Message.TYPE_IMAGE) {
       message = new ImageMessage();
       ((ImageMessage) message).setThumbnail((String) messageSnapShot.child("thumbnail").getValue());
-      message.setShowText(presenter.getString(R.string.message_show_text_image, sender.getName()));
+      if (presenter != null)
+        message.setShowText(presenter.getString(R.string.message_show_text_image, sender.getName()));
+      else if (context != null)
+        message.setShowText(context.getString(R.string.message_show_text_image, sender.getName()));
 
     }
     else if (messageType == Message.TYPE_STICKER) {
       message = new StickerMessage();
-      message.setShowText(presenter.getString(R.string.message_show_text_sticker, sender.getName()));
+      if (presenter != null)
+        message.setShowText(presenter.getString(R.string.message_show_text_sticker, sender.getName()));
+      else if (context != null)
+        message.setShowText(context.getString(R.string.message_show_text_sticker, sender.getName()));
 
       return message;
     }
@@ -122,8 +136,34 @@ public class MessageParser {
     if (messageSnapShot.hasChild("isPending"))
       message.setPending((boolean) messageSnapShot.child("isPending").getValue());
 
-    if (messageSnapShot.hasChild("pendingId"))
-      message.setPendingId((String) messageSnapShot.child("pendingId").getValue());
+    return message;
+  }
+
+  public Message parse(Object[] dbData) {
+    Message message = new Message();
+    int messageType = (int) (long) dbData[4];
+    if (messageType == Message.TYPE_IMAGE) {
+      message = new ImageMessage();
+      ((ImageMessage) message).setThumbnail((String) dbData[5]);
+    }
+    else if (messageType == Message.TYPE_TEXT) {
+      message = new TextMessage();
+      ((TextMessage) message).setMessage((String) dbData[6]);
+    }
+    else if (messageType == Message.TYPE_STICKER) {
+      message = new StickerMessage();
+    }
+    else if (messageType == Message.TYPE_FILE) {
+      message = new FileMessage();
+    }
+    message.setId((String) dbData[0]);
+    message.setDatabaseId((long) dbData[1]);
+    message.setType(messageType);
+    message.setSenderId((String) dbData[2]);
+    message.setShowSender((int)(long) dbData[8] != 0);
+    message.setTime((String) dbData[3]);
+    message.setRoomId((String) dbData[7]);
+
     return message;
   }
 }

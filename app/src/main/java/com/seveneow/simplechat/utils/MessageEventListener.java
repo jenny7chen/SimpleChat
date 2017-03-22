@@ -24,9 +24,8 @@ public class MessageEventListener implements ChildEventListener {
       return;
     }
 
-    if (message.getPendingId() != null) {
+    if (Static.isMessageSentFromLocal(message))
       return;
-    }
 
     RxEvent event = new RxEvent();
     event.id = RxEvent.EVENT_DATA_UPDATE_NOTIFICATION;

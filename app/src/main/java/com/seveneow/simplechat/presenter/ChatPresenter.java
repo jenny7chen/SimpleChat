@@ -9,6 +9,7 @@ import com.seveneow.simplechat.R;
 import com.seveneow.simplechat.model.Message;
 import com.seveneow.simplechat.model.Room;
 import com.seveneow.simplechat.service.FetchMessageService;
+import com.seveneow.simplechat.service.SendMessagesService;
 import com.seveneow.simplechat.utils.BasePresenter;
 import com.seveneow.simplechat.utils.DebugLog;
 import com.seveneow.simplechat.utils.FDBManager;
@@ -42,13 +43,17 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
 
     getView().showLoading();
     //get data here using asynchttp lib
-    //TODO: check this if room manager has room messages data
-    RoomManager.getInstance().checkRoomMessageInit(roomId, this);
-    FDBManager.addRoomEventListener(roomId, new MessageEventListener(roomId, this));
 
-    //    Intent intent = new Intent();
-    //    intent.putExtra(FetchMessageService.PARAM_ROOM_ID, roomId);
-    //    getView().startService(FetchMessageService.class, intent);
+    Room room = RoomManager.getInstance().getRoomById(roomId);
+    if (room.hasMessages()) {
+      onMessagesUpdated(roomId);
+      onMessagesInit();
+      getView().showContent();
+    }
+    DebugLog.e("Baaa", "start service");
+    Intent intent = new Intent();
+    intent.putExtra(FetchMessageService.PARAM_ROOM_ID, roomId);
+    getView().startService(FetchMessageService.class, intent);
   }
 
   public void sendMessage(String messageText) {
@@ -57,16 +62,15 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
 
     Handler handler = new Handler();
     handler.postDelayed(() -> {
-      Message message = MessageGenerator.getPendingTextMessage(messageText);
+      Message message = MessageGenerator.getPendingTextMessage(roomId, messageText, RoomManager.getInstance().getRoomById(roomId).getType());
       message.setId(FDBManager.getMessagePushKey(roomId));
-      RoomManager.getInstance().addMessage(roomId, message);
-      FDBManager.sendMessage(message.getId(), roomId, message);
 
       //send message
       //TODO:bind service of sending message
-
-      //test use
-      //      getView().startService(SendMessageService.class, SendMessageService.generateDataIntent("456", (TextMessage) message));
+      Intent intent = new Intent();
+      intent.putExtra(SendMessagesService.PARAM_ROOM_ID, roomId);
+      intent.putExtra(SendMessagesService.PARAM_MESSAGE, message);
+      getView().startService(SendMessagesService.class, intent);
 
     }, 2); // set a delay for message sent
   }
@@ -124,7 +128,13 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
       onMessagesAdded((String) event.params[0], (Message) event.object);
     }
     else if (event.id == RxEvent.EVENT_ROOM_MESSAGE_INIT) {
-      onMessagesInit();
+      if (roomId.equals(event.object))
+        onMessagesInit();
+    }
+    else if (event.id == RxEvent.EVENT_ROOM_MESSAGE_SAVED) {
+      DebugLog.e("Baaa", "message saved fetch messags");
+      if (roomId.equals(event.object))
+        fetchMessages();
     }
   }
 

@@ -34,12 +34,13 @@
         <service
             android:name=".service.FetchMessageService"
             android:enabled="true"/>
+
         <service
-            android:name=".service.SendMessageService"
+            android:name=".service.SaveMessageService"
             android:enabled="true"/>
 
         <service
-            android:name=".service.SaveDBRequestService"
+            android:name=".service.SendMessagesService"
             android:enabled="true"/>
 
     </application>

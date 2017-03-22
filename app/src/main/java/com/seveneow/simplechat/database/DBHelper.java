@@ -2,18 +2,39 @@ package com.seveneow.simplechat.database;
 
 import android.content.Context;
 
+import com.seveneow.simplechat.model.Message;
+import com.seveneow.simplechat.model.Room;
+import com.seveneow.simplechat.model.User;
+import com.seveneow.simplechat.utils.BasePresenter;
+import com.seveneow.simplechat.utils.DebugLog;
+import com.seveneow.simplechat.utils.MessageParser;
+
 import net.sqlcipher.database.SQLiteDatabase;
 import net.sqlcipher.database.SQLiteOpenHelper;
 
-/**
- * Created by jennychen on 2017/2/14.
- */
+import java.util.ArrayList;
+
 
 public class DBHelper extends SQLiteOpenHelper {
+  public final static String _DBName = "SampleList.db";
   private final static int _DBVersion = 1;
-  private final static String _DBName = "SampleList.db";
+  private static DBHelper instance = null;
 
-  public DBHelper(Context context) {
+  public static synchronized DBHelper getInstance(Context context) {
+    if (instance == null) {
+      instance = new DBHelper(context.getApplicationContext());
+    }
+    return instance;
+  }
+
+  public static void destroy() {
+    if (instance != null) {
+      instance.close();
+      instance = null;
+    }
+  }
+
+  private DBHelper(Context context) {
     super(context, _DBName, null, _DBVersion);
   }
 
@@ -23,24 +44,71 @@ public class DBHelper extends SQLiteOpenHelper {
   }
 
   private void initTable(SQLiteDatabase db) {
-    db.execSQL(Queries.CREATE_USER_TABLE);
-    db.execSQL(Queries.CREATE_MESSAGE_TABLE);
-    db.execSQL(Queries.CREATE_ROOM_TABLE);
+    MessageTable.onCreate(db);
+    RoomUserTable.onCreate(db);
+    RoomTable.onCreate(db);
+    UserTable.onCreate(db);
   }
 
-  private void insert() {
-    //    PreparedStatement stm = c.prepareStatement("UPDATE user_table SET name=? WHERE id=?");
-    //    stm.setString(1, "the name");
-    //    stm.setInt(2, 345);
-    //    stm.executeUpdate();
+  public void insertRoom(Room room, String password) {
+    RoomTable.insert(this, room, password);
+    for (String userId : room.getMembers()) {
+      RoomUserTable.insert(this, room.getId(), userId, password);
+    }
+  }
+
+  public void insertUser(User user, String password) {
+    UserTable.insert(this, user, password);
+  }
+
+  public long insertMessage(Message message, String password) {
+    return MessageTable.insert(this, message, password);
+  }
+
+  public long insertMessageList(ArrayList<Message> messages, String password) {
+    return MessageTable.insertMessages(this, messages, password);
+  }
+
+  public ArrayList<Message> getRoomMessages(MessageParser parser, String roomId, String password) {
+    ArrayList<Message> messages = new ArrayList<>();
+    ArrayList<Object[]> messageData = MessageTable.getMessagesByRoomId(this, roomId, password);
+
+    for (Object[] data : messageData) {
+      Message message = parser.parse(data);
+      if (message == null)
+        continue;
+      messages.add(message);
+    }
+    return messages;
+  }
+
+  public ArrayList<String> getRoomMembers(String roomId, String password) {
+    return RoomUserTable.get(this, roomId, password);
+  }
+
+  public ArrayList<Message> searchMessage(BasePresenter presenter, String[] cols, String[] args, String password) {
+    ArrayList<Message> messages = new ArrayList<>();
+    MessageParser parser = new MessageParser(presenter);
+    ArrayList<Object[]> messageData = MessageTable.getMessagesByArgs(this, cols, args, password);
+    for (Object[] data : messageData) {
+      Message message = parser.parse(data);
+      if (message == null)
+        continue;
+      messages.add(message);
+    }
+    return messages;
+  }
+
+  public void updateMessage(Message message, String password) {
+    MessageTable.update(this, message, password);
   }
 
   @Override
   public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
     //TODO: onUpgrade what to do?
     db.execSQL(Queries.DROP_USER_TABLE);
     db.execSQL(Queries.DROP_MESSAGE_TABLE);
     db.execSQL(Queries.DROP_ROOM_TABLE);
+    db.execSQL(Queries.DROP_ROOM_USER_TABLE);
   }
 }

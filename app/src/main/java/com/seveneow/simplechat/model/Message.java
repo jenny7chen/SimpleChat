@@ -1,5 +1,7 @@
 package com.seveneow.simplechat.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.CallSuper;
 
 import com.seveneow.simplechat.utils.TimeFormat;
@@ -13,17 +15,17 @@ import java.util.Map;
  * Created by jennychen on 2017/1/24.
  */
 
-public class Message {
+public class Message implements Parcelable {
   public static final int TYPE_TEXT = 0;
   public static final int TYPE_IMAGE = 1;
   public static final int TYPE_STICKER = 2;
   public static final int TYPE_FILE = 3;
 
   private int type = TYPE_TEXT;
+  private long databaseId = -1;
   private String id = null;
   private String time = null;
   private String senderId = "";
-  private String pendingId = null;
   private String showTime = "";
   private String roomId = null;
   private String showText = "";
@@ -39,23 +41,31 @@ public class Message {
 
   public Message(Message message) {
     this.id = message.getId();
+    this.databaseId = message.getDatabaseId();
     this.type = message.getType();
     this.time = message.getTime();
     this.senderId = message.getSenderId();
-    this.pendingId = message.getPendingId();
     this.roomId = message.getRoomId();
     this.isPending = message.isPending();
     this.isShowSender = message.isShowSender();
   }
 
-  public void updateMessage(Message message){
+  public void updateMessage(Message message) {
     this.type = message.getType();
+    this.databaseId = message.getDatabaseId();
     this.time = message.getTime();
     this.senderId = message.getSenderId();
-    this.pendingId = message.getPendingId();
     this.roomId = message.getRoomId();
     this.isPending = message.isPending();
     this.isShowSender = message.isShowSender();
+  }
+
+  public long getDatabaseId() {
+    return databaseId;
+  }
+
+  public void setDatabaseId(long databaseId) {
+    this.databaseId = databaseId;
   }
 
   public void setType(int type) {
@@ -122,15 +132,6 @@ public class Message {
     this.isShowSender = isShowSender;
   }
 
-  public String getPendingId() {
-    return pendingId;
-  }
-
-  public void setPendingId(String pendingId) {
-    this.pendingId = pendingId;
-  }
-
-
   public String getShowText() {
     return showText;
   }
@@ -139,6 +140,43 @@ public class Message {
     this.showText = showText;
   }
 
+  public Message(Parcel in) {
+    this.id = in.readString();
+    this.databaseId = in.readLong();
+    this.type = in.readInt();
+    this.time = in.readString();
+    this.senderId = in.readString();
+    this.roomId = in.readString();
+    this.isPending = in.readInt() == 1;
+    this.isShowSender = in.readInt() == 1;
+  }
+
+  @Override
+  public int describeContents() {
+    return 0;
+  }
+
+  @Override
+  public void writeToParcel(Parcel dest, int flags) {
+    dest.writeString(this.id);
+    dest.writeLong(this.databaseId);
+    dest.writeInt(this.type);
+    dest.writeString(this.time);
+    dest.writeString(this.senderId);
+    dest.writeString(this.roomId);
+    dest.writeInt(this.isPending ? 1 : 0);
+    dest.writeInt(this.isShowSender ? 1 : 0);
+  }
+
+  public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
+    public Message createFromParcel(Parcel in) {
+      return new Message(in);
+    }
+
+    public Message[] newArray(int size) {
+      return new Message[size];
+    }
+  };
 
   public static class MessageComparator implements Comparator<Message> {
     @Override
@@ -154,7 +192,6 @@ public class Message {
     result.put("timestamp", Long.valueOf(time));
     result.put("sender_id", senderId);
     result.put("isPending", isPending);
-    result.put("pendingId", pendingId);
     result.put("isShowSender", isShowSender);
     result.put("roomId", roomId);
     return result;

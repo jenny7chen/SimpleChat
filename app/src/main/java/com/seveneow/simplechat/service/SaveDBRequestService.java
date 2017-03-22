@@ -14,7 +14,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 public class SaveDBRequestService extends Service {
-  private static final int PENDING_TIME = 2000;
+  private static final int PENDING_TIME = 1000;
   private static final int MAX_RUNNING_REQUEST_AMOUNT = 10000;
   private final Binder binder = new SaveDBBinder();
   private LinkedList<DBRequest> pendingQueue;
@@ -78,6 +78,7 @@ public class SaveDBRequestService extends Service {
     pendingQueue.clear();
 
     //TODO: start DB transaction here
+
 
     if (runningQueue.size() > MAX_RUNNING_REQUEST_AMOUNT) {
       commitTransaction();

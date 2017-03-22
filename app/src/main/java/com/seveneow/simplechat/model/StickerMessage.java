@@ -1,5 +1,8 @@
 package com.seveneow.simplechat.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.Map;
 
 /**
@@ -43,5 +46,31 @@ public class StickerMessage extends Message {
     map.put("stickerId", stickerId);
     map.put("stickerGroupId", stickerGroupId);
     return map;
+  }
+
+  public static final Parcelable.Creator<StickerMessage> CREATOR = new Parcelable.Creator<StickerMessage>() {
+    public StickerMessage createFromParcel(Parcel in) {
+      return new StickerMessage(in);
+    }
+
+    public StickerMessage[] newArray(int size) {
+      return new StickerMessage[size];
+    }
+  };
+
+  public int describeContents() {
+    return 0;
+  }
+
+  public void writeToParcel(Parcel out, int flags) {
+    super.writeToParcel(out, flags);
+    out.writeString(stickerId);
+    out.writeString(stickerGroupId);
+  }
+
+  public StickerMessage(Parcel in) {
+    super(in);
+    this.stickerId = in.readString();
+    this.stickerGroupId = in.readString();
   }
 }

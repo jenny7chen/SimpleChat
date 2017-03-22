@@ -1,5 +1,8 @@
 package com.seveneow.simplechat.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.Map;
 
 public class FileMessage extends Message {
@@ -14,16 +17,17 @@ public class FileMessage extends Message {
 
   public FileMessage(Message message) {
     super(message);
-    this.url = ((FileMessage)message).getUrl();
-    this.md5 = ((FileMessage)message).getMd5();
-    this.name = ((FileMessage)message).getName();
-    this.size = ((FileMessage)message).getSize();
+    this.url = ((FileMessage) message).getUrl();
+    this.md5 = ((FileMessage) message).getMd5();
+    this.name = ((FileMessage) message).getName();
+    this.size = ((FileMessage) message).getSize();
     this.setType(TYPE_IMAGE);
   }
 
   public FileMessage(int type) {
     super(type);
   }
+
 
   public String getUrl() {
     return url;
@@ -64,5 +68,35 @@ public class FileMessage extends Message {
     map.put("name", name);
     map.put("size", size);
     return map;
+  }
+
+  public static final Parcelable.Creator<FileMessage> CREATOR = new Parcelable.Creator<FileMessage>() {
+    public FileMessage createFromParcel(Parcel in) {
+      return new FileMessage(in);
+    }
+
+    public FileMessage[] newArray(int size) {
+      return new FileMessage[size];
+    }
+  };
+
+  public int describeContents() {
+    return 0;
+  }
+
+  public void writeToParcel(Parcel out, int flags) {
+    super.writeToParcel(out, flags);
+    out.writeString(url);
+    out.writeString(md5);
+    out.writeString(name);
+    out.writeString(size);
+  }
+
+  public FileMessage(Parcel in) {
+    super(in);
+    this.url = in.readString();
+    this.md5 = in.readString();
+    this.name = in.readString();
+    this.size = in.readString();
   }
 }

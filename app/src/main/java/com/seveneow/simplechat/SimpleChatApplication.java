@@ -12,6 +12,8 @@ import com.nostra13.universalimageloader.utils.StorageUtils;
 import com.seveneow.simplechat.utils.FDBManager;
 import com.seveneow.simplechat.utils.Static;
 
+import net.sqlcipher.database.SQLiteDatabase;
+
 import java.io.File;
 
 public class SimpleChatApplication extends Application implements Application.ActivityLifecycleCallbacks{
@@ -25,6 +27,8 @@ public class SimpleChatApplication extends Application implements Application.Ac
     configBuilder.defaultDisplayImageOptions(Static.defaultDisplayImageOptions(R.mipmap.ic_launcher, true));
     configBuilder.memoryCache(new WeakMemoryCache());
     configBuilder.diskCache(new LimitedAgeDiskCache(cacheDir, 86400 /* 1 day */));
+
+    SQLiteDatabase.loadLibs(this);
 
     ImageLoader.getInstance().init(configBuilder.build());
     FDBManager.init();

@@ -96,6 +96,10 @@ public class Room {
     return !(members == null || members.isEmpty());
   }
 
+  public boolean hasMessages() {
+    return !(messages == null || messages.isEmpty());
+  }
+
   private ArrayList<Message> sortMessages(ArrayList<Message> roomList) {
     Collections.sort(roomList, new Message.MessageComparator());
     return roomList;

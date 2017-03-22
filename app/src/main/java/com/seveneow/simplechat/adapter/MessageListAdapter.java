@@ -87,10 +87,10 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
 
   @Override
   public long getItemId(int position) {
-    if (data.get(position).getId() != null)
-      return data.get(position).getId().hashCode();
+    if (data.get(position).getDatabaseId() != -1)
+      return data.get(position).getDatabaseId();
     else
-      return data.get(position).getPendingId().hashCode();
+      return data.get(position).getId().hashCode();
   }
 
   public List<Message> getData() {

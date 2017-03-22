@@ -1,5 +1,8 @@
 package com.seveneow.simplechat.utils;
 
+import android.content.Context;
+import android.content.Intent;
+
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -13,6 +16,7 @@ import com.seveneow.simplechat.model.Post;
 import com.seveneow.simplechat.model.Room;
 import com.seveneow.simplechat.model.User;
 import com.seveneow.simplechat.presenter.ChatPresenter;
+import com.seveneow.simplechat.service.SaveMessageService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,7 +37,8 @@ public class FDBManager {
     RoomManager.getInstance().hasRoomData();
     if (!RoomManager.getInstance().hasRoomData()) {
       getUserRoomList();
-    }else{
+    }
+    else {
       RxEvent event = new RxEvent();
       event.id = RxEvent.EVENT_ROOM_LIST_UPDATE;
       RxEventBus.send(event);
@@ -53,25 +58,28 @@ public class FDBManager {
       RoomManager.getInstance().addRoom(room);
     }
 
-    for(String roomId : roomIdList){
+    for (String roomId : roomIdList) {
       getRoomData(roomId);
     }
   }
 
   private static void getRoomData(String roomId) {
-    DebugLog.e("baaa", "get room data = "+roomId);
+    DebugLog.e("baaa", "get room data = " + roomId);
     databaseRef.child("rooms").child(roomId).addListenerForSingleValueEvent(new RoomEventListener());
   }
 
-  public static void onGotRoomData(Room room){
-    DebugLog.e("baaa", "got room data = "+room);
+  public static void onGotRoomData(Room room) {
+    DebugLog.e("baaa", "got room data = " + room);
     if (room == null) {
       return;
     }
+
     RoomManager.getInstance().addRoom(room);
+    DebugLog.e("baaa", "addRoom(room);= " + room.getMessages().size());
+
   }
 
-  public static void initRoomMessages(String roomId, ChatPresenter presenter) {
+  public static void initRoomMessages(String roomId, Context context) {
     ArrayList<Message> roomMessages = new ArrayList<>();
     databaseRef.child("messages").child(roomId).orderByChild("timestamp").limitToLast(100).addListenerForSingleValueEvent(new ValueEventListener() {
       @Override
@@ -79,17 +87,17 @@ public class FDBManager {
         if (dataSnapshot.getChildren() == null)
           return;
         for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-          Message message = new MessageParser(presenter).parse(postSnapshot);
+          Message message = new MessageParser(context).parse(postSnapshot);
           if (message == null)
             continue;
+          message.setRoomId(roomId);
           roomMessages.add(message);
         }
-        RoomManager.getInstance().updateRoomMessages(roomId, roomMessages);
-        RxEvent event = new RxEvent();
-        event.id = RxEvent.EVENT_ROOM_MESSAGE_INIT;
-        event.object = roomId;
-        RxEventBus.send(event);
-        DebugLog.e("baaa", "message init");
+        Intent intent = new Intent(context, SaveMessageService.class);
+        intent.putExtra(SaveMessageService.PARAM_ROOM_ID, roomId);
+        intent.putExtra(SaveMessageService.PARAM_MESSAGES, roomMessages);
+        context.startService(intent);
+        DebugLog.e("baaa", "initRoomMessages");
       }
 
       @Override
@@ -113,11 +121,11 @@ public class FDBManager {
     databaseRef.child("users").child(userId).setValue(user);
   }
 
-  public static String getMessagePushKey(String roomId){
+  public static String getMessagePushKey(String roomId) {
     return databaseRef.child("messages").child(roomId).push().getKey();
   }
 
-  public static String sendMessage(String key, String roomId, Message message) {
+  public static String sendMessage(String key, String roomId, Message message, Context context) {
     Message messageSend = MessageGenerator.copyMessage(message);
 
     Map<String, Object> roomPushValues = new HashMap<>();
@@ -125,7 +133,6 @@ public class FDBManager {
     roomPushValues.put("timestamp", message.getTime());
 
     messageSend.setPending(false);
-    messageSend.setPendingId("");
     Map<String, Object> pushValues = messageSend.toMap();
 
     Map<String, Object> childUpdates = new HashMap<>();
@@ -134,17 +141,28 @@ public class FDBManager {
     databaseRef.updateChildren(childUpdates).addOnSuccessListener((Void) -> {
       //inform message sent, need pending id for layout update
       message.setPending(false);
-      RxEvent event = new RxEvent();
-      event.id = RxEvent.EVENT_DATA_UPDATE_NOTIFICATION;
-      event.params = new String[]{roomId};
-      event.object = message;
-      RxEventBus.send(event);
 
+      ArrayList<Message> messages = new ArrayList<Message>();
+      messages.add(message);
+      Intent intent = new Intent(context, SaveMessageService.class);
+      intent.putExtra(SaveMessageService.PARAM_ROOM_ID, roomId);
+      intent.putExtra(SaveMessageService.PARAM_MESSAGES, messages);
+      context.startService(intent);
+
+
+      //      RxEvent event = new RxEvent();
+      //      event.id = RxEvent.EVENT_DATA_UPDATE_NOTIFICATION;
+      //      event.params = new String[]{roomId};
+      //      event.object = message;
+      //      RxEventBus.send(event);
+
+
+      //TODO: update room information in DB
       Room room = RoomManager.getInstance().getRoomById(roomId);
       room.setLatestMessageShowText(message.getShowText());
       RxEvent roomEvent = new RxEvent();
       roomEvent.id = RxEvent.EVENT_ROOM_LIST_UPDATE;
-      RxEventBus.send(event);
+      RxEventBus.send(roomEvent);
 
     }).addOnFailureListener((Exception) -> {
       //TODO: update failure status on list

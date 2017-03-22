@@ -1,5 +1,7 @@
 package com.seveneow.simplechat.utils;
 
+import android.content.Context;
+
 import com.seveneow.simplechat.model.Message;
 import com.seveneow.simplechat.model.Room;
 import com.seveneow.simplechat.presenter.ChatPresenter;
@@ -35,10 +37,7 @@ public class RoomManager {
 
   public void addRoom(Room room) {
     roomMap.put(room.getId(), room);
-    RxEvent event = new RxEvent();
-    event.id = RxEvent.EVENT_ROOM_LIST_UPDATE;
-    event.object = room;
-    RxEventBus.send(event);
+    RxEventSender.notifyRoomListUpdated(room);
   }
 
   public Room getRoomById(String roomId) {
@@ -52,35 +51,15 @@ public class RoomManager {
     return sort(roomList);
   }
 
-  public void checkRoomMessageInit(String roomId, ChatPresenter presenter) {
-    if (getRoomById(roomId) == null || getRoomById(roomId).getMessages().size() == 0) {
-      FDBManager.initRoomMessages(roomId, presenter);
-    }
-    else {
-      RxEvent event = new RxEvent();
-      event.id = RxEvent.EVENT_ROOM_MESSAGES_UPDATED;
-      event.object = roomId;
-      RxEventBus.send(event);
-    }
-  }
-
   public void updateRoomMessages(String roomId, ArrayList<Message> messages) {
     Room room = getRoomById(roomId);
     if (messages != null)
       room.setMessages(messages);
-    RxEvent event = new RxEvent();
-    event.id = RxEvent.EVENT_ROOM_MESSAGES_UPDATED;
-    event.object = roomId;
-    RxEventBus.send(event);
   }
 
   public void addMessage(String roomId, Message message) {
     Room room = getRoomById(roomId);
     RxEvent event = new RxEvent();
-    Message oldMessage = null;
-    if (message.getPendingId() != null)
-      oldMessage = room.getMessages().get(message.getId());
-
     if (message.getId() != null) {
       if (room.getMessages().containsKey(message.getId())) {
         event.id = RxEvent.EVENT_ROOM_SINGLE_MESSAGES_UPDATED;
@@ -91,7 +70,6 @@ public class RoomManager {
         event.id = RxEvent.EVENT_ROOM_MESSAGES_ADDED;
         event.object = message;
         room.getMessages().put(message.getId(), message);
-
       }
     }
 
