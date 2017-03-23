@@ -17,6 +17,9 @@ import com.seveneow.simplechat.model.Room;
 import com.seveneow.simplechat.model.User;
 import com.seveneow.simplechat.service.SaveMessageService;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -153,7 +156,15 @@ public class FDBManager {
 
       //TODO: update room information in DB
       Room room = RoomManager.getInstance().getRoomById(roomId);
-      room.setLatestMessageShowText(message.getShowText());
+
+      String text = message.getShowText();
+      try {
+        text = URLDecoder.decode(text, "UTF-8");
+      }
+      catch (UnsupportedEncodingException e) {
+        e.printStackTrace();
+      }
+      room.setLatestMessageShowText(text);
       RxEventSender.notifyRoomListUpdated(room);
 
     }).addOnFailureListener((Exception) -> {
