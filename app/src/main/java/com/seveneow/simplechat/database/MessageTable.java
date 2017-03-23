@@ -5,7 +5,6 @@ import android.database.Cursor;
 import com.seveneow.simplechat.model.ImageMessage;
 import com.seveneow.simplechat.model.Message;
 import com.seveneow.simplechat.model.TextMessage;
-import com.seveneow.simplechat.utils.DebugLog;
 
 import net.sqlcipher.DatabaseUtils;
 import net.sqlcipher.database.SQLiteDatabase;
@@ -70,7 +69,7 @@ public class MessageTable {
     return insertOrUpdateMessages(false, sqlite, messages, password);
   }
 
-  private static long insertOrUpdateMessages(boolean insert, DBHelper sqlite, ArrayList<Message> messages, String password) {
+  private static synchronized long insertOrUpdateMessages(boolean insert, DBHelper sqlite, ArrayList<Message> messages, String password) {
     long result = -1;
     DatabaseUtils.InsertHelper ih = new DatabaseUtils.InsertHelper(sqlite.getWritableDatabase(password), NAME);
     // Get the numeric indexes for each of the columns that we're updating
@@ -84,7 +83,6 @@ public class MessageTable {
     final int messageThumbnailColumn = ih.getColumnIndex(COLUMN_MESSAGE_THUMBNAIL);
     try {
       for (Message message : messages) {
-        // Get the InsertHelper ready to insert a single row
         if (insert)
           ih.prepareForInsert();
         else
@@ -111,6 +109,7 @@ public class MessageTable {
     }
     finally {
       ih.close();
+      sqlite.close();
     }
     return result;
   }
@@ -142,29 +141,26 @@ public class MessageTable {
       cursor.close();
       return messages;
     }
-
     cursor.moveToFirst();
-    for (int i = 0; i <= rowCount; i++) {
-      if (cursor.moveToNext()) {
-        Object[] data = new Object[cols.length];
-        data[0] = cursor.getString(cursor.getColumnIndex(COLUMN_MESSAGE_ID));
-        data[1] = cursor.getLong(cursor.getColumnIndex(COLUMN_ID));
-        data[2] = cursor.getString(cursor.getColumnIndex(COLUMN_MESSAGE_SENDER_ID));
-        data[3] = cursor.getString(cursor.getColumnIndex(COLUMN_MESSAGE_TIME));
-        data[4] = cursor.getLong(cursor.getColumnIndex(COLUMN_MESSAGE_TYPE));
-        data[5] = cursor.getString(cursor.getColumnIndex(COLUMN_MESSAGE_THUMBNAIL));
-        data[6] = cursor.getString(cursor.getColumnIndex(COLUMN_MESSAGE_TEXT));
-        data[7] = cursor.getString(cursor.getColumnIndex(COLUMN_MESSAGE_ROOM_ID));
-        data[8] = cursor.getLong(cursor.getColumnIndex(COLUMN__MESSAGE_SHOW_SENDER));
+    for (int i = 0; i < rowCount; i++) {
+      Object[] data = new Object[cols.length];
+      data[0] = cursor.getString(cursor.getColumnIndex(COLUMN_MESSAGE_ID));
+      data[1] = cursor.getLong(cursor.getColumnIndex(COLUMN_ID));
+      data[2] = cursor.getString(cursor.getColumnIndex(COLUMN_MESSAGE_SENDER_ID));
+      data[3] = cursor.getString(cursor.getColumnIndex(COLUMN_MESSAGE_TIME));
+      data[4] = cursor.getLong(cursor.getColumnIndex(COLUMN_MESSAGE_TYPE));
+      data[5] = cursor.getString(cursor.getColumnIndex(COLUMN_MESSAGE_THUMBNAIL));
+      data[6] = cursor.getString(cursor.getColumnIndex(COLUMN_MESSAGE_TEXT));
+      data[7] = cursor.getString(cursor.getColumnIndex(COLUMN_MESSAGE_ROOM_ID));
+      data[8] = cursor.getLong(cursor.getColumnIndex(COLUMN__MESSAGE_SHOW_SENDER));
 
-        if (data[0] == "0") {
-          continue;
-        }
-        messages.add(data);
+      if (data[0].equals("0")) {
+        continue;
       }
+      messages.add(data);
+      cursor.moveToNext();
     }
     cursor.close();
-    DebugLog.e("baaa", "messages = " + messages);
     return messages;
   }
 

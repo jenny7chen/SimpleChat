@@ -48,6 +48,7 @@ public class Message implements Parcelable {
     this.roomId = message.getRoomId();
     this.isPending = message.isPending();
     this.isShowSender = message.isShowSender();
+    this.showText = message.getShowText();
   }
 
   public void updateMessage(Message message) {
@@ -58,6 +59,7 @@ public class Message implements Parcelable {
     this.roomId = message.getRoomId();
     this.isPending = message.isPending();
     this.isShowSender = message.isShowSender();
+    this.showText = message.getShowText();
   }
 
   public long getDatabaseId() {
@@ -149,6 +151,7 @@ public class Message implements Parcelable {
     this.roomId = in.readString();
     this.isPending = in.readInt() == 1;
     this.isShowSender = in.readInt() == 1;
+    this.showText = in.readString();
   }
 
   @Override
@@ -166,6 +169,7 @@ public class Message implements Parcelable {
     dest.writeString(this.roomId);
     dest.writeInt(this.isPending ? 1 : 0);
     dest.writeInt(this.isShowSender ? 1 : 0);
+    dest.writeString(this.showText);
   }
 
   public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {

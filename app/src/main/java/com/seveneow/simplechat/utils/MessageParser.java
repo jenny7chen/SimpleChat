@@ -142,28 +142,43 @@ public class MessageParser {
   public Message parse(Object[] dbData) {
     Message message = new Message();
     int messageType = (int) (long) dbData[4];
+    String senderId = (String) dbData[2];
+    User sender = UserManager.getInstance().getUser(senderId);
+
     if (messageType == Message.TYPE_IMAGE) {
       message = new ImageMessage();
       ((ImageMessage) message).setThumbnail((String) dbData[5]);
+      if (presenter != null)
+        message.setShowText(presenter.getString(R.string.message_show_text_image, sender.getName()));
+      else if (context != null)
+        message.setShowText(context.getString(R.string.message_show_text_image, sender.getName()));
     }
+
     else if (messageType == Message.TYPE_TEXT) {
       message = new TextMessage();
       ((TextMessage) message).setMessage((String) dbData[6]);
+      message.setShowText((String) dbData[6]);
     }
+
     else if (messageType == Message.TYPE_STICKER) {
       message = new StickerMessage();
+      if (presenter != null)
+        message.setShowText(presenter.getString(R.string.message_show_text_sticker, sender.getName()));
+      else if (context != null)
+        message.setShowText(context.getString(R.string.message_show_text_sticker, sender.getName()));
     }
+
     else if (messageType == Message.TYPE_FILE) {
       message = new FileMessage();
     }
+
     message.setId((String) dbData[0]);
     message.setDatabaseId((long) dbData[1]);
     message.setType(messageType);
     message.setSenderId((String) dbData[2]);
-    message.setShowSender((int)(long) dbData[8] != 0);
+    message.setShowSender((int) (long) dbData[8] != 0);
     message.setTime((String) dbData[3]);
     message.setRoomId((String) dbData[7]);
-
     return message;
   }
 }

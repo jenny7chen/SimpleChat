@@ -24,14 +24,18 @@ public class SaveMessageService extends IntentService {
 
   @Override
   protected void onHandleIntent(@Nullable Intent intent) {
+    DebugLog.e("Baaa", "SaveMessageService start");
+
     if (intent == null)
       return;
     DebugLog.e("baa", "save start");
     String roomId = intent.getStringExtra(PARAM_ROOM_ID);
     ArrayList<Message> messageData = intent.getParcelableArrayListExtra(PARAM_MESSAGES);
-    DBHelper.getInstance(this).insertMessageList(messageData, Static.DB_PASS);
+    DBHelper helper = DBHelper.getInstance(this);
+    helper.insertMessageList(messageData, Static.DB_PASS);
     DebugLog.e("baa", "save end");
     if (intent.getBooleanExtra(PARAM_NOTIFY_CHANGE, true))
       RxEventSender.notifyNewMessageSaved(roomId);
+    helper.close();
   }
 }

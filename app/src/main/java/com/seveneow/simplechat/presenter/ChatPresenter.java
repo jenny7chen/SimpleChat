@@ -49,7 +49,6 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
       onMessagesInit();
       getView().showContent();
     }
-    DebugLog.e("Baaa", "start service");
     Intent intent = new Intent();
     intent.putExtra(FetchMessageService.PARAM_ROOM_ID, roomId);
     getView().startService(FetchMessageService.class, intent);
@@ -161,7 +160,7 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
     if (message == null)
       return;
 
-    RoomManager.getInstance().addMessage(roomId, message);
+    RoomManager.getInstance().addOrUpdateMessage(roomId, message);
   }
 
   public synchronized void updateData(List<Message> updatedData, boolean isSingleMessage, boolean isInsert) {

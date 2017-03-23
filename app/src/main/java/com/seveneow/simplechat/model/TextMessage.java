@@ -21,17 +21,6 @@ public class TextMessage extends Message{
     this.message = ((TextMessage) message).getMessage();
     this.setType(TYPE_TEXT);
   }
-//
-//  public TextMessage(Message message) {
-//    this.id = message.getId();
-//    this.databaseId = message.getDatabaseId();
-//    this.type = message.getType();
-//    this.time = message.getTime();
-//    this.senderId = message.getSenderId();
-//    this.roomId = message.getRoomId();
-//    this.isPending = message.isPending();
-//    this.isShowSender = message.isShowSender();
-//  }
 
   public String getMessage() {
     return message;

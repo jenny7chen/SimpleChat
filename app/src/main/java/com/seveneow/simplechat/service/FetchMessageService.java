@@ -28,6 +28,7 @@ public class FetchMessageService extends IntentService {
 
   @Override
   protected void onHandleIntent(Intent intent) {
+    DebugLog.e("Baaa", "FetchMessageService start");
     String roomId = intent.getStringExtra(PARAM_ROOM_ID);
     Room room = RoomManager.getInstance().getRoomById(roomId);
     if (room == null)
@@ -44,9 +45,10 @@ public class FetchMessageService extends IntentService {
     }
 
     //get new message list from database
-    ArrayList<Message> messages = DBHelper.getInstance(this).getRoomMessages(new MessageParser(this), roomId, Static.DB_PASS);
+    DBHelper helper = DBHelper.getInstance(this);
+    ArrayList<Message> messages = helper.getRoomMessages(new MessageParser(this), roomId, Static.DB_PASS);
     if (messages.size() > 0) {
-      DebugLog.e("FetchMessageService", "has db message return ");
+      DebugLog.e("FetchMessageService", "has db message return, message list size = " + messages.size());
       RoomManager.getInstance().updateRoomMessages(roomId, messages);
       RxEventSender.notifyRoomMessagesUpdated(roomId);
       RxEventSender.notifyRoomMessagesInited(roomId);
@@ -54,6 +56,7 @@ public class FetchMessageService extends IntentService {
     }
 
     FDBManager.initRoomMessages(roomId, this);
+    helper.close();
   }
 
   private ImageMessage getTestImageMessage() {

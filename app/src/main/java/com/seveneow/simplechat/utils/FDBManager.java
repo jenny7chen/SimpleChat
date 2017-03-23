@@ -15,7 +15,6 @@ import com.seveneow.simplechat.model.Message;
 import com.seveneow.simplechat.model.Post;
 import com.seveneow.simplechat.model.Room;
 import com.seveneow.simplechat.model.User;
-import com.seveneow.simplechat.presenter.ChatPresenter;
 import com.seveneow.simplechat.service.SaveMessageService;
 
 import java.util.ArrayList;
@@ -80,10 +79,10 @@ public class FDBManager {
   }
 
   public static void initRoomMessages(String roomId, Context context) {
-    ArrayList<Message> roomMessages = new ArrayList<>();
     databaseRef.child("messages").child(roomId).orderByChild("timestamp").limitToLast(100).addListenerForSingleValueEvent(new ValueEventListener() {
       @Override
       public void onDataChange(DataSnapshot dataSnapshot) {
+        ArrayList<Message> roomMessages = new ArrayList<>();
         if (dataSnapshot.getChildren() == null)
           return;
         for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {

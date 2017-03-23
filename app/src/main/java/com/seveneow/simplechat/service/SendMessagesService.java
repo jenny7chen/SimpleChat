@@ -19,8 +19,7 @@ import java.util.ArrayList;
 
 /**
  * Created by jennychen on 2017/2/16.
- * <p>
- * TODO: Test use, remove this after using socket connection
+ * save pending message to database and send message.
  */
 
 public class SendMessagesService extends IntentService {
@@ -33,11 +32,14 @@ public class SendMessagesService extends IntentService {
 
   @Override
   protected void onHandleIntent(Intent intent) {
+    DebugLog.e("Baaa", "SendMessagesService start");
     String roomId = intent.getStringExtra(PARAM_ROOM_ID);
     Message message = intent.getParcelableExtra(PARAM_MESSAGE);
-    long insertKey = DBHelper.getInstance(this).insertMessage(message, Static.DB_PASS);
+    DBHelper helper = DBHelper.getInstance(this);
+    long insertKey = helper.insertMessage(message, Static.DB_PASS);
     message.setDatabaseId(insertKey);
-    RoomManager.getInstance().addMessage(roomId, message);
+    RoomManager.getInstance().addOrUpdateMessage(roomId, message);
     FDBManager.sendMessage(FDBManager.getMessagePushKey(roomId), roomId, message, this);
+    helper.close();
   }
 }
