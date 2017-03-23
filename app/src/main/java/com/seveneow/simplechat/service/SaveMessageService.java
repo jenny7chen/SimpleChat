@@ -15,6 +15,7 @@ import java.util.ArrayList;
 
 public class SaveMessageService extends IntentService {
   public static final String PARAM_ROOM_ID = "room_id";
+  public static final String PARAM_NOTIFY_CHANGE = "notify_change";
   public static final String PARAM_MESSAGES = "messages";
 
   public SaveMessageService() {
@@ -30,6 +31,7 @@ public class SaveMessageService extends IntentService {
     ArrayList<Message> messageData = intent.getParcelableArrayListExtra(PARAM_MESSAGES);
     DBHelper.getInstance(this).insertMessageList(messageData, Static.DB_PASS);
     DebugLog.e("baa", "save end");
-    RxEventSender.notifyNewMessageSaved(roomId);
+    if (intent.getBooleanExtra(PARAM_NOTIFY_CHANGE, true))
+      RxEventSender.notifyNewMessageSaved(roomId);
   }
 }

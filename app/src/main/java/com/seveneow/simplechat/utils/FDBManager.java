@@ -146,23 +146,16 @@ public class FDBManager {
       messages.add(message);
       Intent intent = new Intent(context, SaveMessageService.class);
       intent.putExtra(SaveMessageService.PARAM_ROOM_ID, roomId);
+      intent.putExtra(SaveMessageService.PARAM_NOTIFY_CHANGE, false);
       intent.putExtra(SaveMessageService.PARAM_MESSAGES, messages);
       context.startService(intent);
 
-
-      //      RxEvent event = new RxEvent();
-      //      event.id = RxEvent.EVENT_DATA_UPDATE_NOTIFICATION;
-      //      event.params = new String[]{roomId};
-      //      event.object = message;
-      //      RxEventBus.send(event);
-
+      RoomManager.getInstance().addOrUpdateMessage(roomId, message);
 
       //TODO: update room information in DB
       Room room = RoomManager.getInstance().getRoomById(roomId);
       room.setLatestMessageShowText(message.getShowText());
-      RxEvent roomEvent = new RxEvent();
-      roomEvent.id = RxEvent.EVENT_ROOM_LIST_UPDATE;
-      RxEventBus.send(roomEvent);
+      RxEventSender.notifyRoomListUpdated(room);
 
     }).addOnFailureListener((Exception) -> {
       //TODO: update failure status on list

@@ -3,7 +3,6 @@ package com.seveneow.simplechat.presenter;
 
 import android.content.Intent;
 import android.os.Handler;
-import android.util.Log;
 
 import com.seveneow.simplechat.R;
 import com.seveneow.simplechat.model.Message;
@@ -118,13 +117,13 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
     else if (event.id == RxEvent.EVENT_DATA_UPDATE_NOTIFICATION) {
       onReceiveMessage((String) event.params[0], (Message) event.object);
     }
-    else if (event.id == RxEvent.EVENT_ROOM_MESSAGES_UPDATED) {
+    else if (event.id == RxEvent.EVENT_ROOM_MESSAGE_LIST_UPDATED) {
       onMessagesUpdated((String) event.object);
     }
-    else if (event.id == RxEvent.EVENT_ROOM_SINGLE_MESSAGES_UPDATED) {
+    else if (event.id == RxEvent.EVENT_ROOM_MESSAGE_UPDATED) {
       onMessagesUpdated((String) event.params[0], (Message) event.object);
     }
-    else if (event.id == RxEvent.EVENT_ROOM_MESSAGES_ADDED) {
+    else if (event.id == RxEvent.EVENT_ROOM_MESSAGE_ADDED) {
       onMessagesAdded((String) event.params[0], (Message) event.object);
     }
     else if (event.id == RxEvent.EVENT_ROOM_MESSAGE_INIT) {

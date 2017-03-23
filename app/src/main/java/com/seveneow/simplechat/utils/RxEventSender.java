@@ -6,7 +6,7 @@ import com.seveneow.simplechat.model.Room;
 public class RxEventSender {
   public static void notifyRoomMessagesUpdated(String roomId){
     RxEvent event = new RxEvent();
-    event.id = RxEvent.EVENT_ROOM_MESSAGES_UPDATED;
+    event.id = RxEvent.EVENT_ROOM_MESSAGE_LIST_UPDATED;
     event.object = roomId;
     RxEventBus.send(event);
   }
@@ -31,4 +31,5 @@ public class RxEventSender {
     event.object = roomId;
     RxEventBus.send(event);
   }
+
 }

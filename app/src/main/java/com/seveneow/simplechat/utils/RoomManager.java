@@ -1,10 +1,7 @@
 package com.seveneow.simplechat.utils;
 
-import android.content.Context;
-
 import com.seveneow.simplechat.model.Message;
 import com.seveneow.simplechat.model.Room;
-import com.seveneow.simplechat.presenter.ChatPresenter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -57,17 +54,17 @@ public class RoomManager {
       room.setMessages(messages);
   }
 
-  public void addMessage(String roomId, Message message) {
+  public void addOrUpdateMessage(String roomId, Message message) {
     Room room = getRoomById(roomId);
     RxEvent event = new RxEvent();
     if (message.getId() != null) {
       if (room.getMessages().containsKey(message.getId())) {
-        event.id = RxEvent.EVENT_ROOM_SINGLE_MESSAGES_UPDATED;
+        event.id = RxEvent.EVENT_ROOM_MESSAGE_UPDATED;
         event.object = message;
         room.getMessages().get(message.getId()).updateMessage(message);
       }
       else {
-        event.id = RxEvent.EVENT_ROOM_MESSAGES_ADDED;
+        event.id = RxEvent.EVENT_ROOM_MESSAGE_ADDED;
         event.object = message;
         room.getMessages().put(message.getId(), message);
       }

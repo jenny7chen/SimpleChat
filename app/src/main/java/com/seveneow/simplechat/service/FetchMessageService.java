@@ -56,39 +56,6 @@ public class FetchMessageService extends IntentService {
     FDBManager.initRoomMessages(roomId, this);
   }
 
-//  private void getMessagesFromServer(String roomId) {
-//    FDBManager.initRoomMessages(roomId);
-//
-//    String url = "https://" + Static.FIREBASE_PROJECT_ID + ".firebaseio-demo.com/messages/" + roomId + ".json";
-//    SyncHttpClient client = new SyncHttpClient();
-//    client.setEnableRedirects(true);
-//
-//    if (BuildConfig.DEBUG) {
-//      client.setLoggingLevel(Log.ERROR);
-//    }
-//    else {
-//      client.setLoggingEnabled(false);
-//    }
-//    Header header = new BasicHeader("Authorization", "key=AAAAITet3RY:APA91bF1EOwJlTQ88tQCog4Z2ARSRc9aTR4JwNzGHn7Zt4zqkf097rICiWoTPK_nzneoTO4yb018grE2diFydA5BsR8TXIXoGH4H649MWGUJYlxLwS5x8sAdcvZnOkWbYvx477GvSspC");
-//    Header[] headers = {header};
-//    RequestParams requestParams = new RequestParams();
-//    requestParams.setContentEncoding("UTF-8");
-//    AsyncHttpResponseHandler responseHandler = new AsyncHttpResponseHandler() {
-//      @Override
-//      public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-//        JsonElement jsonElement = new JsonParser().parse(new String(responseBody));
-//        DebugLog.e("baaa", "result = " + jsonElement.toString());
-//      }
-//
-//      @Override
-//      public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-//        Log.e("baaa", "onFailure status code = " + statusCode);
-//      }
-//    };
-//    client.get(this, url, requestParams, responseHandler);
-//  }
-
-
   private ImageMessage getTestImageMessage() {
     try {
       Thread.sleep(200);

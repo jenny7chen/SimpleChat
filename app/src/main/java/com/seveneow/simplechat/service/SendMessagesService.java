@@ -9,6 +9,7 @@ import com.seveneow.simplechat.model.Message;
 import com.seveneow.simplechat.model.TextMessage;
 import com.seveneow.simplechat.utils.DebugLog;
 import com.seveneow.simplechat.utils.FDBManager;
+import com.seveneow.simplechat.utils.RoomManager;
 import com.seveneow.simplechat.utils.RxEventSender;
 import com.seveneow.simplechat.utils.Static;
 
@@ -35,8 +36,8 @@ public class SendMessagesService extends IntentService {
     String roomId = intent.getStringExtra(PARAM_ROOM_ID);
     Message message = intent.getParcelableExtra(PARAM_MESSAGE);
     long insertKey = DBHelper.getInstance(this).insertMessage(message, Static.DB_PASS);
-    RxEventSender.notifyNewMessageSaved(roomId);
     message.setDatabaseId(insertKey);
+    RoomManager.getInstance().addMessage(roomId, message);
     FDBManager.sendMessage(FDBManager.getMessagePushKey(roomId), roomId, message, this);
   }
 }
