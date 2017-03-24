@@ -136,6 +136,9 @@ public class MessageParser {
     if (messageSnapShot.hasChild("isPending"))
       message.setPending((boolean) messageSnapShot.child("isPending").getValue());
 
+    if (messageSnapShot.hasChild("database_id"))
+      message.setDatabaseId((Long) messageSnapShot.child("database_id").getValue());
+
     return message;
   }
 

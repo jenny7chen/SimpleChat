@@ -47,7 +47,7 @@ public class Static {
   }
 
   public static boolean isMessageSentFromLocal(Message message){
-    return message.getDatabaseId() == -1;
+    return message.getDatabaseId() != -1;
   }
 
   public static boolean isMyServiceRunning(Context context, Class<?> serviceClass) {

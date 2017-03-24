@@ -1,9 +1,17 @@
 package com.seveneow.simplechat.utils;
 
+import android.content.Intent;
+
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.seveneow.simplechat.model.Message;
+import com.seveneow.simplechat.model.Room;
+import com.seveneow.simplechat.service.SaveMessageService;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.ArrayList;
 
 
 public class MessageEventListener implements ChildEventListener {
@@ -18,7 +26,6 @@ public class MessageEventListener implements ChildEventListener {
   @Override
   public void onChildAdded(DataSnapshot dataSnapshot, String s) {
     Message message = new MessageParser(presenter).parse(dataSnapshot);
-
     if (message == null) {
       DebugLog.e("ba", "message data is null");
       return;
@@ -27,11 +34,7 @@ public class MessageEventListener implements ChildEventListener {
     if (Static.isMessageSentFromLocal(message))
       return;
 
-    RxEvent event = new RxEvent();
-    event.id = RxEvent.EVENT_DATA_UPDATE_NOTIFICATION;
-    event.params = new String[]{roomId};
-    event.object = message;
-    RxEventBus.send(event);
+    addNewMessage(message);
   }
 
   @Override
@@ -43,11 +46,38 @@ public class MessageEventListener implements ChildEventListener {
       return;
     }
 
-    RxEvent event = new RxEvent();
-    event.id = RxEvent.EVENT_DATA_UPDATE_NOTIFICATION;
-    event.params = new String[]{roomId};
-    event.object = message;
-    RxEventBus.send(event);
+    if (Static.isMessageSentFromLocal(message))
+      return;
+
+    addNewMessage(message);
+  }
+
+  private synchronized void addNewMessage(Message message) {
+    ArrayList<Message> messages = new ArrayList<Message>();
+    messages.add(message);
+
+    boolean isAdd = RoomManager.getInstance().addOrUpdateMessage(roomId, message);
+
+    //TODO: check data base data
+    if(isAdd) {
+      Intent intent = new Intent();
+      intent.putExtra(SaveMessageService.PARAM_ROOM_ID, roomId);
+      intent.putExtra(SaveMessageService.PARAM_NOTIFY_CHANGE, false);
+      intent.putExtra(SaveMessageService.PARAM_MESSAGES, messages);
+      presenter.startService(SaveMessageService.class, intent);
+    }
+
+    //TODO: update room information in DB
+    Room room = RoomManager.getInstance().getRoomById(roomId);
+    String text = message.getShowText();
+    try {
+      text = URLDecoder.decode(text, "UTF-8");
+    }
+    catch (UnsupportedEncodingException e) {
+      e.printStackTrace();
+    }
+    room.setLatestMessageShowText(text);
+    RxEventSender.notifyRoomListUpdated(room);
   }
 
   @Override

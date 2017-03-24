@@ -197,6 +197,7 @@ public class Message implements Parcelable {
     result.put("sender_id", senderId);
     result.put("isPending", isPending);
     result.put("isShowSender", isShowSender);
+    result.put("database_id", databaseId);
     result.put("roomId", roomId);
     return result;
   }

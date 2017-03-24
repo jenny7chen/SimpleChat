@@ -81,7 +81,7 @@ public class FDBManager {
 
   }
 
-  public static void initRoomMessages(String roomId, Context context) {
+  public static void getServerMessages(String roomId, Context context) {
     databaseRef.child("messages").child(roomId).orderByChild("timestamp").limitToLast(100).addListenerForSingleValueEvent(new ValueEventListener() {
       @Override
       public void onDataChange(DataSnapshot dataSnapshot) {
@@ -99,7 +99,8 @@ public class FDBManager {
         intent.putExtra(SaveMessageService.PARAM_ROOM_ID, roomId);
         intent.putExtra(SaveMessageService.PARAM_MESSAGES, roomMessages);
         context.startService(intent);
-        DebugLog.e("baaa", "initRoomMessages");
+        DebugLog.e("baaa", "getServerMessages");
+//        RxEventSender.notifyRoomMessagesInited(roomId);
       }
 
       @Override

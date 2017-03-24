@@ -7,8 +7,10 @@ import android.os.Handler;
 import com.seveneow.simplechat.R;
 import com.seveneow.simplechat.model.Message;
 import com.seveneow.simplechat.model.Room;
-import com.seveneow.simplechat.service.FetchMessageService;
+import com.seveneow.simplechat.service.FetchLocalMessagesService;
+import com.seveneow.simplechat.service.InitMessageService;
 import com.seveneow.simplechat.service.SendMessagesService;
+import com.seveneow.simplechat.service.UpdateMessageService;
 import com.seveneow.simplechat.utils.BasePresenter;
 import com.seveneow.simplechat.utils.DebugLog;
 import com.seveneow.simplechat.utils.FDBManager;
@@ -48,10 +50,11 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
       onMessagesUpdated(roomId);
       onMessagesInit();
       getView().showContent();
+      return;
     }
     Intent intent = new Intent();
-    intent.putExtra(FetchMessageService.PARAM_ROOM_ID, roomId);
-    getView().startService(FetchMessageService.class, intent);
+    intent.putExtra(InitMessageService.PARAM_ROOM_ID, roomId);
+    getView().startService(InitMessageService.class, intent);
   }
 
   public void sendMessage(String messageText) {
@@ -132,11 +135,28 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
     else if (event.id == RxEvent.EVENT_ROOM_MESSAGE_SAVED) {
       DebugLog.e("Baaa", "message saved fetch messags");
       if (roomId.equals(event.object))
-        fetchMessages();
+        updateFromLocalDB();
     }
   }
 
+  private void updateFromLocalDB() {
+    if (!isViewAttached())
+      return;
+    Intent intent = new Intent();
+    intent.putExtra(FetchLocalMessagesService.PARAM_ROOM_ID, roomId);
+    getView().startService(FetchLocalMessagesService.class, intent);
+  }
+
   private void onMessagesInit() {
+    if (!isViewAttached())
+      return;
+
+    getView().showContent();
+    DebugLog.e("baaa", "onMessageInit startService");
+    Intent intent = new Intent();
+    intent.putExtra(UpdateMessageService.PARAM_ROOM_ID, roomId);
+    getView().startService(UpdateMessageService.class, intent);
+
     FDBManager.addRoomEventListener(roomId, new MessageEventListener(roomId, this));
   }
 

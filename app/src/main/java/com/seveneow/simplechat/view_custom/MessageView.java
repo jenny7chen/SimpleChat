@@ -30,14 +30,14 @@ public class MessageView extends RelativeLayout {
     initRootView(isMe);
   }
 
-  public void setMessage(Message message) {
+  public void setMessage(Message message, Message nextMessage) {
     this.message = message;
     setRootView();
     if (Static.isMessageFromMe(message)) {
       setMessageFromMeView();
     }
     else {
-      setMessageFromOthersView();
+      setMessageFromOthersView(nextMessage);
     }
     setTypeView();
   }
@@ -55,14 +55,13 @@ public class MessageView extends RelativeLayout {
     findViewById(R.id.message_sender).setVisibility(GONE);
 
     if (isMe) {
-      setGravity(Gravity.END);
+      setGravity(Gravity.END | Gravity.BOTTOM);
       findViewById(R.id.message_sent_time).setVisibility(VISIBLE);
       findViewById(R.id.message_view_container).setBackgroundColor(Color.parseColor("#f2f2f2"));
     }
     else {
-      setGravity(Gravity.START);
+      setGravity(Gravity.START | Gravity.BOTTOM);
       findViewById(R.id.message_got_time).setVisibility(VISIBLE);
-      findViewById(R.id.avatar).setVisibility(VISIBLE);
       findViewById(R.id.message_sender).setVisibility(VISIBLE);
       findViewById(R.id.message_view_container).setBackgroundColor(Color.parseColor("#8ca3e1"));
     }
@@ -79,12 +78,18 @@ public class MessageView extends RelativeLayout {
     sentMessageTimeView.setText(message.getShowTime());
   }
 
-  private void setMessageFromOthersView() {
+  private void setMessageFromOthersView(Message nextMessage) {
     TextView gotMessageTimeView = (TextView) findViewById(R.id.message_got_time);
     gotMessageTimeView.setText(message.getShowTime());
 
     CircleImageView circleImageView = (CircleImageView) findViewById(R.id.avatar);
-    ImageLoader.getInstance().displayImage(UserManager.getInstance().getUserPhoto(message.getSenderId()), circleImageView, Static.defaultDisplayImageOptions(R.mipmap.ic_launcher, true));
+    if (nextMessage != null && nextMessage.getSenderId().equals(message.getSenderId())) {
+      circleImageView.setVisibility(INVISIBLE);
+    }
+    else {
+      circleImageView.setVisibility(VISIBLE);
+      ImageLoader.getInstance().displayImage(UserManager.getInstance().getUserPhoto(message.getSenderId()), circleImageView, Static.defaultDisplayImageOptions(R.mipmap.ic_launcher, true));
+    }
   }
 
   public void setTypeView() {

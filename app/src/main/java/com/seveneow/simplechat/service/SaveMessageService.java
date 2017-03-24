@@ -28,6 +28,7 @@ public class SaveMessageService extends IntentService {
 
     if (intent == null)
       return;
+
     DebugLog.e("baa", "save start");
     String roomId = intent.getStringExtra(PARAM_ROOM_ID);
     ArrayList<Message> messageData = intent.getParcelableArrayListExtra(PARAM_MESSAGES);

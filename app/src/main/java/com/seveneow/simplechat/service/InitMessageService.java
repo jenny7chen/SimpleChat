@@ -19,23 +19,23 @@ import java.util.ArrayList;
 import java.util.Random;
 
 
-public class FetchMessageService extends IntentService {
+public class InitMessageService extends IntentService {
   public static final String PARAM_ROOM_ID = "room_id";
 
-  public FetchMessageService() {
-    super("FetchMessageService");
+  public InitMessageService() {
+    super("InitMessageService");
   }
 
   @Override
   protected void onHandleIntent(Intent intent) {
-    DebugLog.e("Baaa", "FetchMessageService start");
+    DebugLog.e("Baaa", "InitMessageService start");
     String roomId = intent.getStringExtra(PARAM_ROOM_ID);
     Room room = RoomManager.getInstance().getRoomById(roomId);
     if (room == null)
       return;
 
     //check if save to DB is in processing, if it's running, need to wait until data saving finished.
-    while (Static.isMyServiceRunning(this, SaveDBRequestService.class)) {
+    while (Static.isMyServiceRunning(this, SaveMessageService.class)) {
       try {
         Thread.sleep(100);
       }
@@ -48,14 +48,15 @@ public class FetchMessageService extends IntentService {
     DBHelper helper = DBHelper.getInstance(this);
     ArrayList<Message> messages = helper.getRoomMessages(new MessageParser(this), roomId, Static.DB_PASS);
     if (messages.size() > 0) {
-      DebugLog.e("FetchMessageService", "has db message return, message list size = " + messages.size());
+      DebugLog.e("InitMessageService", "has db message return, message list size = " + messages.size());
       RoomManager.getInstance().updateRoomMessages(roomId, messages);
       RxEventSender.notifyRoomMessagesUpdated(roomId);
       RxEventSender.notifyRoomMessagesInited(roomId);
       return;
     }
 
-    FDBManager.initRoomMessages(roomId, this);
+    FDBManager.getServerMessages(roomId, this);
+    RxEventSender.notifyRoomMessagesInited(roomId);
     helper.close();
   }
 

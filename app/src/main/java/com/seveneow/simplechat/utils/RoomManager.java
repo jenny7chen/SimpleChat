@@ -54,7 +54,7 @@ public class RoomManager {
       room.setMessages(messages);
   }
 
-  public void addOrUpdateMessage(String roomId, Message message) {
+  public boolean addOrUpdateMessage(String roomId, Message message) {
     Room room = getRoomById(roomId);
     RxEvent event = new RxEvent();
     if (message.getId() != null) {
@@ -72,6 +72,7 @@ public class RoomManager {
 
     event.params = new String[]{roomId};
     RxEventBus.send(event);
+    return event.id == RxEvent.EVENT_ROOM_MESSAGE_ADDED;
   }
 
   private ArrayList<Room> sort(ArrayList<Room> roomList) {

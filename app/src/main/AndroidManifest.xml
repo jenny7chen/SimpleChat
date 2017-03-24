@@ -32,7 +32,7 @@
         </service>
 
         <service
-            android:name=".service.FetchMessageService"
+            android:name=".service.InitMessageService"
             android:enabled="true"/>
 
         <service
@@ -41,6 +41,14 @@
 
         <service
             android:name=".service.SendMessagesService"
+            android:enabled="true"/>
+
+        <service
+            android:name=".service.FetchLocalMessagesService"
+            android:enabled="true"/>
+
+        <service
+            android:name=".service.UpdateMessageService"
             android:enabled="true"/>
 
     </application>

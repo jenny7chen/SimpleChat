@@ -9,6 +9,7 @@ import com.seveneow.simplechat.model.TextMessage;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Random;
 
 
 public class MessageGenerator {
@@ -29,6 +30,33 @@ public class MessageGenerator {
       text.setShowText(message);
     }
     return text;
+  }
+
+  public static Message getTestImageMessage(String roomId, int roomType) {
+    ImageMessage image = new ImageMessage();
+    image.setThumbnail(getImageUrl());
+    image.setTime(String.valueOf(TimeParser.getCurrentTimeString()));
+    image.setSenderId(Static.userId);
+    image.setId(image.getTime());
+    image.setRoomId(roomId);
+    image.setPending(true);
+    if (roomType == Room.TYPE_USER)
+      image.setShowSender(roomType != Room.TYPE_USER);
+    return image;
+  }
+
+  private static String getImageUrl() {
+    Random r = new Random();
+    int i1 = r.nextInt(4);
+    String[] urls = {
+        "https://images.pexels.com/photos/286426/pexels-photo-286426.jpeg?w=1260&h=750&auto=compress&cs=tinysrgb",
+        "https://images.pexels.com/photos/25585/pexels-photo-25585.jpg?w=1260&h=750&auto=compress&cs=tinysrgb",
+        "https://images.pexels.com/photos/247470/pexels-photo-247470.jpeg?w=1260&h=750&auto=compress&cs=tinysrgb",
+        "https://images.pexels.com/photos/250389/pexels-photo-250389.jpeg?w=1260&h=750&auto=compress&cs=tinysrgb",
+        "https://images.pexels.com/photos/29682/pexels-photo-29682.jpg?w=1260&h=750&auto=compress&cs=tinysrgb"
+    };
+    return urls[i1];
+
   }
 
   public static Message copyMessage(Message message) {

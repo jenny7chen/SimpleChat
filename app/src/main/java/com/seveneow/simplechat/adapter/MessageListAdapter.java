@@ -69,7 +69,12 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
     Message message = data.get(position);
     holder.message = message;
     MessageView view = (MessageView) holder.itemView;
-    view.setMessage(message);
+
+    Message nextMessage = null;
+    if (position > 0) {
+      nextMessage = data.get((position - 1));
+    }
+    view.setMessage(message, nextMessage);
   }
 
   @Override
