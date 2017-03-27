@@ -152,7 +152,7 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
       return;
 
     getView().showContent();
-    DebugLog.e("baaa", "onMessageInit startService");
+    DebugLog.e("baaa", "onMessageInit start update Service");
     Intent intent = new Intent();
     intent.putExtra(UpdateMessageService.PARAM_ROOM_ID, roomId);
     getView().startService(UpdateMessageService.class, intent);
@@ -205,8 +205,7 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
       }
     }
     else {
-      if (getView().getData() == null)
-        getView().setDataToList((List<Object>) (Object) updatedData);
+      getView().setDataToList((List<Object>) (Object) updatedData);
       getView().notifyChanged(BasicListMvpView.NOTIFY_ALL_DATA_CHANGED);
     }
   }

@@ -69,9 +69,9 @@ public class DBHelper extends SQLiteOpenHelper {
     return MessageTable.insertMessages(this, messages, password);
   }
 
-  public ArrayList<Message> getRoomMessages(MessageParser parser, String roomId, String password) {
+  public ArrayList<Message> getRoomMessages(MessageParser parser, String roomId, String password, int countLimit) {
     ArrayList<Message> messages = new ArrayList<>();
-    ArrayList<Object[]> messageData = MessageTable.getMessagesByRoomId(this, roomId, password);
+    ArrayList<Object[]> messageData = MessageTable.getMessagesByRoomId(this, roomId, password, countLimit);
 
     for (Object[] data : messageData) {
       Message message = parser.parse(data);
@@ -86,11 +86,22 @@ public class DBHelper extends SQLiteOpenHelper {
     return RoomUserTable.get(this, roomId, password);
   }
 
-  public ArrayList<Message> searchMessage(BasePresenter presenter, String[] cols, String[] args, String password) {
+  public ArrayList<Message> searchMessage(BasePresenter presenter, String[] cols, String[] args, String password, int countLimit) {
     ArrayList<Message> messages = new ArrayList<>();
     MessageParser parser = new MessageParser(presenter);
-    ArrayList<Object[]> messageData = MessageTable.getMessagesByArgs(this, cols, args, password);
+    ArrayList<Object[]> messageData = MessageTable.getMessagesByArgs(this, cols, args, password, countLimit);
     for (Object[] data : messageData) {
+      Message message = parser.parse(data);
+      if (message == null)
+        continue;
+      messages.add(message);
+    }
+    return messages;
+  }
+
+  public static ArrayList<Message> parseDBObjectListToMessageList(ArrayList<Object[]> objectList, MessageParser parser){
+    ArrayList<Message> messages = new ArrayList<>();
+    for (Object[] data : objectList) {
       Message message = parser.parse(data);
       if (message == null)
         continue;

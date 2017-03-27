@@ -46,7 +46,7 @@ public class InitMessageService extends IntentService {
 
     //get new message list from database
     DBHelper helper = DBHelper.getInstance(this);
-    ArrayList<Message> messages = helper.getRoomMessages(new MessageParser(this), roomId, Static.DB_PASS);
+    ArrayList<Message> messages = helper.getRoomMessages(new MessageParser(this), roomId, Static.DB_PASS, 100);
     if (messages.size() > 0) {
       DebugLog.e("InitMessageService", "has db message return, message list size = " + messages.size());
       RoomManager.getInstance().updateRoomMessages(roomId, messages);

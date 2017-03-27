@@ -36,10 +36,12 @@ public class SendMessagesService extends IntentService {
     String roomId = intent.getStringExtra(PARAM_ROOM_ID);
     Message message = intent.getParcelableExtra(PARAM_MESSAGE);
     DBHelper helper = DBHelper.getInstance(this);
+
     long insertKey = helper.insertMessage(message, Static.DB_PASS);
     message.setDatabaseId(insertKey);
+
     RoomManager.getInstance().addOrUpdateMessage(roomId, message);
-    FDBManager.sendMessage(FDBManager.getMessagePushKey(roomId), roomId, message, this);
+    FDBManager.sendMessage(message.getId(), roomId, message, this);
     helper.close();
   }
 }

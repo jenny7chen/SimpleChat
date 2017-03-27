@@ -62,17 +62,19 @@ public class RoomManager {
         event.id = RxEvent.EVENT_ROOM_MESSAGE_UPDATED;
         event.object = message;
         room.getMessages().get(message.getId()).updateMessage(message);
+        DebugLog.e("Baaa", "message already exists, just update");
       }
       else {
         event.id = RxEvent.EVENT_ROOM_MESSAGE_ADDED;
         event.object = message;
         room.getMessages().put(message.getId(), message);
+        DebugLog.e("Baaa", "message is new, add it");
       }
+      event.params = new String[]{roomId};
+      RxEventBus.send(event);
+      return event.id == RxEvent.EVENT_ROOM_MESSAGE_ADDED;
     }
-
-    event.params = new String[]{roomId};
-    RxEventBus.send(event);
-    return event.id == RxEvent.EVENT_ROOM_MESSAGE_ADDED;
+    return false;
   }
 
   private ArrayList<Room> sort(ArrayList<Room> roomList) {

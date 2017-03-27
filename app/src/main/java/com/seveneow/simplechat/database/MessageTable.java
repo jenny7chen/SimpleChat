@@ -114,11 +114,12 @@ public class MessageTable {
     return result;
   }
 
-  public static ArrayList<Object[]> getMessagesByRoomId(DBHelper dbHelper, String roomId, String password) {
-    return getMessagesByArgs(dbHelper, new String[]{COLUMN_MESSAGE_ROOM_ID}, new String[]{roomId}, password);
+  public static ArrayList<Object[]> getMessagesByRoomId(DBHelper dbHelper, String roomId, String password, int countLimit) {
+    return getMessagesByArgs(dbHelper, new String[]{COLUMN_MESSAGE_ROOM_ID}, new String[]{roomId}, password, countLimit);
   }
 
-  public static ArrayList<Object[]> getMessagesByArgs(DBHelper dbHelper, String[] selectionCols, String[] args, String password) {
+  public static ArrayList<Object[]> getMessagesByArgs(DBHelper dbHelper, String[] selectionCols, String[] args, String password, int countLimit) {
+
     SQLiteDatabase db = dbHelper.getReadableDatabase(password);
 
     String[] cols = new String[]{COLUMN_MESSAGE_ID, COLUMN_ID, COLUMN_MESSAGE_SENDER_ID,
@@ -133,6 +134,9 @@ public class MessageTable {
       if (i < selectionCols.length - 1) {
         sb.append("AND");
       }
+    }
+    if (countLimit > 0) {
+      sb.append(" LIMIT ").append(countLimit);
     }
     ArrayList<Object[]> messages = new ArrayList<>();
     Cursor cursor = db.query(NAME, cols, sb.toString(), args, null, null, null);

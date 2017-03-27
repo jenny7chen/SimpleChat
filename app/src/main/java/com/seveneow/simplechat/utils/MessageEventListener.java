@@ -30,6 +30,7 @@ public class MessageEventListener implements ChildEventListener {
       DebugLog.e("ba", "message data is null");
       return;
     }
+    DebugLog.e("baaa", "message from message event listener : " + message.getShowText()+" id = " + message.getId());
 
     if (Static.isMessageSentFromLocal(message))
       return;
@@ -45,6 +46,7 @@ public class MessageEventListener implements ChildEventListener {
       DebugLog.e("la", "message data is null");
       return;
     }
+    DebugLog.e("baaa", "message from message event listener : onChildChanged" + message.getShowText()+" id = " + message.getId());
 
     if (Static.isMessageSentFromLocal(message))
       return;
@@ -65,19 +67,19 @@ public class MessageEventListener implements ChildEventListener {
       intent.putExtra(SaveMessageService.PARAM_NOTIFY_CHANGE, false);
       intent.putExtra(SaveMessageService.PARAM_MESSAGES, messages);
       presenter.startService(SaveMessageService.class, intent);
-    }
 
-    //TODO: update room information in DB
-    Room room = RoomManager.getInstance().getRoomById(roomId);
-    String text = message.getShowText();
-    try {
-      text = URLDecoder.decode(text, "UTF-8");
+      //TODO: update room information in DB
+      Room room = RoomManager.getInstance().getRoomById(roomId);
+      String text = message.getShowText();
+      try {
+        text = URLDecoder.decode(text, "UTF-8");
+      }
+      catch (UnsupportedEncodingException e) {
+        e.printStackTrace();
+      }
+      room.setLatestMessageShowText(text);
+      RxEventSender.notifyRoomListUpdated(room);
     }
-    catch (UnsupportedEncodingException e) {
-      e.printStackTrace();
-    }
-    room.setLatestMessageShowText(text);
-    RxEventSender.notifyRoomListUpdated(room);
   }
 
   @Override

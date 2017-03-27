@@ -36,7 +36,6 @@ public class FDBManager {
   }
 
   public static void checkDataInit() {
-    RoomManager.getInstance().hasRoomData();
     if (!RoomManager.getInstance().hasRoomData()) {
       getUserRoomList();
     }
@@ -95,11 +94,11 @@ public class FDBManager {
           message.setRoomId(roomId);
           roomMessages.add(message);
         }
+        DebugLog.e("baa", "onServer message get");
         Intent intent = new Intent(context, SaveMessageService.class);
         intent.putExtra(SaveMessageService.PARAM_ROOM_ID, roomId);
         intent.putExtra(SaveMessageService.PARAM_MESSAGES, roomMessages);
         context.startService(intent);
-        DebugLog.e("baaa", "getServerMessages");
 //        RxEventSender.notifyRoomMessagesInited(roomId);
       }
 

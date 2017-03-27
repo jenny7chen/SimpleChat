@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import com.seveneow.simplechat.database.DBHelper;
 import com.seveneow.simplechat.model.Message;
 import com.seveneow.simplechat.utils.DebugLog;
+import com.seveneow.simplechat.utils.MessageParser;
 import com.seveneow.simplechat.utils.RxEventSender;
 import com.seveneow.simplechat.utils.Static;
 
@@ -33,6 +34,7 @@ public class SaveMessageService extends IntentService {
     String roomId = intent.getStringExtra(PARAM_ROOM_ID);
     ArrayList<Message> messageData = intent.getParcelableArrayListExtra(PARAM_MESSAGES);
     DBHelper helper = DBHelper.getInstance(this);
+
     helper.insertMessageList(messageData, Static.DB_PASS);
     DebugLog.e("baa", "save end");
     if (intent.getBooleanExtra(PARAM_NOTIFY_CHANGE, true))
