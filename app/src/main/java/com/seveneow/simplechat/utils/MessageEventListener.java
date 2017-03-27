@@ -30,13 +30,11 @@ public class MessageEventListener implements ChildEventListener {
       DebugLog.e("ba", "message data is null");
       return;
     }
-    //TODO:add this to avoid immediately message add event when sending messages
-    //    if(Static.isMessageFromMe(message))
-    //      return;
 
-    //TODO:test use , need to remove database id in formal version
-    if (Static.isMessageSentFromLocal(message))
+    Message localMessage = RoomManager.getInstance().getRoomById(roomId).getMessages().get(message.getId());
+    if (localMessage != null && localMessage.isPending()) {
       return;
+    }
 
     addNewMessage(message);
   }
@@ -49,9 +47,10 @@ public class MessageEventListener implements ChildEventListener {
       DebugLog.e("la", "message data is null");
       return;
     }
-    //TODO:test use , need to remove database id in formal version
-    if (Static.isMessageSentFromLocal(message))
+    Message localMessage = RoomManager.getInstance().getRoomById(roomId).getMessages().get(message.getId());
+    if (localMessage != null && localMessage.isPending()) {
       return;
+    }
 
     addNewMessage(message);
   }
