@@ -8,7 +8,7 @@ import com.seveneow.simplechat.model.User;
 import net.sqlcipher.database.SQLiteDatabase;
 
 public class UserTable {
-  public static final String NAME = "Room";
+  public static final String NAME = "User";
 
   private static final String COLUMN_ID = "_id";
   private static final String COLUMN_USER_ID = "_USER_ID";

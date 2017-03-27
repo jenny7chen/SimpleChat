@@ -79,7 +79,7 @@ public class MessageEventListener implements ChildEventListener {
         e.printStackTrace();
       }
       room.setLatestMessageShowText(text);
-      RxEventSender.notifyRoomListUpdated(room);
+      RxEventSender.notifyRoomListUpdated();
     }
   }
 

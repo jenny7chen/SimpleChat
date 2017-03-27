@@ -1,11 +1,13 @@
 package com.seveneow.simplechat.database;
 
-import android.content.ContentValues;
 import android.database.Cursor;
 
 import com.seveneow.simplechat.model.Room;
 
+import net.sqlcipher.DatabaseUtils;
 import net.sqlcipher.database.SQLiteDatabase;
+
+import java.util.ArrayList;
 
 public class RoomTable {
   public static final String NAME = "Room";
@@ -38,14 +40,49 @@ public class RoomTable {
   }
 
   public static long insert(DBHelper sqlite, Room room, String password) {
-    ContentValues values = new ContentValues();
-    values.put(COLUMN_ROOM_ID, room.getId());
-    values.put(COLUMN_ROOM_NAME, room.getName());
-    values.put(COLUMN_LATEST_MESSAGE_TIME, room.getLatestMessageTime());
-    values.put(COLUMN_LATEST_MESSAGE_TEXT, room.getLatestMessageShowText());
-    values.put(COLUMN_ROOM_TYPE, room.getType());
-    values.put(COLUMN_ROOM_PHOTO, room.getPhoto());
-    return sqlite.getWritableDatabase(password).insert(NAME, null, values);
+    ArrayList<Room> updateList = new ArrayList<>();
+    updateList.add(room);
+    return insert(sqlite, updateList, password);
+  }
+
+  public static long insert(DBHelper sqlite, ArrayList<Room> rooms, String password) {
+    return insertOrUpdateRooms(true, sqlite, rooms, password);
+  }
+
+  private static synchronized long insertOrUpdateRooms(boolean insert, DBHelper sqlite, ArrayList<Room> rooms, String password) {
+    long result = -1;
+    DatabaseUtils.InsertHelper ih = new DatabaseUtils.InsertHelper(sqlite.getWritableDatabase(password), NAME);
+    // Get the numeric indexes for each of the columns that we're updating
+    final int roomIdColumn = ih.getColumnIndex(COLUMN_ROOM_ID);
+    final int roomNameColumn = ih.getColumnIndex(COLUMN_ROOM_NAME);
+    final int roomLatestMessageTimeColumn = ih.getColumnIndex(COLUMN_LATEST_MESSAGE_TIME);
+    final int roomLatestTextColumn = ih.getColumnIndex(COLUMN_LATEST_MESSAGE_TEXT);
+    final int roomTypeColumn = ih.getColumnIndex(COLUMN_ROOM_TYPE);
+    final int roomPhotoColumn = ih.getColumnIndex(COLUMN_ROOM_PHOTO);
+    try {
+      for (Room room : rooms) {
+        if (insert)
+          ih.prepareForInsert();
+        else
+          ih.prepareForReplace();
+
+        // Add the data for each column
+        ih.bind(roomIdColumn, room.getId());
+        ih.bind(roomNameColumn, room.getName());
+        ih.bind(roomLatestMessageTimeColumn, room.getLatestMessageTime());
+        ih.bind(roomLatestTextColumn, room.getLatestMessageShowText());
+        ih.bind(roomTypeColumn, room.getType());
+        ih.bind(roomPhotoColumn, room.getPhoto());
+
+        // Insert the row into the database.
+        result = ih.execute();
+      }
+    }
+    finally {
+      ih.close();
+      sqlite.close();
+    }
+    return result;
   }
 
   public static Object[] get(DBHelper dbHelper, String roomId, String password) {
@@ -64,13 +101,49 @@ public class RoomTable {
     cursor.moveToFirst();
     data[0] = cursor.getString(cursor.getColumnIndex(COLUMN_ROOM_ID));
     data[1] = cursor.getLong(cursor.getColumnIndex(COLUMN_ID));
-    data[1] = cursor.getString(cursor.getColumnIndex(COLUMN_ROOM_NAME));
-    data[2] = cursor.getString(cursor.getColumnIndex(COLUMN_LATEST_MESSAGE_TIME));
-    data[3] = cursor.getString(cursor.getColumnIndex(COLUMN_LATEST_MESSAGE_TEXT));
-    data[4] = cursor.getLong(cursor.getColumnIndex(COLUMN_ROOM_TYPE));
-    data[5] = cursor.getString(cursor.getColumnIndex(COLUMN_ROOM_PHOTO));
+    data[2] = cursor.getString(cursor.getColumnIndex(COLUMN_ROOM_NAME));
+    data[3] = cursor.getString(cursor.getColumnIndex(COLUMN_LATEST_MESSAGE_TIME));
+    data[4] = cursor.getString(cursor.getColumnIndex(COLUMN_LATEST_MESSAGE_TEXT));
+    data[5] = cursor.getLong(cursor.getColumnIndex(COLUMN_ROOM_TYPE));
+    data[6] = cursor.getString(cursor.getColumnIndex(COLUMN_ROOM_PHOTO));
 
     cursor.close();
     return data;
+  }
+
+  public static ArrayList<Object[]> getRooms(DBHelper dbHelper, String password) {
+    SQLiteDatabase db = dbHelper.getReadableDatabase(password);
+
+    String[] cols = new String[]{COLUMN_ROOM_ID, COLUMN_ID, COLUMN_ROOM_NAME,
+        COLUMN_LATEST_MESSAGE_TIME, COLUMN_LATEST_MESSAGE_TEXT, COLUMN_ROOM_TYPE, COLUMN_ROOM_PHOTO};
+
+    ArrayList<Object[]> resultList = new ArrayList<>();
+    Cursor cursor = db.query(NAME, cols, null, null, null, null, null);
+    int rowCount = cursor.getCount();
+    if (rowCount == 0) {
+      cursor.close();
+      return resultList;
+    }
+    cursor.moveToFirst();
+    for (int i = 0; i < rowCount; i++) {
+      Object[] data = new Object[cols.length];
+
+      cursor.moveToFirst();
+      data[0] = cursor.getString(cursor.getColumnIndex(COLUMN_ROOM_ID));
+      data[1] = cursor.getLong(cursor.getColumnIndex(COLUMN_ID));
+      data[2] = cursor.getString(cursor.getColumnIndex(COLUMN_ROOM_NAME));
+      data[3] = cursor.getString(cursor.getColumnIndex(COLUMN_LATEST_MESSAGE_TIME));
+      data[4] = cursor.getString(cursor.getColumnIndex(COLUMN_LATEST_MESSAGE_TEXT));
+      data[5] = cursor.getLong(cursor.getColumnIndex(COLUMN_ROOM_TYPE));
+      data[6] = cursor.getString(cursor.getColumnIndex(COLUMN_ROOM_PHOTO));
+
+      if (data[0].equals("0")) {
+        continue;
+      }
+      resultList.add(data);
+      cursor.moveToNext();
+    }
+    cursor.close();
+    return resultList;
   }
 }

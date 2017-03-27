@@ -10,7 +10,8 @@ public class RxEvent {
   public static final int EVENT_ROOM_MESSAGE_UPDATED = 5;
   public static final int EVENT_ROOM_MESSAGE_INIT = 6;
   public static final int EVENT_ROOM_LIST_UPDATE = 7;
-  public static final int EVENT_ROOM_MESSAGE_SAVED = 8;
+  public static final int EVENT_ROOM_LIST_INITED = 8;
+  public static final int EVENT_ROOM_MESSAGE_SAVED = 9;
 
   public int id;
   public Object[] params = {};

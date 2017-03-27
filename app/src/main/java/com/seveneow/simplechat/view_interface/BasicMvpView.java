@@ -17,7 +17,7 @@ public interface BasicMvpView extends MvpView {
 
   public void loadData();
 
-  public List<Message> getData();
+  public List<Object> getData();
 
   public void startService(Class serviceClass, Intent intent);
 

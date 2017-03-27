@@ -5,6 +5,8 @@ import android.support.annotation.NonNull;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
+import android.widget.ProgressBar;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.hannesdorfmann.mosby.mvp.viewstate.ViewState;
@@ -22,12 +24,15 @@ import java.util.List;
 public class MainActivity extends BaseActivity<BasicListMvpView, MainPresenter> implements BasicListMvpView {
   private RecyclerView recyclerView;
   private RoomListAdapter adapter;
+  private ProgressBar progressBar;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
     recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+    progressBar = (ProgressBar) findViewById(R.id.progressBar);
+
     LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
     recyclerView.setLayoutManager(linearLayoutManager);
     DefaultItemAnimator animator = new DefaultItemAnimator();
@@ -60,12 +65,17 @@ public class MainActivity extends BaseActivity<BasicListMvpView, MainPresenter> 
 
   @Override
   public void showLoading() {
-
+    //show progressbar here
+    progressBar.setVisibility(View.VISIBLE);
   }
 
   @Override
   public void showContent() {
-
+    MainViewState state = (MainViewState) viewState;
+    state.setData((List<Room>) (Object) getData());
+    //hide error view here
+    progressBar.setVisibility(View.GONE);
+    recyclerView.setVisibility(View.VISIBLE);
   }
 
   @Override
@@ -79,7 +89,7 @@ public class MainActivity extends BaseActivity<BasicListMvpView, MainPresenter> 
   }
 
   @Override
-  public List<Message> getData() {
+  public List<Object> getData() {
     return null;
   }
 
@@ -120,16 +130,39 @@ public class MainActivity extends BaseActivity<BasicListMvpView, MainPresenter> 
     return 0;
   }
 
-  public class MainViewState implements ViewState<BasicMvpView> {
+  public class MainViewState implements ViewState<BasicListMvpView> {
     final int STATE_SHOW_CONTENT = 0;
+    final int STATE_SHOW_LOADING = 1;
+    final int STATE_SHOW_ERROR = 2;
+
+    int state = STATE_SHOW_CONTENT;
+    List<Room> rooms = null;
+
+    public void setData(List<Room> rooms) {
+      this.rooms = rooms;
+    }
 
     /**
      * Is called from Mosby to apply the view state to the view.
      * We do that by calling the methods from the View interface (like the presenter does)
      */
     @Override
-    public void apply(BasicMvpView view, boolean retained) {
+    public void apply(BasicListMvpView view, boolean retained) {
 
+      switch (state) {
+      case STATE_SHOW_LOADING:
+        view.showLoading();
+        break;
+
+      case STATE_SHOW_ERROR:
+        view.showError();
+        break;
+
+      case STATE_SHOW_CONTENT:
+        presenter.updateData(rooms);
+        view.showContent();
+        break;
+      }
     }
   }
 }

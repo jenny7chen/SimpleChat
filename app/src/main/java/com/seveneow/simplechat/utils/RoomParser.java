@@ -33,9 +33,9 @@ public class RoomParser {
     }
     room.setMembers(members);
 
-    if(roomSnapShot.hasChild("latest_message")){
+    if (roomSnapShot.hasChild("latest_message")) {
       DataSnapshot latestMessageSnapShot = roomSnapShot.child("latest_message");
-      room.setLatestMessageShowTime(TimeParser.getTimeStr(String.valueOf(latestMessageSnapShot.child("timestamp").getValue()),TimeFormat.CHAT_TIME_FORMAT));
+      room.setLatestMessageShowTime(TimeParser.getTimeStr(String.valueOf(latestMessageSnapShot.child("timestamp").getValue()), TimeFormat.CHAT_TIME_FORMAT));
 
       String showText = (String) latestMessageSnapShot.child("show_text").getValue();
       try {
@@ -57,6 +57,22 @@ public class RoomParser {
     }
 
     DebugLog.e("Baaa", "room name = " + room.getName());
+    return room;
+  }
+
+  public Room parse(Object[] data) {
+    Room room = new Room();
+
+    room.setId((String) data[0]);
+
+    int type = (int) (long) data[5];
+    room.setType(type);
+    room.setName((String) data[2]);
+    room.setPhoto((String) data[6]);
+
+    String latestMessageTime = (String) data[3];
+    room.setLatestMessageShowTime(TimeParser.getTimeStr(latestMessageTime, TimeFormat.CHAT_TIME_FORMAT));
+    room.setLatestMessageShowText((String) data[4]);
     return room;
   }
 

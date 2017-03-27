@@ -11,6 +11,7 @@ import java.util.LinkedHashMap;
 public class RoomManager {
   private static RoomManager roomManager = new RoomManager();
   private static LinkedHashMap<String, Room> roomMap = new LinkedHashMap<>();
+  private static ArrayList<Room> showRoomList = new ArrayList<>();
 
   private RoomManager() {
 
@@ -34,7 +35,6 @@ public class RoomManager {
 
   public void addRoom(Room room) {
     roomMap.put(room.getId(), room);
-    RxEventSender.notifyRoomListUpdated(room);
   }
 
   public Room getRoomById(String roomId) {
@@ -44,8 +44,11 @@ public class RoomManager {
   public ArrayList<Room> getAllRooms() {
     if (roomMap == null)
       roomMap = new LinkedHashMap<>();
-    ArrayList<Room> roomList = new ArrayList<>(roomMap.values());
-    return sort(roomList);
+    if (showRoomList == null)
+      showRoomList = new ArrayList<>();
+    showRoomList.clear();
+    showRoomList.addAll(sort(new ArrayList<>(roomMap.values())));
+    return showRoomList;
   }
 
   public void updateRoomMessages(String roomId, ArrayList<Message> messages) {

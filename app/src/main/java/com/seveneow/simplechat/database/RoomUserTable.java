@@ -8,7 +8,7 @@ import net.sqlcipher.database.SQLiteDatabase;
 import java.util.ArrayList;
 
 public class RoomUserTable {
-  public static final String NAME = "Room";
+  public static final String NAME = "RoomUser";
 
   private static final String COLUMN_ID = "_id";
   private static final String COLUMN_ROOM_ID = "_ROOM_ID";
@@ -35,25 +35,51 @@ public class RoomUserTable {
     return sqlite.getWritableDatabase(password).insert(NAME, null, values);
   }
 
-  public static ArrayList<String> get(DBHelper dbHelper, String roomId, String password) {
+  public static ArrayList<String> getUserListByRoomId(DBHelper helper, String roomId,String password){
+    ArrayList<Object[]> resultList = getResultListByArgs(helper, new String[]{COLUMN_ROOM_ID}, new String[]{roomId}, password);
+    ArrayList<String> userIdList = new ArrayList<>();
+    for(Object[] data : resultList){
+      userIdList.add((String)data[2]);
+    }
+    return userIdList;
+  }
+
+  public static ArrayList<Object[]> getResultListByArgs(DBHelper dbHelper, String[] selectionCols, String[] args, String password) {
+
     SQLiteDatabase db = dbHelper.getReadableDatabase(password);
 
-    String[] cols = new String[]{COLUMN_ID, COLUMN_ID, COLUMN_USER_ID};
-    String[] selectionArgs = new String[]{roomId};
-    Cursor cursor = db.query(NAME, cols, COLUMN_ROOM_ID + " = ?", selectionArgs, null, null, null);
-    int rowCount = cursor.getCount();
-    if (rowCount == 0) {
-      return null;
-    }
-    cursor.moveToFirst();
-    ArrayList<String> allUser = new ArrayList<>();
-    for (int i = 0; i <= rowCount; i++) {
-      if (cursor.moveToNext()) {
-        allUser.add(cursor.getString(cursor.getColumnIndex(COLUMN_USER_ID)));
+    String[] cols = new String[]{COLUMN_ID, COLUMN_ROOM_ID, COLUMN_USER_ID};
+
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < selectionCols.length; i++) {
+      String col = selectionCols[i];
+      sb.append(col);
+      sb.append(" = ? ");
+      if (i < selectionCols.length - 1) {
+        sb.append("AND");
       }
     }
-    cursor.close();
+    ArrayList<Object[]> resultList = new ArrayList<>();
+    Cursor cursor = db.query(NAME, cols, sb.toString(), args, null, null, null);
+    int rowCount = cursor.getCount();
+    if (rowCount == 0) {
+      cursor.close();
+      return resultList;
+    }
+    cursor.moveToFirst();
+    for (int i = 0; i < rowCount; i++) {
+      Object[] data = new Object[cols.length];
+      data[0] = cursor.getLong(cursor.getColumnIndex(COLUMN_ID));
+      data[1] = cursor.getString(cursor.getColumnIndex(COLUMN_ROOM_ID));
+      data[2] = cursor.getString(cursor.getColumnIndex(COLUMN_USER_ID));
 
-    return allUser;
+      if (data[1].equals("0")) {
+        continue;
+      }
+      resultList.add(data);
+      cursor.moveToNext();
+    }
+    cursor.close();
+    return resultList;
   }
 }

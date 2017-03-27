@@ -51,6 +51,17 @@
             android:name=".service.UpdateMessageService"
             android:enabled="true"/>
 
+        <service
+            android:name=".service.InitRoomListService"
+            android:enabled="true"/>
+
+        <service
+            android:name=".service.SaveRoomService"
+            android:enabled="true"/>
+
+        <service
+            android:name=".service.UpdateRoomService"
+            android:enabled="true"/>
     </application>
 
 </manifest>

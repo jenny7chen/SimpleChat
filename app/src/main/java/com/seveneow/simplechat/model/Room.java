@@ -1,5 +1,7 @@
 package com.seveneow.simplechat.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.CallSuper;
 
 import java.util.ArrayList;
@@ -10,7 +12,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-public class Room {
+public class Room implements Parcelable{
   public static final int TYPE_NONE = 0;
   public static final int TYPE_GROUP = 1;
   public static final int TYPE_BOARD = 2;
@@ -22,9 +24,7 @@ public class Room {
   private int type = TYPE_GROUP;
   private String id;
   private String name;
-  private String description;
   private String photo;
-  private String photoMd5;
   private ArrayList<String> members;
   private ConcurrentHashMap<String, Message> messages = new ConcurrentHashMap<>();
   private ArrayList<Message> showMessages = new ArrayList<>();
@@ -126,28 +126,12 @@ public class Room {
     this.name = name;
   }
 
-  public String getDescription() {
-    return description;
-  }
-
-  public void setDescription(String description) {
-    this.description = description;
-  }
-
   public String getPhoto() {
     return photo;
   }
 
   public void setPhoto(String photo) {
     this.photo = photo;
-  }
-
-  public String getPhotoMd5() {
-    return photoMd5;
-  }
-
-  public void setPhotoMd5(String photoMd5) {
-    this.photoMd5 = photoMd5;
   }
 
   public ArrayList<String> getMembers() {
@@ -165,6 +149,44 @@ public class Room {
   public void setShowMessages(ArrayList<Message> showMessages) {
     this.showMessages = showMessages;
   }
+
+  public Room(Parcel in) {
+    this.id = in.readString();
+    this.name = in.readString();
+    this.type = in.readInt();
+    this.photo = in.readString();
+    if(this.members == null)
+      this.members = new ArrayList<>();
+    in.readStringList(this.members);
+    this.latestMessageShowText = in.readString();
+    this.latestMessageShowTime = in.readString();
+  }
+
+  @Override
+  public int describeContents() {
+    return 0;
+  }
+
+  @Override
+  public void writeToParcel(Parcel dest, int flags) {
+    dest.writeString(this.id);
+    dest.writeString(this.name);
+    dest.writeInt(this.type);
+    dest.writeString(this.photo);
+    dest.writeStringList(this.members);
+    dest.writeString(this.latestMessageShowText);
+    dest.writeString(this.latestMessageShowTime);
+  }
+
+  public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
+    public Room createFromParcel(Parcel in) {
+      return new Room(in);
+    }
+
+    public Room[] newArray(int size) {
+      return new Room[size];
+    }
+  };
 
   @CallSuper
   public Map<String, Object> toMap() {

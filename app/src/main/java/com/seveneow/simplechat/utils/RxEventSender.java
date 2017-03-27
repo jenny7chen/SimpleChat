@@ -18,10 +18,15 @@ public class RxEventSender {
     RxEventBus.send(event);
   }
 
-  public static void notifyRoomListUpdated(Room room){
+  public static void notifyRoomListUpdated(){
     RxEvent event = new RxEvent();
     event.id = RxEvent.EVENT_ROOM_LIST_UPDATE;
-    event.object = room;
+    RxEventBus.send(event);
+  }
+
+  public static void notifyRoomListInited(){
+    RxEvent event = new RxEvent();
+    event.id = RxEvent.EVENT_ROOM_LIST_INITED;
     RxEventBus.send(event);
   }
 

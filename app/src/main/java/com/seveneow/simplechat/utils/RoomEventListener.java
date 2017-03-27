@@ -10,8 +10,7 @@ public class RoomEventListener implements ValueEventListener {
 
   @Override
   public void onDataChange(DataSnapshot dataSnapshot) {
-    Room room = new RoomParser().parse(dataSnapshot);
-    FDBManager.onGotRoomData(room);
+
   }
 
   @Override

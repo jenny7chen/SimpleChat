@@ -96,7 +96,7 @@ public class ChatActivity extends BaseActivity<ChatListMvpView, ChatPresenter> i
   @Override
   public void showContent() {
     ChatViewState state = (ChatViewState) viewState;
-    state.setData(getData());
+    state.setData((List<Message>) (Object) getData());
     //hide error view here
     progressBar.setVisibility(View.GONE);
     recyclerView.setVisibility(View.VISIBLE);
@@ -145,8 +145,8 @@ public class ChatActivity extends BaseActivity<ChatListMvpView, ChatPresenter> i
   }
 
   @Override
-  public List<Message> getData() {
-    return adapter == null ? null : adapter.getData();
+  public List<Object> getData() {
+    return adapter == null ? null : (List<Object>) (Object) adapter.getData();
   }
 
   @Override

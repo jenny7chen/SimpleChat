@@ -2,12 +2,14 @@ package com.seveneow.simplechat.database;
 
 import android.content.Context;
 
+import com.seveneow.simplechat.R;
 import com.seveneow.simplechat.model.Message;
 import com.seveneow.simplechat.model.Room;
 import com.seveneow.simplechat.model.User;
 import com.seveneow.simplechat.utils.BasePresenter;
 import com.seveneow.simplechat.utils.DebugLog;
 import com.seveneow.simplechat.utils.MessageParser;
+import com.seveneow.simplechat.utils.RoomParser;
 
 import net.sqlcipher.database.SQLiteDatabase;
 import net.sqlcipher.database.SQLiteOpenHelper;
@@ -57,6 +59,32 @@ public class DBHelper extends SQLiteOpenHelper {
     }
   }
 
+  public void insertRooms(ArrayList<Room> rooms, String password) {
+    RoomTable.insert(this, rooms, password);
+    for (Room room : rooms) {
+      for (String userId : room.getMembers()) {
+        RoomUserTable.insert(this, room.getId(), userId, password);
+      }
+    }
+  }
+
+  public ArrayList<Room> getUserRoomList(RoomParser roomParser, String password) {
+    ArrayList<Object[]> roomDataList = RoomTable.getRooms(this, password);
+    ArrayList<Room> roomList = new ArrayList<>();
+    for (Object[] roomData : roomDataList) {
+      Room room = roomParser.parse(roomData);
+      ArrayList<String> roomUserList = getRoomMembers(room.getId(), password);
+      room.setMembers(roomUserList);
+      roomList.add(room);
+    }
+    return roomList;
+  }
+
+  public ArrayList<String> getRoomMembers(String roomId, String password) {
+    return RoomUserTable.getUserListByRoomId(this, roomId, password);
+
+  }
+
   public void insertUser(User user, String password) {
     UserTable.insert(this, user, password);
   }
@@ -82,10 +110,6 @@ public class DBHelper extends SQLiteOpenHelper {
     return messages;
   }
 
-  public ArrayList<String> getRoomMembers(String roomId, String password) {
-    return RoomUserTable.get(this, roomId, password);
-  }
-
   public ArrayList<Message> searchMessage(BasePresenter presenter, String[] cols, String[] args, String password, int countLimit) {
     ArrayList<Message> messages = new ArrayList<>();
     MessageParser parser = new MessageParser(presenter);
@@ -99,7 +123,7 @@ public class DBHelper extends SQLiteOpenHelper {
     return messages;
   }
 
-  public static ArrayList<Message> parseDBObjectListToMessageList(ArrayList<Object[]> objectList, MessageParser parser){
+  public static ArrayList<Message> parseDBObjectListToMessageList(ArrayList<Object[]> objectList, MessageParser parser) {
     ArrayList<Message> messages = new ArrayList<>();
     for (Object[] data : objectList) {
       Message message = parser.parse(data);

@@ -35,6 +35,7 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
     roomId = intent.getStringExtra("roomId");
     DebugLog.e("baaa", "enter room : " + roomId);
     Room room = RoomManager.getInstance().getRoomById(roomId);
+    if(room != null)
     getView().setTitle(room.getName());
   }
 
@@ -157,12 +158,9 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
       DebugLog.e("Baaaa", " onMessage init show content");
       FDBManager.addRoomEventListener(roomId, new MessageEventListener(roomId, this));
     }
-    else {
-      DebugLog.e("baaa", "onMessageInit start update Service");
-      Intent intent = new Intent();
-      intent.putExtra(UpdateMessageService.PARAM_ROOM_ID, roomId);
-      getView().startService(UpdateMessageService.class, intent);
-    }
+    Intent intent = new Intent();
+    intent.putExtra(UpdateMessageService.PARAM_ROOM_ID, roomId);
+    getView().startService(UpdateMessageService.class, intent);
   }
 
   public void onReceiveMessage(String roomId, String notificationMessage) {

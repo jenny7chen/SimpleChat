@@ -16,10 +16,10 @@ import com.seveneow.simplechat.model.Post;
 import com.seveneow.simplechat.model.Room;
 import com.seveneow.simplechat.model.User;
 import com.seveneow.simplechat.service.SaveMessageService;
+import com.seveneow.simplechat.service.SaveRoomService;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,22 +35,26 @@ public class FDBManager {
     databaseRef.keepSynced(true);
   }
 
-  public static void checkDataInit() {
-    if (!RoomManager.getInstance().hasRoomData()) {
-      getUserRoomList();
-    }
-    else {
-      RxEvent event = new RxEvent();
-      event.id = RxEvent.EVENT_ROOM_LIST_UPDATE;
-      RxEventBus.send(event);
-    }
+  public static void getServerRoomList(String userId, Context context) {
+    databaseRef.child("users").child(userId).child("rooms").addListenerForSingleValueEvent(new ValueEventListener() {
+      @Override
+      public void onDataChange(DataSnapshot dataSnapshot) {
+        ArrayList<String> roomIdList = new ArrayList<String>();
+        for (DataSnapshot roomId : dataSnapshot.getChildren()) {
+          roomIdList.add(roomId.getKey());
+        }
+
+        FDBManager.onGotRoomList(roomIdList, context);
+      }
+
+      @Override
+      public void onCancelled(DatabaseError databaseError) {
+
+      }
+    });
   }
 
-  private static void getUserRoomList() {
-    databaseRef.child("users").child(Static.userId).child("rooms").addListenerForSingleValueEvent(new UserRoomsEventListener());
-  }
-
-  public static void onGotUserRooms(ArrayList<String> roomIdList) {
+  public static void onGotRoomList(ArrayList<String> roomIdList, Context context) {
     DebugLog.e("Baa", "roomList = " + roomIdList);
 
     for (String roomId : roomIdList) {
@@ -60,24 +64,35 @@ public class FDBManager {
     }
 
     for (String roomId : roomIdList) {
-      getRoomData(roomId);
+      getServerRoomData(roomId, context);
     }
   }
 
-  private static void getRoomData(String roomId) {
+  private static void getServerRoomData(String roomId, Context context) {
     DebugLog.e("baaa", "get room data = " + roomId);
-    databaseRef.child("rooms").child(roomId).addListenerForSingleValueEvent(new RoomEventListener());
+    databaseRef.child("rooms").child(roomId).addListenerForSingleValueEvent(new ValueEventListener() {
+      @Override
+      public void onDataChange(DataSnapshot dataSnapshot) {
+        Room room = new RoomParser().parse(dataSnapshot);
+        FDBManager.onGotRoomData(room, context);
+      }
+
+      @Override
+      public void onCancelled(DatabaseError databaseError) {
+
+      }
+    });
   }
 
-  public static void onGotRoomData(Room room) {
+  public static void onGotRoomData(Room room, Context context) {
     DebugLog.e("baaa", "got room data = " + room);
     if (room == null) {
       return;
     }
-
     RoomManager.getInstance().addRoom(room);
-    DebugLog.e("baaa", "addRoom(room);= " + room.getMessages().size());
-
+    Intent intent = new Intent(context, SaveRoomService.class);
+    intent.putExtra(SaveRoomService.PARAM_ROOMS, room);
+    context.startService(intent);
   }
 
   public static void getServerMessages(String roomId, Context context) {
@@ -164,7 +179,7 @@ public class FDBManager {
         e.printStackTrace();
       }
       room.setLatestMessageShowText(text);
-      RxEventSender.notifyRoomListUpdated(room);
+      RxEventSender.notifyRoomListUpdated();
 
     }).addOnFailureListener((Exception) -> {
       //TODO: update failure status on list
