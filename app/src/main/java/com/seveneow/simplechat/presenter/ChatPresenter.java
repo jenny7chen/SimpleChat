@@ -101,6 +101,7 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
 
     if (isWholeListUpdate) {
       updateData(messageList, false, false);
+      FDBManager.addRoomEventListener(roomId, new MessageEventListener(roomId, this));
     }
     else {
       List<Message> updatedMessages = Arrays.asList(messages);
@@ -151,13 +152,17 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
     if (!isViewAttached())
       return;
 
-    getView().showContent();
-    DebugLog.e("baaa", "onMessageInit start update Service");
-    Intent intent = new Intent();
-    intent.putExtra(UpdateMessageService.PARAM_ROOM_ID, roomId);
-    getView().startService(UpdateMessageService.class, intent);
-
-    FDBManager.addRoomEventListener(roomId, new MessageEventListener(roomId, this));
+    if (RoomManager.getInstance().getRoomById(roomId).hasMessages()) {
+      getView().showContent();
+      DebugLog.e("Baaaa", " onMessage init show content");
+      FDBManager.addRoomEventListener(roomId, new MessageEventListener(roomId, this));
+    }
+    else {
+      DebugLog.e("baaa", "onMessageInit start update Service");
+      Intent intent = new Intent();
+      intent.putExtra(UpdateMessageService.PARAM_ROOM_ID, roomId);
+      getView().startService(UpdateMessageService.class, intent);
+    }
   }
 
   public void onReceiveMessage(String roomId, String notificationMessage) {
@@ -205,7 +210,9 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
       }
     }
     else {
-      getView().setDataToList((List<Object>) (Object) updatedData);
+      //check data is null, when set the list when in first time updating the data or just notify for the same list
+      if (getView().getData() == null || getView().getData().size() == 0)
+        getView().setDataToList((List<Object>) (Object) updatedData);
       getView().notifyChanged(BasicListMvpView.NOTIFY_ALL_DATA_CHANGED);
     }
   }

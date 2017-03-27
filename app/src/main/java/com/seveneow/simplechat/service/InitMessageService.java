@@ -55,7 +55,6 @@ public class InitMessageService extends IntentService {
       return;
     }
 
-    FDBManager.getServerMessages(roomId, this);
     RxEventSender.notifyRoomMessagesInited(roomId);
     helper.close();
   }

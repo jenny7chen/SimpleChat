@@ -99,7 +99,6 @@ public class FDBManager {
         intent.putExtra(SaveMessageService.PARAM_ROOM_ID, roomId);
         intent.putExtra(SaveMessageService.PARAM_MESSAGES, roomMessages);
         context.startService(intent);
-//        RxEventSender.notifyRoomMessagesInited(roomId);
       }
 
       @Override

@@ -30,8 +30,11 @@ public class MessageEventListener implements ChildEventListener {
       DebugLog.e("ba", "message data is null");
       return;
     }
-    DebugLog.e("baaa", "message from message event listener : " + message.getShowText()+" id = " + message.getId());
+    //TODO:add this to avoid immediately message add event when sending messages
+    //    if(Static.isMessageFromMe(message))
+    //      return;
 
+    //TODO:test use , need to remove database id in formal version
     if (Static.isMessageSentFromLocal(message))
       return;
 
@@ -46,8 +49,7 @@ public class MessageEventListener implements ChildEventListener {
       DebugLog.e("la", "message data is null");
       return;
     }
-    DebugLog.e("baaa", "message from message event listener : onChildChanged" + message.getShowText()+" id = " + message.getId());
-
+    //TODO:test use , need to remove database id in formal version
     if (Static.isMessageSentFromLocal(message))
       return;
 
@@ -61,7 +63,7 @@ public class MessageEventListener implements ChildEventListener {
     boolean isAdd = RoomManager.getInstance().addOrUpdateMessage(roomId, message);
 
     //TODO: check data base data
-    if(isAdd) {
+    if (isAdd) {
       Intent intent = new Intent();
       intent.putExtra(SaveMessageService.PARAM_ROOM_ID, roomId);
       intent.putExtra(SaveMessageService.PARAM_NOTIFY_CHANGE, false);
