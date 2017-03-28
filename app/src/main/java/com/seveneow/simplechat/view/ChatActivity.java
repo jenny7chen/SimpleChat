@@ -71,7 +71,6 @@ public class ChatActivity extends BaseActivity<ChatListMvpView, ChatPresenter> i
 
   @Override
   public void onNewViewStateInstance() {
-    presenter.setRoomData(getIntent());
     loadData();
     //entering at the first time
   }
@@ -164,7 +163,8 @@ public class ChatActivity extends BaseActivity<ChatListMvpView, ChatPresenter> i
 
   @Override
   public void loadData() {
-    presenter.fetchMessages();
+    presenter.setRoomId(getIntent());
+    presenter.initRoomData();
   }
 
   @Override

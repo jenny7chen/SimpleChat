@@ -128,7 +128,6 @@ public class RoomTable {
     for (int i = 0; i < rowCount; i++) {
       Object[] data = new Object[cols.length];
 
-      cursor.moveToFirst();
       data[0] = cursor.getString(cursor.getColumnIndex(COLUMN_ROOM_ID));
       data[1] = cursor.getLong(cursor.getColumnIndex(COLUMN_ID));
       data[2] = cursor.getString(cursor.getColumnIndex(COLUMN_ROOM_NAME));

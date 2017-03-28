@@ -16,9 +16,12 @@ import com.seveneow.simplechat.model.Message;
 import com.seveneow.simplechat.model.Room;
 import com.seveneow.simplechat.presenter.MainPresenter;
 import com.seveneow.simplechat.utils.BaseActivity;
+import com.seveneow.simplechat.utils.DebugLog;
+import com.seveneow.simplechat.utils.RoomManager;
 import com.seveneow.simplechat.view_interface.BasicListMvpView;
 import com.seveneow.simplechat.view_interface.BasicMvpView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends BaseActivity<BasicListMvpView, MainPresenter> implements BasicListMvpView {
@@ -90,7 +93,7 @@ public class MainActivity extends BaseActivity<BasicListMvpView, MainPresenter> 
 
   @Override
   public List<Object> getData() {
-    return null;
+    return adapter == null ? null : (List<Object>) (Object) adapter.getData();
   }
 
   @Override

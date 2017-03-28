@@ -2,6 +2,7 @@ package com.seveneow.simplechat;
 
 import android.app.Activity;
 import android.app.Application;
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.nostra13.universalimageloader.cache.disc.impl.LimitedAgeDiskCache;
@@ -9,14 +10,16 @@ import com.nostra13.universalimageloader.cache.memory.impl.WeakMemoryCache;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.utils.StorageUtils;
+import com.seveneow.simplechat.service.InitRoomListService;
 import com.seveneow.simplechat.utils.FDBManager;
+import com.seveneow.simplechat.utils.RoomManager;
 import com.seveneow.simplechat.utils.Static;
 
 import net.sqlcipher.database.SQLiteDatabase;
 
 import java.io.File;
 
-public class SimpleChatApplication extends Application implements Application.ActivityLifecycleCallbacks{
+public class SimpleChatApplication extends Application implements Application.ActivityLifecycleCallbacks {
   @Override
   public void onCreate() {
     super.onCreate();
@@ -36,7 +39,18 @@ public class SimpleChatApplication extends Application implements Application.Ac
   }
 
   @Override
+  public void onTrimMemory(int level) {
+    super.onTrimMemory(level);
+
+  }
+
+  @Override
   public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+    if (!RoomManager.getInstance().hasRoomData()) {
+      Intent intent = new Intent(this, InitRoomListService.class);
+      intent.putExtra(InitRoomListService.PARAM_USER_ID, Static.userId);
+      startService(intent);
+    }
   }
 
   @Override

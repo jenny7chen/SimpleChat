@@ -31,15 +31,25 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
   ArrayList<Message> messageList = new ArrayList<>();
   private String roomId;
 
-  public void setRoomData(Intent intent) {
+  public void setRoomId(Intent intent){
     roomId = intent.getStringExtra("roomId");
-    DebugLog.e("baaa", "enter room : " + roomId);
-    Room room = RoomManager.getInstance().getRoomById(roomId);
-    if(room != null)
-    getView().setTitle(room.getName());
   }
 
-  public void fetchMessages() {
+  public void initRoomData() {
+    if (!isViewAttached())
+      return;
+
+    if(RoomManager.getInstance().getRoomById(roomId) == null){
+      return;
+    }
+
+    DebugLog.e("baaa", "enter room : " + roomId);
+    Room room = RoomManager.getInstance().getRoomById(roomId);
+    getView().setTitle(room.getName());
+    fetchMessages();
+  }
+
+  private void fetchMessages() {
     if (!isViewAttached())
       return;
 
@@ -138,6 +148,8 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
       DebugLog.e("Baaa", "message saved fetch messags");
       if (roomId.equals(event.object))
         updateFromLocalDB();
+    }else if(event.id == RxEvent.EVENT_ROOM_LIST_UPDATE){
+      initRoomData();
     }
   }
 
@@ -209,7 +221,7 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
     }
     else {
       //check data is null, when set the list when in first time updating the data or just notify for the same list
-      if (getView().getData() == null || getView().getData().size() == 0)
+      if (getView().getData() == null)
         getView().setDataToList((List<Object>) (Object) updatedData);
       getView().notifyChanged(BasicListMvpView.NOTIFY_ALL_DATA_CHANGED);
     }

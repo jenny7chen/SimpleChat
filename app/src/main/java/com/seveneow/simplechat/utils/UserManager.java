@@ -20,8 +20,11 @@ public class UserManager {
     if (userId.equals("123")) {
       user.setName("實驗體1號");
     }
-    else {
+    else if (userId.equals("456")) {
       user.setName("實驗體2號");
+    }
+    else {
+      user.setName("實驗體3號");
     }
     return user;
   }

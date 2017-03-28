@@ -22,6 +22,8 @@ public class RoomManager {
   }
 
   public void addAllRooms(ArrayList<Room> rooms) {
+    if (roomMap == null)
+      roomMap = new LinkedHashMap<>();
     for (Room room : rooms) {
       roomMap.put(room.getId(), room);
     }
