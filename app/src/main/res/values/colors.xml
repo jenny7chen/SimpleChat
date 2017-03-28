@@ -3,6 +3,8 @@
     <color name="colorPrimary">#8ca3e1</color>
     <color name="colorPrimaryDark">#718dda</color>
     <color name="colorAccent">#FF4081</color>
+    <color name="chat_bubble_gray">#f2f2f2</color>
+    <color name="chat_bubble_purple">#8ca3e1</color>
     <color name="editor_bg">#99ccff</color>
     <color name="editor_send_btn_bg">#8ca3e1</color>
 </resources>

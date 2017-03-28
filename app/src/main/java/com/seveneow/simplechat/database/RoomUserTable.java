@@ -32,7 +32,7 @@ public class RoomUserTable {
     ContentValues values = new ContentValues();
     values.put(COLUMN_ROOM_ID, roomId);
     values.put(COLUMN_USER_ID, userId);
-    return sqlite.getWritableDatabase(password).insert(NAME, null, values);
+    return sqlite.openWritableDB(password).insert(NAME, null, values);
   }
 
   public static ArrayList<String> getUserListByRoomId(DBHelper helper, String roomId,String password){
@@ -46,7 +46,7 @@ public class RoomUserTable {
 
   public static ArrayList<Object[]> getResultListByArgs(DBHelper dbHelper, String[] selectionCols, String[] args, String password) {
 
-    SQLiteDatabase db = dbHelper.getReadableDatabase(password);
+    SQLiteDatabase db = dbHelper.openReadableDB(password);
 
     String[] cols = new String[]{COLUMN_ID, COLUMN_ROOM_ID, COLUMN_USER_ID};
 

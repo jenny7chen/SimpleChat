@@ -2,12 +2,10 @@ package com.seveneow.simplechat.database;
 
 import android.content.Context;
 
-import com.seveneow.simplechat.R;
 import com.seveneow.simplechat.model.Message;
 import com.seveneow.simplechat.model.Room;
 import com.seveneow.simplechat.model.User;
 import com.seveneow.simplechat.utils.BasePresenter;
-import com.seveneow.simplechat.utils.DebugLog;
 import com.seveneow.simplechat.utils.MessageParser;
 import com.seveneow.simplechat.utils.RoomParser;
 
@@ -21,6 +19,7 @@ public class DBHelper extends SQLiteOpenHelper {
   public final static String _DBName = "SampleList.db";
   private final static int _DBVersion = 1;
   private static DBHelper instance = null;
+  private Context context;
 
   public static synchronized DBHelper getInstance(Context context) {
     if (instance == null) {
@@ -38,6 +37,23 @@ public class DBHelper extends SQLiteOpenHelper {
 
   private DBHelper(Context context) {
     super(context, _DBName, null, _DBVersion);
+    this.context = context;
+  }
+
+  public SQLiteDatabase openWritableDB(String password) {
+    SQLiteDatabase db = getWritableDatabase(password);
+    if (!db.isOpen()) {
+      db = SQLiteDatabase.openOrCreateDatabase(_DBName, password, null);
+    }
+    return db;
+  }
+
+  public SQLiteDatabase openReadableDB(String password) {
+    SQLiteDatabase db = getWritableDatabase(password);
+    if (!db.isOpen()) {
+      db = SQLiteDatabase.openOrCreateDatabase(_DBName, password, null);
+    }
+    return db;
   }
 
   @Override

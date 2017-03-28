@@ -51,7 +51,7 @@ public class RoomTable {
 
   private static synchronized long insertOrUpdateRooms(boolean insert, DBHelper sqlite, ArrayList<Room> rooms, String password) {
     long result = -1;
-    DatabaseUtils.InsertHelper ih = new DatabaseUtils.InsertHelper(sqlite.getWritableDatabase(password), NAME);
+    DatabaseUtils.InsertHelper ih = new DatabaseUtils.InsertHelper(sqlite.openWritableDB(password), NAME);
     // Get the numeric indexes for each of the columns that we're updating
     final int roomIdColumn = ih.getColumnIndex(COLUMN_ROOM_ID);
     final int roomNameColumn = ih.getColumnIndex(COLUMN_ROOM_NAME);
@@ -86,7 +86,7 @@ public class RoomTable {
   }
 
   public static Object[] get(DBHelper dbHelper, String roomId, String password) {
-    SQLiteDatabase db = dbHelper.getReadableDatabase(password);
+    SQLiteDatabase db = dbHelper.openReadableDB(password);
 
     String[] cols = new String[]{COLUMN_ROOM_ID, COLUMN_ID, COLUMN_ROOM_NAME,
         COLUMN_LATEST_MESSAGE_TIME, COLUMN_LATEST_MESSAGE_TEXT, COLUMN_ROOM_TYPE, COLUMN_ROOM_PHOTO};
@@ -112,7 +112,7 @@ public class RoomTable {
   }
 
   public static ArrayList<Object[]> getRooms(DBHelper dbHelper, String password) {
-    SQLiteDatabase db = dbHelper.getReadableDatabase(password);
+    SQLiteDatabase db = dbHelper.openReadableDB(password);
 
     String[] cols = new String[]{COLUMN_ROOM_ID, COLUMN_ID, COLUMN_ROOM_NAME,
         COLUMN_LATEST_MESSAGE_TIME, COLUMN_LATEST_MESSAGE_TEXT, COLUMN_ROOM_TYPE, COLUMN_ROOM_PHOTO};

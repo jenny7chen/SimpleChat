@@ -57,13 +57,13 @@ public class MessageView extends RelativeLayout {
     if (isMe) {
       setGravity(Gravity.END | Gravity.BOTTOM);
       findViewById(R.id.message_sent_time).setVisibility(VISIBLE);
-      findViewById(R.id.message_view_container).setBackgroundColor(Color.parseColor("#f2f2f2"));
+      findViewById(R.id.message_view_container).setBackgroundResource(R.drawable.chat_bubble_gray);
     }
     else {
       setGravity(Gravity.START | Gravity.BOTTOM);
       findViewById(R.id.message_got_time).setVisibility(VISIBLE);
       findViewById(R.id.message_sender).setVisibility(VISIBLE);
-      findViewById(R.id.message_view_container).setBackgroundColor(Color.parseColor("#8ca3e1"));
+      findViewById(R.id.message_view_container).setBackgroundResource(R.drawable.chat_bubble_purple);
     }
   }
 

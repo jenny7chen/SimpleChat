@@ -36,11 +36,11 @@ public class UserTable {
     values.put(COLUMN_USER_ID, user.getId());
     values.put(COLUMN_USER_NAME, user.getName());
     values.put(COLUMN_USER_AVATAR, user.getAvatar());
-    return sqlite.getWritableDatabase(password).insert(NAME, null, values);
+    return sqlite.openWritableDB(password).insert(NAME, null, values);
   }
 
   public static Object[] get(DBHelper dbHelper, String roomId, String password) {
-    SQLiteDatabase db = dbHelper.getReadableDatabase(password);
+    SQLiteDatabase db = dbHelper.openReadableDB(password);
 
     String[] cols = new String[]{COLUMN_USER_ID, COLUMN_ID, COLUMN_USER_NAME,
         COLUMN_USER_AVATAR};

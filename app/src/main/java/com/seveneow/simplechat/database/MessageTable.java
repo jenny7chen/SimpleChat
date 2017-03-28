@@ -71,7 +71,7 @@ public class MessageTable {
 
   private static synchronized long insertOrUpdateMessages(boolean insert, DBHelper sqlite, ArrayList<Message> messages, String password) {
     long result = -1;
-    DatabaseUtils.InsertHelper ih = new DatabaseUtils.InsertHelper(sqlite.getWritableDatabase(password), NAME);
+    DatabaseUtils.InsertHelper ih = new DatabaseUtils.InsertHelper(sqlite.openWritableDB(password), NAME);
     // Get the numeric indexes for each of the columns that we're updating
     final int messageIdColumn = ih.getColumnIndex(COLUMN_MESSAGE_ID);
     final int messageSenderColumn = ih.getColumnIndex(COLUMN_MESSAGE_SENDER_ID);
@@ -120,7 +120,7 @@ public class MessageTable {
 
   public static ArrayList<Object[]> getMessagesByArgs(DBHelper dbHelper, String[] selectionCols, String[] args, String password, int countLimit) {
 
-    SQLiteDatabase db = dbHelper.getReadableDatabase(password);
+    SQLiteDatabase db = dbHelper.openReadableDB(password);
 
     String[] cols = new String[]{COLUMN_MESSAGE_ID, COLUMN_ID, COLUMN_MESSAGE_SENDER_ID,
         COLUMN_MESSAGE_TIME, COLUMN_MESSAGE_TYPE, COLUMN_MESSAGE_THUMBNAIL,
@@ -169,7 +169,7 @@ public class MessageTable {
   }
 
   public static Object[] get(DBHelper dbHelper, String messageId, String password) {
-    SQLiteDatabase db = dbHelper.getReadableDatabase(password);
+    SQLiteDatabase db = dbHelper.openReadableDB(password);
 
     String[] cols = new String[]{COLUMN_MESSAGE_ID, COLUMN_ID, COLUMN_MESSAGE_SENDER_ID,
         COLUMN_MESSAGE_TIME, COLUMN_MESSAGE_TYPE, COLUMN_MESSAGE_THUMBNAIL,
@@ -198,7 +198,7 @@ public class MessageTable {
   }
 
   public static int cleanExpiredData(DBHelper sqlite, String password) {
-    SQLiteDatabase db = sqlite.getWritableDatabase(password);
+    SQLiteDatabase db = sqlite.openWritableDB(password);
 
     long expire = new Date().getTime() - EXPIRY;
     String[] whereArgs = new String[]{String.valueOf(expire)};
