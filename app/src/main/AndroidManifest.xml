@@ -17,7 +17,8 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".view.ChatActivity">
+        <activity
+            android:name=".view.ChatActivity">
         </activity>
 
         <service android:name=".service.IMFirebaseMessagingService">

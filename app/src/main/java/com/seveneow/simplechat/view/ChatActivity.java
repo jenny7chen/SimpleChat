@@ -87,6 +87,13 @@ public class ChatActivity extends BaseActivity<ChatListMvpView, ChatPresenter> i
   }
 
   @Override
+  protected void onPause() {
+    hideSoftKeyboard();
+    messageEditorView.removeFocus();
+    super.onPause();
+  }
+
+  @Override
   public void showLoading() {
     //show progressbar here
     progressBar.setVisibility(View.VISIBLE);

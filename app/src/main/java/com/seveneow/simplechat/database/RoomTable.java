@@ -80,7 +80,6 @@ public class RoomTable {
     }
     finally {
       ih.close();
-      sqlite.close();
     }
     return result;
   }

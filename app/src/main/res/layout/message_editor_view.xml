@@ -5,21 +5,27 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/editor_bg"
-    android:paddingTop="1dp">
+    android:paddingTop="1dp"
+    android:minHeight="50dp"
+    android:focusableInTouchMode="true"
+    android:focusable="true">
 
     <EditText
         android:id="@+id/editor_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@android:color/white"
-        android:focusableInTouchMode="true"
         android:maxLines="5"
         android:minHeight="50dp"
         android:minLines="2"
+        android:nextFocusLeft="@id/editor_text"
+        android:nextFocusUp="@id/editor_text"
         android:paddingLeft="15dp"
         android:paddingRight="15dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toLeftOf="@+id/send_button"/>
+        app:layout_constraintRight_toLeftOf="@+id/send_button"
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <RelativeLayout
         android:id="@+id/send_button"

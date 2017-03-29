@@ -14,6 +14,8 @@ import com.seveneow.simplechat.R;
 
 public class MessageEditorView extends RelativeLayout {
   private MessageEditorListener listener = null;
+  private EditText editText;
+  private RelativeLayout sendButton;
 
   public MessageEditorView(Context context) {
     super(context);
@@ -37,8 +39,8 @@ public class MessageEditorView extends RelativeLayout {
   }
 
   private void initListeners() {
-    RelativeLayout sendButton = (RelativeLayout) findViewById(R.id.send_button);
-    EditText editText = (EditText) findViewById(R.id.editor_text);
+    sendButton = (RelativeLayout) findViewById(R.id.send_button);
+    editText = (EditText) findViewById(R.id.editor_text);
     sendButton.setOnClickListener((view) -> {
       if (listener != null) {
         String message = editText.getText().toString();
@@ -55,7 +57,7 @@ public class MessageEditorView extends RelativeLayout {
   }
 
   public void setHint(String hintText) {
-    EditText editText = (EditText) findViewById(R.id.editor_text);
+    editText = (EditText) findViewById(R.id.editor_text);
     editText.setHint(hintText);
   }
 
@@ -65,13 +67,20 @@ public class MessageEditorView extends RelativeLayout {
   //  }
 
   public void setSendButtonColor(int color) {
-    RelativeLayout sendButton = (RelativeLayout) findViewById(R.id.send_button);
     sendButton.setBackgroundColor(color);
   }
 
   public interface MessageEditorListener {
     public void onSendButtonPressed(String message);
 
+  }
+
+  public void removeFocus() {
+    editText.clearFocus();
+  }
+
+  public void giveFocus() {
+    editText.requestFocus();
   }
 
 }

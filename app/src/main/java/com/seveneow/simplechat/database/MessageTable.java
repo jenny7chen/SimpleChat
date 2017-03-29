@@ -109,7 +109,6 @@ public class MessageTable {
     }
     finally {
       ih.close();
-      sqlite.close();
     }
     return result;
   }
