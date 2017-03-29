@@ -179,7 +179,7 @@ public class FDBManager {
         e.printStackTrace();
       }
       room.setLatestMessageShowText(text);
-      RxEventSender.notifyRoomListUpdated();
+      RxEventSender.notifyRoomShowTextUpdate();
 
     }).addOnFailureListener((Exception) -> {
       //TODO: update failure status on list

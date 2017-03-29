@@ -30,7 +30,7 @@ public class SaveRoomService extends IntentService {
     DBHelper helper = DBHelper.getInstance(this);
     helper.insertRoom(roomData, Static.DB_PASS);
     if (intent.getBooleanExtra(PARAM_NOTIFY_CHANGE, true))
-      RxEventSender.notifyRoomListUpdated();
+      RxEventSender.notifyRoomInserted(roomData);
     helper.close();
   }
 }

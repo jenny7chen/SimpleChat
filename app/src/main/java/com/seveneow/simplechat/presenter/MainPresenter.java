@@ -40,14 +40,19 @@ public class MainPresenter extends BasePresenter<BasicListMvpView> {
     getView().startService(UpdateRoomService.class, intent);
   }
 
-  private void onRoomsUpdated() {
+  private void onRoomsUpdated(Room... room) {
     if (!isViewAttached())
       return;
     DebugLog.e("Baaa", "onRoom update");
     roomList = RoomManager.getInstance().getAllRooms();
 
-    getView().setDataToList((List<Object>) (Object) roomList);
-    getView().notifyChanged(BasicListMvpView.NOTIFY_ALL_DATA_CHANGED);
+    if (getView().getData() == null)
+      getView().setDataToList((List<Object>) (Object) roomList);
+
+    if (room != null && room.length > 0)
+      getView().notifyChanged(BasicListMvpView.NOTIFY_DATA_RANGE_CHANGED, 0, roomList.size(), room[0]);
+    else
+      getView().notifyChanged(BasicListMvpView.NOTIFY_ALL_DATA_CHANGED);
     getView().showContent();
   }
 
@@ -58,11 +63,14 @@ public class MainPresenter extends BasePresenter<BasicListMvpView> {
 
   @Override
   public void onEvent(RxEvent event) {
-    if (event.id == RxEvent.EVENT_ROOM_LIST_UPDATE) {
+    if (event.id == RxEvent.EVENT_ROOM_LIST_UPDATE || event.id == RxEvent.EVENT_ROOM_SHOWTEXT_UPDATE) {
       onRoomsUpdated();
     }
     else if (event.id == RxEvent.EVENT_ROOM_LIST_INITED) {
       onRoomsInit();
+    }
+    else if (event.id == RxEvent.EVENT_ROOM_INSERTED) {
+      onRoomsUpdated((Room) event.object);
     }
   }
 }

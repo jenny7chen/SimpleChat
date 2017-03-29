@@ -24,9 +24,22 @@ public class RxEventSender {
     RxEventBus.send(event);
   }
 
+  public static void notifyRoomInserted(Room room){
+    RxEvent event = new RxEvent();
+    event.id = RxEvent.EVENT_ROOM_INSERTED;
+    event.object = room;
+    RxEventBus.send(event);
+  }
+
   public static void notifyRoomListInited(){
     RxEvent event = new RxEvent();
     event.id = RxEvent.EVENT_ROOM_LIST_INITED;
+    RxEventBus.send(event);
+  }
+
+  public static void notifyRoomShowTextUpdate(){
+    RxEvent event = new RxEvent();
+    event.id = RxEvent.EVENT_ROOM_SHOWTEXT_UPDATE;
     RxEventBus.send(event);
   }
 
