@@ -179,6 +179,7 @@ public class FDBManager {
         e.printStackTrace();
       }
       room.setLatestMessageShowText(text);
+      room.setLatestMessageShowTime(message.getShowTime());
       RxEventSender.notifyRoomShowTextUpdate();
 
     }).addOnFailureListener((Exception) -> {

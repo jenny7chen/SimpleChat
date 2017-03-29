@@ -44,11 +44,8 @@ public class FetchLocalMessagesService extends IntentService {
     //get new message list from database
     DBHelper helper = DBHelper.getInstance(this);
     ArrayList<Message> messages = helper.getRoomMessages(new MessageParser(this), roomId, Static.DB_PASS, 100);
-    if (messages.size() > 0) {
-      RoomManager.getInstance().updateRoomMessages(roomId, messages);
-      RxEventSender.notifyRoomMessagesUpdated(roomId);
-      return;
-    }
+    RoomManager.getInstance().updateRoomMessages(roomId, messages);
+    RxEventSender.notifyRoomMessagesUpdated(roomId);
     helper.close();
   }
 }

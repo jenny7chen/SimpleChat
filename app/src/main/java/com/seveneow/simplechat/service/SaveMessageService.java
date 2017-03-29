@@ -46,6 +46,9 @@ public class SaveMessageService extends IntentService {
   private boolean hasNewMessage(String roomId, ArrayList<Message> messages) {
     ConcurrentHashMap<String, Message> localMessages = RoomManager.getInstance().getRoomById(roomId).getMessages();
     boolean hasNewMessage = false;
+    if (messages.size() == 0)
+      return true;
+
     for (Message message : messages) {
       if (localMessages.containsKey(message.getId())) {
         continue;
