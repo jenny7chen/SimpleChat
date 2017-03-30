@@ -142,15 +142,11 @@ public class FDBManager {
   }
 
   public static String sendMessage(String key, String roomId, Message message, Context context) {
-    Message messageSend = MessageGenerator.copyMessage(message);
-
     Map<String, Object> roomPushValues = new HashMap<>();
     roomPushValues.put("show_text", message.getShowText());
     roomPushValues.put("timestamp", message.getTime());
 
-    messageSend.setPending(false);
-    Map<String, Object> pushValues = messageSend.toMap();
-
+    Map<String, Object> pushValues = message.toMap();
     Map<String, Object> childUpdates = new HashMap<>();
     childUpdates.put("/messages/" + roomId + "/" + key, pushValues);
     childUpdates.put("/rooms/" + roomId + "/latest_message/", roomPushValues);
