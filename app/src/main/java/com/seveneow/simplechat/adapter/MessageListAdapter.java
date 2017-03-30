@@ -11,7 +11,6 @@ import android.widget.Toast;
 
 import com.seveneow.simplechat.model.Message;
 import com.seveneow.simplechat.utils.BaseActivity;
-import com.seveneow.simplechat.utils.DebugLog;
 import com.seveneow.simplechat.utils.Static;
 import com.seveneow.simplechat.view_custom.MessageView;
 
@@ -93,7 +92,6 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
 
   @Override
   public long getItemId(int position) {
-    DebugLog.e("baaa", "position = " + position + " database id = " +  data.get(position).getDatabaseId() + " message id = " + data.get(position).getId());
     if (data.get(position).getDatabaseId() != -1)
       return data.get(position).getDatabaseId();
     else
