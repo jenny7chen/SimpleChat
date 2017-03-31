@@ -33,20 +33,25 @@ public class SaveMessageService extends IntentService {
       return;
 
     String roomId = intent.getStringExtra(PARAM_ROOM_ID);
+    boolean notifyListChange = intent.getBooleanExtra(PARAM_NOTIFY_LIST_CHANGE, true);
+    boolean notifyAdd = intent.getBooleanExtra(PARAM_NOTIFY_ADD, false);
     ArrayList<Message> messageData = intent.getParcelableArrayListExtra(PARAM_MESSAGES);
-    DBHelper helper = DBHelper.getInstance(this);
-    long lastInsertRowId = helper.insertMessageList(messageData, Static.DB_PASS);
 
-    if (intent.getBooleanExtra(PARAM_NOTIFY_LIST_CHANGE, true) && hasNewMessage(roomId, messageData)) {
-      DebugLog.e("Baaa", "save message list from server success, notify saved");
+    DBHelper helper = DBHelper.getInstance(this);
+    helper.insertMessageList(messageData, Static.DB_PASS);
+
+    if (notifyListChange && hasNewMessage(roomId, messageData)) {
+      DebugLog.e("Baaa", "save message list from server success, " + messageData.size() + "notify saved");
       RxEventSender.notifyNewMessageSaved(roomId);
     }
-    else if (intent.getBooleanExtra(PARAM_NOTIFY_ADD, false)) {
-      DebugLog.e("Baaa", "save message from server success, notify add/update");
+    if (notifyAdd) {
+      DebugLog.e("Baaa", "save message from server success message size = " + messageData.size() + ", notify add/update");
       Message newMessage = messageData.get(0);
-      newMessage.setDatabaseId(lastInsertRowId);
+      //      newMessage.setDatabaseId(lastInsertRowId);
       RoomManager.getInstance().addOrUpdateRoomMessage(roomId, newMessage);
     }
+    DebugLog.e("Baaa", "SaveMessageService end");
+
   }
 
   //TODO: remove this if need to notify when messages been updated such as "Remove"

@@ -20,15 +20,15 @@ public class MessageEventListener implements ChildEventListener {
 
   @Override
   public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-    onGotNewMessage(dataSnapshot);
+    onGotNewMessage(dataSnapshot, true);
   }
 
   @Override
   public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-    onGotNewMessage(dataSnapshot);
+    onGotNewMessage(dataSnapshot, false);
   }
 
-  private synchronized void onGotNewMessage(DataSnapshot dataSnapshot) {
+  private synchronized void onGotNewMessage(DataSnapshot dataSnapshot, boolean isAdd) {
     Message message = new MessageParser(presenter).parse(dataSnapshot);
 
     if (message == null) {
@@ -36,13 +36,14 @@ public class MessageEventListener implements ChildEventListener {
       return;
     }
     Message localMessage = RoomManager.getInstance().getRoomById(roomId).getMessages().get(message.getId());
-    if (localMessage != null && localMessage.isPending()) {
+    if (localMessage != null && isAdd) {
       //prevent message sent by this device from being called back instantly.
       //because firebase off-line database will call back to here immediately after we pushed data to it.
       //it makes us not able to get the true sent callback
       return;
     }
 
+    DebugLog.e("ba", "receive new message ");
     Intent intent = new Intent();
     intent.putExtra(HandleNewMessageService.PARAM_ROOM_ID, roomId);
     intent.putExtra(HandleNewMessageService.PARAM_MESSAGE, message);

@@ -101,7 +101,7 @@ public class FDBManager {
           message.setRoomId(roomId);
           roomMessages.add(message);
         }
-        DebugLog.e("baa", "onServer message get");
+        DebugLog.e("baa", "onServer message get, size = " + roomMessages.size());
         Intent intent = new Intent(context, SaveMessageService.class);
         intent.putExtra(SaveMessageService.PARAM_ROOM_ID, roomId);
         intent.putExtra(SaveMessageService.PARAM_MESSAGES, roomMessages);

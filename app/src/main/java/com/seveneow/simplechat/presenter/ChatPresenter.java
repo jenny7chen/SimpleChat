@@ -127,14 +127,13 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
     if (!isViewAttached())
       return;
 
-    if (RoomManager.getInstance().getRoomById(roomId).hasMessages()) {
-      getView().showContent();
-      DebugLog.e("Baaaa", " onMessage init show content");
-      FDBManager.addRoomEventListener(roomId, new MessageEventListener(roomId, this));
-    }
     Intent intent = new Intent();
     intent.putExtra(GetServerMessageListService.PARAM_ROOM_ID, roomId);
     getView().startService(GetServerMessageListService.class, intent);
+
+    if(RoomManager.getInstance().getRoomById(roomId).hasMessages()){
+      FDBManager.addRoomEventListener(roomId, new MessageEventListener(roomId, this));
+    }
   }
 
   public void onMessagesAdded(Message message) {

@@ -37,7 +37,7 @@ public class HandleNewMessageService extends IntentService {
 
     Intent saveIntent = new Intent(this, SaveMessageService.class);
     saveIntent.putExtra(SaveMessageService.PARAM_ROOM_ID, roomId);
-    saveIntent.putExtra(SaveMessageService.PARAM_NOTIFY_ADD, isAdd);
+    saveIntent.putExtra(SaveMessageService.PARAM_NOTIFY_ADD, true);
     saveIntent.putExtra(SaveMessageService.PARAM_NOTIFY_LIST_CHANGE, false);
     saveIntent.putExtra(SaveMessageService.PARAM_MESSAGES, messageToBeSaved);
     startService(saveIntent);
