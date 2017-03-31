@@ -73,17 +73,24 @@ public class RoomListAdapter extends RecyclerView.Adapter<RoomListAdapter.Holder
     Room room = data.get(position);
     holder.room = room;
     View view = holder.itemView;
+    view.setVisibility(View.VISIBLE);
+    TextView nameView = (TextView) view.findViewById(R.id.name_view);
+    TextView textView = (TextView) view.findViewById(R.id.text_view);
+
     if (room.getType() == Room.TYPE_NONE) {
       DebugLog.e("Baaa", "set gone name = " + room.getName());
       view.setVisibility(View.GONE);
     }
-    else {
+    else if (room.getType() == Room.TYPE_BOARD) {
       DebugLog.e("Baaa", "set visible name = " + room.getName());
+      textView.setVisibility(View.GONE);
       view.setVisibility(View.VISIBLE);
     }
-    TextView nameView = (TextView) view.findViewById(R.id.name_view);
+    else {
+      textView.setVisibility(View.VISIBLE);
+      view.setVisibility(View.VISIBLE);
+    }
     nameView.setText(room.getName());
-    TextView textView = (TextView) view.findViewById(R.id.text_view);
     textView.setText(room.getLatestMessageShowText());
     ImageView imageView = (ImageView) view.findViewById(R.id.avatar);
     ImageLoader.getInstance().displayImage(room.getPhoto(), imageView, Static.defaultDisplayImageOptions(R.mipmap.ic_launcher, true));

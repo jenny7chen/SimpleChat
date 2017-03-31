@@ -119,7 +119,7 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
       return;
     Intent intent = new Intent();
     intent.putExtra(GetDBMessageListService.PARAM_ROOM_ID, roomId);
-    intent.putExtra(GetDBMessageListService.PARAM_NOTIFY_INIT, notifyInit);
+    intent.putExtra(GetDBMessageListService.PARAM_IS_INIT, notifyInit);
     getView().startService(GetDBMessageListService.class, intent);
   }
 
@@ -131,7 +131,7 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
     intent.putExtra(GetServerMessageListService.PARAM_ROOM_ID, roomId);
     getView().startService(GetServerMessageListService.class, intent);
 
-    if(RoomManager.getInstance().getRoomById(roomId).hasMessages()){
+    if (RoomManager.getInstance().getRoomById(roomId).hasMessages()) {
       FDBManager.addRoomEventListener(roomId, new MessageEventListener(roomId, this));
     }
   }
