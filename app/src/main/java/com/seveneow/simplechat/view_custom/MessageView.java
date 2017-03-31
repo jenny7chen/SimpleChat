@@ -32,7 +32,6 @@ public class MessageView extends RelativeLayout {
 
   public void setMessage(Message message, Message nextMessage) {
     this.message = message;
-    setRootView();
     if (Static.isMessageFromMe(message)) {
       setMessageFromMeView();
     }
@@ -67,12 +66,6 @@ public class MessageView extends RelativeLayout {
     }
   }
 
-  protected void setRootView() {
-    TextView senderView = (TextView) findViewById(R.id.message_sender);
-    senderView.setText(message.getSenderId());
-    senderView.setVisibility(message.isShowSender() ? VISIBLE : GONE);
-  }
-
   private void setMessageFromMeView() {
     TextView sentMessageTimeView = (TextView) findViewById(R.id.message_sent_time);
     sentMessageTimeView.setText(message.getShowTime());
@@ -81,6 +74,10 @@ public class MessageView extends RelativeLayout {
   private void setMessageFromOthersView(Message nextMessage) {
     TextView gotMessageTimeView = (TextView) findViewById(R.id.message_got_time);
     gotMessageTimeView.setText(message.getShowTime());
+
+    TextView senderView = (TextView) findViewById(R.id.message_sender);
+    senderView.setText(message.getSenderId());
+    senderView.setVisibility(message.isShowSender() ? VISIBLE : GONE);
 
     CircleImageView circleImageView = (CircleImageView) findViewById(R.id.avatar);
     if (nextMessage != null && nextMessage.getSenderId().equals(message.getSenderId())) {

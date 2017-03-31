@@ -20,6 +20,7 @@ public class Message implements Parcelable {
   public static final int TYPE_IMAGE = 1;
   public static final int TYPE_STICKER = 2;
   public static final int TYPE_FILE = 3;
+  public static final int TYPE_SYSTEM_MESSAGE = 4;
 
   private int type = TYPE_TEXT;
   private long databaseId = -1;
