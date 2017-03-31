@@ -15,11 +15,10 @@ import com.seveneow.simplechat.model.Message;
 import com.seveneow.simplechat.model.Post;
 import com.seveneow.simplechat.model.Room;
 import com.seveneow.simplechat.model.User;
+import com.seveneow.simplechat.service.HandleNewMessageService;
 import com.seveneow.simplechat.service.SaveMessageService;
 import com.seveneow.simplechat.service.SaveRoomService;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -58,12 +57,6 @@ public class FDBManager {
     DebugLog.e("Baa", "roomList = " + roomIdList);
 
     for (String roomId : roomIdList) {
-      Room room = new Room();
-      room.setId(roomId);
-      RoomManager.getInstance().addRoom(room);
-    }
-
-    for (String roomId : roomIdList) {
       getServerRoomData(roomId, context);
     }
   }
@@ -89,7 +82,6 @@ public class FDBManager {
     if (room == null) {
       return;
     }
-    RoomManager.getInstance().addRoom(room);
     Intent intent = new Intent(context, SaveRoomService.class);
     intent.putExtra(SaveRoomService.PARAM_ROOMS, room);
     context.startService(intent);
@@ -154,29 +146,10 @@ public class FDBManager {
       //inform message sent, need pending id for layout update
       message.setPending(false);
 
-      ArrayList<Message> messages = new ArrayList<Message>();
-      messages.add(message);
-      Intent intent = new Intent(context, SaveMessageService.class);
-      intent.putExtra(SaveMessageService.PARAM_ROOM_ID, roomId);
-      intent.putExtra(SaveMessageService.PARAM_NOTIFY_CHANGE, false);
-      intent.putExtra(SaveMessageService.PARAM_MESSAGES, messages);
+      Intent intent = new Intent(context, HandleNewMessageService.class);
+      intent.putExtra(HandleNewMessageService.PARAM_ROOM_ID, roomId);
+      intent.putExtra(HandleNewMessageService.PARAM_MESSAGE, message);
       context.startService(intent);
-
-      RoomManager.getInstance().addOrUpdateMessage(roomId, message);
-
-      //TODO: update room information in DB
-      Room room = RoomManager.getInstance().getRoomById(roomId);
-
-      String text = message.getShowText();
-      try {
-        text = URLDecoder.decode(text, "UTF-8");
-      }
-      catch (UnsupportedEncodingException e) {
-        e.printStackTrace();
-      }
-      room.setLatestMessageShowText(text);
-      room.setLatestMessageShowTime(message.getShowTime());
-      RxEventSender.notifyRoomShowTextUpdate();
 
     }).addOnFailureListener((Exception) -> {
       //TODO: update failure status on list

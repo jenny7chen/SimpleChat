@@ -16,17 +16,19 @@ import com.seveneow.simplechat.utils.Static;
 import java.util.ArrayList;
 
 
-public class FetchLocalMessagesService extends IntentService {
+public class GetDBMessageListService extends IntentService {
   public static final String PARAM_ROOM_ID = "room_id";
+  public static final String PARAM_NOTIFY_INIT = "notify_init";
 
-  public FetchLocalMessagesService() {
-    super("fetchLocalMessageService");
+  public GetDBMessageListService() {
+    super("GetDBMessageListService");
   }
 
   @Override
   protected void onHandleIntent(Intent intent) {
-    DebugLog.e("Baaa", "fetchLocalMessageService start");
+    DebugLog.e("Baaa", "GetDBMessageListService start");
     String roomId = intent.getStringExtra(PARAM_ROOM_ID);
+    boolean notifyInit = intent.getBooleanExtra(PARAM_NOTIFY_INIT, false);
     Room room = RoomManager.getInstance().getRoomById(roomId);
     if (room == null)
       return;
@@ -45,7 +47,10 @@ public class FetchLocalMessagesService extends IntentService {
     DBHelper helper = DBHelper.getInstance(this);
     ArrayList<Message> messages = helper.getRoomMessages(new MessageParser(this), roomId, Static.DB_PASS, 100);
     RoomManager.getInstance().updateRoomMessages(roomId, messages);
-    RxEventSender.notifyRoomMessagesUpdated(roomId);
+
+    if (notifyInit) {
+      RxEventSender.notifyRoomMessagesInited(roomId);
+    }
     helper.close();
   }
 }

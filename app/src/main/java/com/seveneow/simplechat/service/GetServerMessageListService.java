@@ -10,23 +10,23 @@ import com.seveneow.simplechat.utils.RoomManager;
 import com.seveneow.simplechat.utils.Static;
 
 
-public class UpdateMessageService extends IntentService {
+public class GetServerMessageListService extends IntentService {
   public static final String PARAM_ROOM_ID = "room_id";
 
-  public UpdateMessageService() {
-    super("UpdateMessageService");
+  public GetServerMessageListService() {
+    super("GetServerMessageListService");
   }
 
   @Override
   protected void onHandleIntent(Intent intent) {
-    DebugLog.e("Baaa", "UpdateMessageService start");
+    DebugLog.e("Baaa", "GetServerMessageListService start");
     String roomId = intent.getStringExtra(PARAM_ROOM_ID);
     Room room = RoomManager.getInstance().getRoomById(roomId);
     if (room == null)
       return;
 
     //check if save to DB is in processing, if it's running, need to wait until data saving finished.
-    while (Static.isMyServiceRunning(this, SaveDBRequestService.class) || Static.isMyServiceRunning(this, FetchLocalMessagesService.class)) {
+    while (Static.isMyServiceRunning(this, SaveMessageService.class) || Static.isMyServiceRunning(this, GetDBMessageListService.class)) {
       try {
         Thread.sleep(100);
       }

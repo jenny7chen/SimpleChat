@@ -14,16 +14,16 @@ import com.seveneow.simplechat.utils.Static;
 import java.util.ArrayList;
 
 
-public class InitRoomListService extends IntentService {
-  public static final String PARAM_USER_ID = "user_id";
+public class GetDBRoomListService extends IntentService {
+  public static final String PARAM_NOTIFY_INIT = "notify_init";
 
-  public InitRoomListService() {
-    super("InitRoomListService");
+  public GetDBRoomListService() {
+    super("GetDBRoomListService");
   }
 
   @Override
   protected void onHandleIntent(Intent intent) {
-    DebugLog.e("Baaa", "InitRoomListService start");
+    DebugLog.e("Baaa", "GetDBRoomListService start");
 
     //check if save to DB is in processing, if it's running, need to wait until data saving finished.
     while (Static.isMyServiceRunning(this, SaveRoomService.class)) {
@@ -39,7 +39,7 @@ public class InitRoomListService extends IntentService {
     DBHelper helper = DBHelper.getInstance(this);
     ArrayList<Room> rooms = helper.getUserRoomList(new RoomParser(), Static.DB_PASS);
     if (rooms.size() > 0) {
-      DebugLog.e("InitRoomListService", "has db rooms return, room list size = " + rooms.size());
+      DebugLog.e("GetDBRoomListService", "has db rooms return, room list size = " + rooms.size());
       RoomManager.getInstance().addAllRooms(rooms);
       RxEventSender.notifyRoomListUpdated();
       RxEventSender.notifyRoomListInited();

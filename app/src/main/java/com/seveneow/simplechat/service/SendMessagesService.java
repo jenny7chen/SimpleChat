@@ -3,19 +3,12 @@ package com.seveneow.simplechat.service;
 import android.app.IntentService;
 import android.content.Intent;
 
-import com.google.gson.JsonObject;
 import com.seveneow.simplechat.database.DBHelper;
 import com.seveneow.simplechat.model.Message;
-import com.seveneow.simplechat.model.TextMessage;
 import com.seveneow.simplechat.utils.DebugLog;
 import com.seveneow.simplechat.utils.FDBManager;
 import com.seveneow.simplechat.utils.RoomManager;
-import com.seveneow.simplechat.utils.RxEventSender;
 import com.seveneow.simplechat.utils.Static;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.ArrayList;
 
 /**
  * Created by jennychen on 2017/2/16.
@@ -40,7 +33,7 @@ public class SendMessagesService extends IntentService {
     long insertKey = helper.insertMessage(message, Static.DB_PASS);
     message.setDatabaseId(insertKey);
 
-    RoomManager.getInstance().addOrUpdateMessage(roomId, message);
+    RoomManager.getInstance().addOrUpdateRoomMessage(roomId, message);
     FDBManager.sendMessage(message.getId(), roomId, message, this);
     helper.close();
   }

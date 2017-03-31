@@ -35,8 +35,9 @@ public class RoomManager {
     return roomMap.size() > 0;
   }
 
-  public void addRoom(Room room) {
+  public void addOrUpdateRoom(Room room) {
     roomMap.put(room.getId(), room);
+    RxEventSender.notifyRoomInserted(room);
   }
 
   public Room getRoomById(String roomId) {
@@ -57,9 +58,10 @@ public class RoomManager {
     Room room = getRoomById(roomId);
     if (messages != null)
       room.setMessages(messages);
+    RxEventSender.notifyRoomMessagesUpdated(roomId);
   }
 
-  public boolean addOrUpdateMessage(String roomId, Message message) {
+  public boolean addOrUpdateRoomMessage(String roomId, Message message) {
     Room room = getRoomById(roomId);
     RxEvent event = new RxEvent();
     if (message.getId() != null) {
@@ -73,7 +75,7 @@ public class RoomManager {
         event.object = message;
         room.getMessages().put(message.getId(), message);
       }
-      event.params = new String[]{roomId};
+      event.roomId = roomId;
       RxEventBus.send(event);
       return event.id == RxEvent.EVENT_ROOM_MESSAGE_ADDED;
     }

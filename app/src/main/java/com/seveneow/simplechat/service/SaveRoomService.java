@@ -8,11 +8,11 @@ import android.support.annotation.Nullable;
 import com.seveneow.simplechat.database.DBHelper;
 import com.seveneow.simplechat.model.Room;
 import com.seveneow.simplechat.utils.DebugLog;
+import com.seveneow.simplechat.utils.RoomManager;
 import com.seveneow.simplechat.utils.RxEventSender;
 import com.seveneow.simplechat.utils.Static;
 
 public class SaveRoomService extends IntentService {
-  public static final String PARAM_NOTIFY_CHANGE = "notify_change";
   public static final String PARAM_ROOMS = "room";
 
   public SaveRoomService() {
@@ -28,9 +28,8 @@ public class SaveRoomService extends IntentService {
 
     Room roomData = intent.getParcelableExtra(PARAM_ROOMS);
     DBHelper helper = DBHelper.getInstance(this);
-    helper.insertRoom(roomData, Static.DB_PASS);
-    if (intent.getBooleanExtra(PARAM_NOTIFY_CHANGE, true))
-      RxEventSender.notifyRoomInserted(roomData);
+    long insertId = helper.insertRoom(roomData, Static.DB_PASS);
+    RoomManager.getInstance().addOrUpdateRoom(roomData);
     helper.close();
   }
 }

@@ -33,10 +33,6 @@
         </service>
 
         <service
-            android:name=".service.InitMessageService"
-            android:enabled="true"/>
-
-        <service
             android:name=".service.SaveMessageService"
             android:enabled="true"/>
 
@@ -45,15 +41,15 @@
             android:enabled="true"/>
 
         <service
-            android:name=".service.FetchLocalMessagesService"
+            android:name=".service.GetDBMessageListService"
             android:enabled="true"/>
 
         <service
-            android:name=".service.UpdateMessageService"
+            android:name=".service.GetServerMessageListService"
             android:enabled="true"/>
 
         <service
-            android:name=".service.InitRoomListService"
+            android:name=".service.GetDBRoomListService"
             android:enabled="true"/>
 
         <service
@@ -61,7 +57,11 @@
             android:enabled="true"/>
 
         <service
-            android:name=".service.UpdateRoomService"
+            android:name=".service.GetServerRoomListService"
+            android:enabled="true"/>
+
+        <service
+            android:name=".service.HandleNewMessageService"
             android:enabled="true"/>
     </application>
 

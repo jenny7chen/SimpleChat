@@ -4,7 +4,7 @@ package com.seveneow.simplechat.presenter;
 import android.content.Intent;
 
 import com.seveneow.simplechat.model.Room;
-import com.seveneow.simplechat.service.UpdateRoomService;
+import com.seveneow.simplechat.service.GetServerRoomListService;
 import com.seveneow.simplechat.utils.BasePresenter;
 import com.seveneow.simplechat.utils.DebugLog;
 import com.seveneow.simplechat.utils.RoomManager;
@@ -36,8 +36,8 @@ public class MainPresenter extends BasePresenter<BasicListMvpView> {
       onRoomsUpdated();
     }
     Intent intent = new Intent();
-    intent.putExtra(UpdateRoomService.PARAM_USER_ID, Static.userId);
-    getView().startService(UpdateRoomService.class, intent);
+    intent.putExtra(GetServerRoomListService.PARAM_USER_ID, Static.userId);
+    getView().startService(GetServerRoomListService.class, intent);
   }
 
   private void onRoomsUpdated(Room... room) {
@@ -63,13 +63,13 @@ public class MainPresenter extends BasePresenter<BasicListMvpView> {
 
   @Override
   public void onEvent(RxEvent event) {
-    if (event.id == RxEvent.EVENT_ROOM_LIST_UPDATE || event.id == RxEvent.EVENT_ROOM_SHOWTEXT_UPDATE) {
+    if (event.id == RxEvent.EVENT_ROOM_LIST_UPDATE || event.id == RxEvent.EVENT_ROOM_LATEST_MESSAGE_SHOW_TEXT_UPDATE) {
       onRoomsUpdated();
     }
-    else if (event.id == RxEvent.EVENT_ROOM_LIST_INITED) {
+    else if (event.id == RxEvent.EVENT_ROOM_LIST_INIT) {
       onRoomsInit();
     }
-    else if (event.id == RxEvent.EVENT_ROOM_INSERTED) {
+    else if (event.id == RxEvent.EVENT_ROOM_ADDED) {
       onRoomsUpdated((Room) event.object);
     }
   }

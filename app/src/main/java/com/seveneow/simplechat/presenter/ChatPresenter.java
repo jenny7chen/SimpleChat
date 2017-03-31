@@ -7,16 +7,14 @@ import android.os.Handler;
 import com.seveneow.simplechat.R;
 import com.seveneow.simplechat.model.Message;
 import com.seveneow.simplechat.model.Room;
-import com.seveneow.simplechat.service.FetchLocalMessagesService;
-import com.seveneow.simplechat.service.InitMessageService;
+import com.seveneow.simplechat.service.GetDBMessageListService;
+import com.seveneow.simplechat.service.GetServerMessageListService;
 import com.seveneow.simplechat.service.SendMessagesService;
-import com.seveneow.simplechat.service.UpdateMessageService;
 import com.seveneow.simplechat.utils.BasePresenter;
 import com.seveneow.simplechat.utils.DebugLog;
 import com.seveneow.simplechat.utils.FDBManager;
 import com.seveneow.simplechat.utils.MessageEventListener;
 import com.seveneow.simplechat.utils.MessageGenerator;
-import com.seveneow.simplechat.utils.MessageParser;
 import com.seveneow.simplechat.utils.RoomManager;
 import com.seveneow.simplechat.utils.RxEvent;
 import com.seveneow.simplechat.utils.Static;
@@ -29,9 +27,10 @@ import java.util.List;
 
 public class ChatPresenter extends BasePresenter<ChatListMvpView> {
   ArrayList<Message> messageList = new ArrayList<>();
+  private static final boolean IS_INIT = true;
   private String roomId;
 
-  public void setRoomId(Intent intent){
+  public void setRoomId(Intent intent) {
     roomId = intent.getStringExtra("roomId");
   }
 
@@ -39,17 +38,18 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
     if (!isViewAttached())
       return;
 
-    if(RoomManager.getInstance().getRoomById(roomId) == null){
+    Room room = RoomManager.getInstance().getRoomById(roomId);
+
+    if (room == null) {
       return;
     }
 
     DebugLog.e("baaa", "enter room : " + roomId);
-    Room room = RoomManager.getInstance().getRoomById(roomId);
     getView().setTitle(room.getName());
-    fetchMessages();
+    initMessages();
   }
 
-  private void fetchMessages() {
+  private void initMessages() {
     if (!isViewAttached())
       return;
 
@@ -58,14 +58,12 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
 
     Room room = RoomManager.getInstance().getRoomById(roomId);
     if (room.hasMessages()) {
-      onMessagesUpdated(roomId);
+      onMessagesUpdated();
       onMessagesInit();
       getView().showContent();
       return;
     }
-    Intent intent = new Intent();
-    intent.putExtra(InitMessageService.PARAM_ROOM_ID, roomId);
-    getView().startService(InitMessageService.class, intent);
+    getDataFromDB(IS_INIT);
   }
 
   public void sendMessage(String messageText) {
@@ -87,78 +85,42 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
     }, 2); // set a delay for message sent
   }
 
-  public void onMessagesAdded(String roomId, Message message) {
-    if (!isViewAttached())
-      return;
-
-    if (!this.roomId.equals(roomId)) {
-      return;
-    }
-
-    messageList.add(0, message);
-    updateData(messageList, true, true);
-    getView().showContent();
-  }
-
-  public void onMessagesUpdated(String roomId, Message... messages) {
-    if (!isViewAttached())
-      return;
-
-    if (!this.roomId.equals(roomId)) {
-      return;
-    }
-    boolean isWholeListUpdate = messages == null || messages.length == 0;
-    this.messageList = RoomManager.getInstance().getRoomById(roomId).getShowMessages();
-
-    if (isWholeListUpdate) {
-      updateData(messageList, false, false);
-      FDBManager.addRoomEventListener(roomId, new MessageEventListener(roomId, this));
-    }
-    else {
-      List<Message> updatedMessages = Arrays.asList(messages);
-      updateData(updatedMessages, true, false);
-    }
-
-    getView().showContent();
-  }
-
   @Override
   public void onEvent(RxEvent event) {
-    if (event.id == RxEvent.EVENT_NOTIFICATION) {
+    String roomId = event.roomId;
+    if (event.id == RxEvent.EVENT_ROOM_LIST_UPDATE) {
+      initRoomData();
 
-      onReceiveMessage((String) event.params[0], (String) event.object);
     }
-    else if (event.id == RxEvent.EVENT_DATA_UPDATE_NOTIFICATION) {
-      onReceiveMessage((String) event.params[0], (Message) event.object);
+    else if (!this.roomId.equals(roomId)) {
+      return;
     }
-    else if (event.id == RxEvent.EVENT_ROOM_MESSAGE_LIST_UPDATED) {
-      onMessagesUpdated((String) event.object);
+
+    if (event.id == RxEvent.EVENT_ROOM_MESSAGE_LIST_UPDATED) {
+      onMessagesUpdated();
     }
     else if (event.id == RxEvent.EVENT_ROOM_MESSAGE_UPDATED) {
-      onMessagesUpdated((String) event.params[0], (Message) event.object);
+      onMessagesUpdated((Message) event.object);
     }
     else if (event.id == RxEvent.EVENT_ROOM_MESSAGE_ADDED) {
-      onMessagesAdded((String) event.params[0], (Message) event.object);
+      onMessagesAdded((Message) event.object);
     }
     else if (event.id == RxEvent.EVENT_ROOM_MESSAGE_INIT) {
-      if (roomId.equals(event.object))
-        onMessagesInit();
+      onMessagesInit();
     }
-    else if (event.id == RxEvent.EVENT_ROOM_MESSAGE_SAVED) {
+    else if (event.id == RxEvent.EVENT_ROOM_MESSAGE_IS_SAVED_TO_DB) {
       DebugLog.e("Baaa", "message saved fetch messags");
-      if (roomId.equals(event.object))
-        updateFromLocalDB();
-    }else if(event.id == RxEvent.EVENT_ROOM_LIST_UPDATE){
-      initRoomData();
+      getDataFromDB(!IS_INIT);
     }
   }
 
-  private void updateFromLocalDB() {
+  private void getDataFromDB(boolean notifyInit) {
     if (!isViewAttached())
       return;
     Intent intent = new Intent();
-    intent.putExtra(FetchLocalMessagesService.PARAM_ROOM_ID, roomId);
-    getView().startService(FetchLocalMessagesService.class, intent);
+    intent.putExtra(GetDBMessageListService.PARAM_ROOM_ID, roomId);
+    intent.putExtra(GetDBMessageListService.PARAM_NOTIFY_INIT, notifyInit);
+    getView().startService(GetDBMessageListService.class, intent);
   }
 
   private void onMessagesInit() {
@@ -171,34 +133,39 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
       FDBManager.addRoomEventListener(roomId, new MessageEventListener(roomId, this));
     }
     Intent intent = new Intent();
-    intent.putExtra(UpdateMessageService.PARAM_ROOM_ID, roomId);
-    getView().startService(UpdateMessageService.class, intent);
+    intent.putExtra(GetServerMessageListService.PARAM_ROOM_ID, roomId);
+    getView().startService(GetServerMessageListService.class, intent);
   }
 
-  public void onReceiveMessage(String roomId, String notificationMessage) {
-    MessageParser parser = new MessageParser(this);
-    Message message = parser.parse(notificationMessage);
-
-    onReceiveMessage(roomId, message);
-  }
-
-  /**
-   * when received message from web or other users client or got messages by init listener
-   */
-  public void onReceiveMessage(String roomId, Message message) {
+  public void onMessagesAdded(Message message) {
     if (!isViewAttached())
       return;
 
-    if (!roomId.equals(this.roomId))
-      return;
-
-    if (message == null)
-      return;
-
-    RoomManager.getInstance().addOrUpdateMessage(roomId, message);
+    messageList.add(0, message);
+    updateViewData(messageList, true, true);
+    getView().showContent();
   }
 
-  public synchronized void updateData(List<Message> updatedData, boolean isSingleMessage, boolean isInsert) {
+  public void onMessagesUpdated(Message... messages) {
+    if (!isViewAttached())
+      return;
+
+    boolean isWholeListUpdate = messages == null || messages.length == 0;
+    this.messageList = RoomManager.getInstance().getRoomById(roomId).getShowMessages();
+
+    if (isWholeListUpdate) {
+      updateViewData(messageList, false, false);
+      FDBManager.addRoomEventListener(roomId, new MessageEventListener(roomId, this));
+    }
+    else {
+      List<Message> updatedMessages = Arrays.asList(messages);
+      updateViewData(updatedMessages, true, false);
+    }
+
+    getView().showContent();
+  }
+
+  public synchronized void updateViewData(List<Message> updatedData, boolean isSingleMessage, boolean isInsert) {
     if (!isViewAttached())
       return;
 

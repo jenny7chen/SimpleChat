@@ -208,7 +208,7 @@ public class ChatActivity extends BaseActivity<ChatListMvpView, ChatPresenter> i
         break;
 
       case STATE_SHOW_CONTENT:
-        presenter.updateData(messageList, false, false);
+        presenter.updateViewData(messageList, false, false);
         view.showContent();
         break;
       }

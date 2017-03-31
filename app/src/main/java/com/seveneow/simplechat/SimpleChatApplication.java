@@ -10,7 +10,7 @@ import com.nostra13.universalimageloader.cache.memory.impl.WeakMemoryCache;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.utils.StorageUtils;
-import com.seveneow.simplechat.service.InitRoomListService;
+import com.seveneow.simplechat.service.GetDBRoomListService;
 import com.seveneow.simplechat.utils.FDBManager;
 import com.seveneow.simplechat.utils.RoomManager;
 import com.seveneow.simplechat.utils.Static;
@@ -47,8 +47,7 @@ public class SimpleChatApplication extends Application implements Application.Ac
   @Override
   public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
     if (!RoomManager.getInstance().hasRoomData()) {
-      Intent intent = new Intent(this, InitRoomListService.class);
-      intent.putExtra(InitRoomListService.PARAM_USER_ID, Static.userId);
+      Intent intent = new Intent(this, GetDBRoomListService.class);
       startService(intent);
     }
   }

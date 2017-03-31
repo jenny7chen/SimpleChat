@@ -68,11 +68,12 @@ public class DBHelper extends SQLiteOpenHelper {
     UserTable.onCreate(db);
   }
 
-  public void insertRoom(Room room, String password) {
-    RoomTable.insert(this, room, password);
+  public long insertRoom(Room room, String password) {
+    long insertId =  RoomTable.insert(this, room, password);
     for (String userId : room.getMembers()) {
       RoomUserTable.insert(this, room.getId(), userId, password);
     }
+    return insertId;
   }
 
   public void insertRooms(ArrayList<Room> rooms, String password) {
