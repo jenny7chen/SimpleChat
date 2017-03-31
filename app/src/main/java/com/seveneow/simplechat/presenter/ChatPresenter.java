@@ -70,9 +70,25 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
     if (!isViewAttached())
       return;
 
+    Message message = MessageGenerator.getPendingTextMessage(roomId, messageText, RoomManager.getInstance().getRoomById(roomId).getType());
+    sendMessage(message);
+  }
+
+  //TODO: test use for send image message
+  public void sendMessage() {
+    if (!isViewAttached())
+      return;
+
+    Message message = MessageGenerator.getTestImageMessage(this, roomId, RoomManager.getInstance().getRoomById(roomId).getType());
+    sendMessage(message);
+  }
+
+  public void sendMessage(Message message) {
+    if (!isViewAttached())
+      return;
+
     Handler handler = new Handler();
     handler.postDelayed(() -> {
-      Message message = MessageGenerator.getPendingTextMessage(roomId, messageText, RoomManager.getInstance().getRoomById(roomId).getType());
       message.setId(FDBManager.getMessagePushKey(roomId));
 
       //send message

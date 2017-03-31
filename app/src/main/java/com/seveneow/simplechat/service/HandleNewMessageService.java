@@ -42,18 +42,16 @@ public class HandleNewMessageService extends IntentService {
     saveIntent.putExtra(SaveMessageService.PARAM_MESSAGES, messageToBeSaved);
     startService(saveIntent);
 
-    if (isAdd) {
-      //TODO: need to update room DB data
-      String text = message.getShowText();
-      try {
-        text = URLDecoder.decode(text, "UTF-8");
-      }
-      catch (UnsupportedEncodingException e) {
-        e.printStackTrace();
-      }
-      room.setLatestMessageShowText(text);
-      room.setLatestMessageShowTime(message.getShowTime());
-      RxEventSender.notifyRoomShowTextUpdate();
+    //TODO: need to update room DB data, need to adjust image show text
+    String text = message.getShowText();
+    try {
+      text = URLDecoder.decode(text, "UTF-8");
     }
+    catch (UnsupportedEncodingException e) {
+      e.printStackTrace();
+    }
+    room.setLatestMessageShowText(text);
+    room.setLatestMessageShowTime(message.getShowTime());
+    RxEventSender.notifyRoomShowTextUpdate();
   }
 }

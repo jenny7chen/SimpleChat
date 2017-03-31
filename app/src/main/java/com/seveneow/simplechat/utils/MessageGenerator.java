@@ -1,5 +1,6 @@
 package com.seveneow.simplechat.utils;
 
+import com.seveneow.simplechat.R;
 import com.seveneow.simplechat.model.FileMessage;
 import com.seveneow.simplechat.model.ImageMessage;
 import com.seveneow.simplechat.model.Message;
@@ -20,8 +21,7 @@ public class MessageGenerator {
     text.setTime(String.valueOf(TimeParser.getCurrentTimeString()));
     text.setSenderId(Static.userId);
     text.setRoomId(roomId);
-    if (roomType == Room.TYPE_USER)
-      text.setShowSender(roomType != Room.TYPE_USER);
+    text.setShowSender(roomType != Room.TYPE_USER);
     try {
       text.setShowText(URLEncoder.encode(message, "UTF-8"));
     }
@@ -32,7 +32,7 @@ public class MessageGenerator {
     return text;
   }
 
-  public static Message getTestImageMessage(String roomId, int roomType) {
+  public static Message getTestImageMessage(BasePresenter presenter, String roomId, int roomType) {
     ImageMessage image = new ImageMessage();
     image.setThumbnail(getImageUrl());
     image.setTime(String.valueOf(TimeParser.getCurrentTimeString()));
@@ -40,8 +40,16 @@ public class MessageGenerator {
     image.setId(image.getTime());
     image.setRoomId(roomId);
     image.setPending(true);
-    if (roomType == Room.TYPE_USER)
-      image.setShowSender(roomType != Room.TYPE_USER);
+    image.setShowSender(roomType != Room.TYPE_USER);
+
+    String showText = presenter.getString(R.string.message_show_text_image, UserManager.getInstance().getUser(Static.userId).getName());
+    try {
+      image.setShowText(URLEncoder.encode(showText, "UTF-8"));
+    }
+    catch (UnsupportedEncodingException e) {
+      e.printStackTrace();
+      image.setShowText("");
+    }
     return image;
   }
 
