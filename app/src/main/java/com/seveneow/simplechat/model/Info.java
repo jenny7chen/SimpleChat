@@ -33,6 +33,10 @@ public class Info implements Parcelable{
   private String latestMessageShowTime = "";
   private boolean isFavorite;
   private boolean hasChat;
+  private boolean isPublic;
+  private boolean isBlock;
+  private String creatorId;
+  private String boardUrl;
 
   public Info() {
 
@@ -156,8 +160,8 @@ public class Info implements Parcelable{
     return isFavorite;
   }
 
-  public void setFavorite(boolean favorite) {
-    isFavorite = favorite;
+  public void setFavorite(boolean isFavorite) {
+    this.isFavorite = isFavorite;
   }
 
   public boolean hasChat() {
@@ -166,6 +170,38 @@ public class Info implements Parcelable{
 
   public void setHasChat(boolean hasChat) {
     this.hasChat = hasChat;
+  }
+
+  public boolean isPublic() {
+    return isPublic;
+  }
+
+  public void setPublic(boolean isPublic) {
+    this.isPublic = isPublic;
+  }
+
+  public boolean isBlock() {
+    return isBlock;
+  }
+
+  public void setBlock(boolean isBlock) {
+    this.isBlock = isBlock;
+  }
+
+  public String getCreatorId() {
+    return creatorId;
+  }
+
+  public void setCreatorId(String creatorId) {
+    this.creatorId = creatorId;
+  }
+
+  public String getBoardUrl() {
+    return boardUrl;
+  }
+
+  public void setBoardUrl(String boardUrl) {
+    this.boardUrl = boardUrl;
   }
 
   public Info(Parcel in) {

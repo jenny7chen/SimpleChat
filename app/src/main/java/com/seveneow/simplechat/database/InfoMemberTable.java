@@ -35,7 +35,7 @@ public class InfoMemberTable {
     return sqlite.openWritableDB(password).insert(NAME, null, values);
   }
 
-  public static ArrayList<String> getUserListByRoomId(DBHelper helper, String roomId,String password){
+  public static ArrayList<String> get(DBHelper helper, String roomId,String password){
     ArrayList<Object[]> resultList = getResultListByArgs(helper, new String[]{COLUMN_ROOM_ID}, new String[]{roomId}, password);
     ArrayList<String> userIdList = new ArrayList<>();
     for(Object[] data : resultList){

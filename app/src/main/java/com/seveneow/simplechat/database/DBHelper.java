@@ -69,7 +69,7 @@ public class DBHelper extends SQLiteOpenHelper {
   }
 
   public long insertRoom(Info info, String password) {
-    long insertId =  InfoTable.insert(this, info, password);
+    long insertId =  InfoTable.insert(InfoTable.CHAT, this, info, password);
     for (String userId : info.getMembers()) {
       InfoMemberTable.insert(this, info.getId(), userId, password);
     }
@@ -77,7 +77,7 @@ public class DBHelper extends SQLiteOpenHelper {
   }
 
   public void insertRooms(ArrayList<Info> infos, String password) {
-    InfoTable.insert(this, infos, password);
+    InfoTable.insert(InfoTable.CHAT, this, infos, password);
     for (Info info : infos) {
       for (String userId : info.getMembers()) {
         InfoMemberTable.insert(this, info.getId(), userId, password);
@@ -86,7 +86,7 @@ public class DBHelper extends SQLiteOpenHelper {
   }
 
   public ArrayList<Info> getUserRoomList(RoomParser roomParser, String password) {
-    ArrayList<Object[]> roomDataList = InfoTable.getRooms(this, password);
+    ArrayList<Object[]> roomDataList = InfoTable.getChats(this, password);
     ArrayList<Info> infoList = new ArrayList<>();
     for (Object[] roomData : roomDataList) {
       Info info = roomParser.parse(roomData);
@@ -98,7 +98,7 @@ public class DBHelper extends SQLiteOpenHelper {
   }
 
   public ArrayList<String> getRoomMembers(String roomId, String password) {
-    return InfoMemberTable.getUserListByRoomId(this, roomId, password);
+    return InfoMemberTable.get(this, roomId, password);
 
   }
 
