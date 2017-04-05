@@ -15,7 +15,7 @@ import android.widget.Toast;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.seveneow.simplechat.R;
-import com.seveneow.simplechat.model.Room;
+import com.seveneow.simplechat.model.Info;
 import com.seveneow.simplechat.utils.DebugLog;
 import com.seveneow.simplechat.utils.Static;
 import com.seveneow.simplechat.view.ChatActivity;
@@ -24,7 +24,7 @@ import java.util.List;
 
 
 public class RoomListAdapter extends RecyclerView.Adapter<RoomListAdapter.Holder> {
-  private List<Room> data = null;
+  private List<Info> data = null;
   private Context context;
 
   public RoomListAdapter(Context context) {
@@ -61,8 +61,8 @@ public class RoomListAdapter extends RecyclerView.Adapter<RoomListAdapter.Holder
     else {
       //TODO: add partial update here
       // when payloads is not empty, update view
-      Room room = (Room) payloads.get(0);
-      if (room.getId().equals(holder.room.getId())) {
+      Info info = (Info) payloads.get(0);
+      if (info.getId().equals(holder.info.getId())) {
         onBindViewHolder(holder, position);
       }
     }
@@ -70,19 +70,19 @@ public class RoomListAdapter extends RecyclerView.Adapter<RoomListAdapter.Holder
 
   @Override
   public void onBindViewHolder(Holder holder, int position) {
-    Room room = data.get(position);
-    holder.room = room;
+    Info info = data.get(position);
+    holder.info = info;
     View view = holder.itemView;
     view.setVisibility(View.VISIBLE);
     TextView nameView = (TextView) view.findViewById(R.id.name_view);
     TextView textView = (TextView) view.findViewById(R.id.text_view);
 
-    if (room.getType() == Room.TYPE_NONE) {
-      DebugLog.e("Baaa", "set gone name = " + room.getName());
+    if (info.getType() == Info.TYPE_NONE) {
+      DebugLog.e("Baaa", "set gone name = " + info.getName());
       view.setVisibility(View.GONE);
     }
-    else if (room.getType() == Room.TYPE_BOARD) {
-      DebugLog.e("Baaa", "set visible name = " + room.getName());
+    else if (info.getType() == Info.TYPE_BOARD) {
+      DebugLog.e("Baaa", "set visible name = " + info.getName());
       textView.setVisibility(View.GONE);
       view.setVisibility(View.VISIBLE);
     }
@@ -90,10 +90,10 @@ public class RoomListAdapter extends RecyclerView.Adapter<RoomListAdapter.Holder
       textView.setVisibility(View.VISIBLE);
       view.setVisibility(View.VISIBLE);
     }
-    nameView.setText(room.getName());
-    textView.setText(room.getLatestMessageShowText());
+    nameView.setText(info.getName());
+    textView.setText(info.getLatestMessageShowText());
     ImageView imageView = (ImageView) view.findViewById(R.id.avatar);
-    ImageLoader.getInstance().displayImage(room.getPhoto(), imageView, Static.defaultDisplayImageOptions(R.mipmap.ic_launcher, true));
+    ImageLoader.getInstance().displayImage(info.getPhoto(), imageView, Static.defaultDisplayImageOptions(R.mipmap.ic_launcher, true));
   }
 
   @Override
@@ -114,17 +114,17 @@ public class RoomListAdapter extends RecyclerView.Adapter<RoomListAdapter.Holder
     return data.get(position).getId().hashCode();
   }
 
-  public List<Room> getData() {
+  public List<Info> getData() {
     return data;
   }
 
-  public void setData(List<Room> data) {
+  public void setData(List<Info> data) {
     this.data = data;
   }
 
 
   public class Holder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
-    public Room room;
+    public Info info;
 
     public Holder(View itemView) {
       super(itemView);
@@ -138,7 +138,7 @@ public class RoomListAdapter extends RecyclerView.Adapter<RoomListAdapter.Holder
       Activity activity = scanForActivity(context);
       if (activity != null) {
         Intent intent = new Intent(activity, ChatActivity.class);
-        intent.putExtra("roomId", room.getId());
+        intent.putExtra("roomId", info.getId());
         activity.startActivity(intent);
       }
     }

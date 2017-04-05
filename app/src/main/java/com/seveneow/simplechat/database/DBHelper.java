@@ -3,7 +3,7 @@ package com.seveneow.simplechat.database;
 import android.content.Context;
 
 import com.seveneow.simplechat.model.Message;
-import com.seveneow.simplechat.model.Room;
+import com.seveneow.simplechat.model.Info;
 import com.seveneow.simplechat.model.User;
 import com.seveneow.simplechat.utils.BasePresenter;
 import com.seveneow.simplechat.utils.MessageParser;
@@ -63,47 +63,47 @@ public class DBHelper extends SQLiteOpenHelper {
 
   private void initTable(SQLiteDatabase db) {
     MessageTable.onCreate(db);
-    RoomUserTable.onCreate(db);
-    RoomTable.onCreate(db);
-    UserTable.onCreate(db);
+    InfoMemberTable.onCreate(db);
+    InfoTable.onCreate(db);
+    HotTable.onCreate(db);
   }
 
-  public long insertRoom(Room room, String password) {
-    long insertId =  RoomTable.insert(this, room, password);
-    for (String userId : room.getMembers()) {
-      RoomUserTable.insert(this, room.getId(), userId, password);
+  public long insertRoom(Info info, String password) {
+    long insertId =  InfoTable.insert(this, info, password);
+    for (String userId : info.getMembers()) {
+      InfoMemberTable.insert(this, info.getId(), userId, password);
     }
     return insertId;
   }
 
-  public void insertRooms(ArrayList<Room> rooms, String password) {
-    RoomTable.insert(this, rooms, password);
-    for (Room room : rooms) {
-      for (String userId : room.getMembers()) {
-        RoomUserTable.insert(this, room.getId(), userId, password);
+  public void insertRooms(ArrayList<Info> infos, String password) {
+    InfoTable.insert(this, infos, password);
+    for (Info info : infos) {
+      for (String userId : info.getMembers()) {
+        InfoMemberTable.insert(this, info.getId(), userId, password);
       }
     }
   }
 
-  public ArrayList<Room> getUserRoomList(RoomParser roomParser, String password) {
-    ArrayList<Object[]> roomDataList = RoomTable.getRooms(this, password);
-    ArrayList<Room> roomList = new ArrayList<>();
+  public ArrayList<Info> getUserRoomList(RoomParser roomParser, String password) {
+    ArrayList<Object[]> roomDataList = InfoTable.getRooms(this, password);
+    ArrayList<Info> infoList = new ArrayList<>();
     for (Object[] roomData : roomDataList) {
-      Room room = roomParser.parse(roomData);
-      ArrayList<String> roomUserList = getRoomMembers(room.getId(), password);
-      room.setMembers(roomUserList);
-      roomList.add(room);
+      Info info = roomParser.parse(roomData);
+      ArrayList<String> roomUserList = getRoomMembers(info.getId(), password);
+      info.setMembers(roomUserList);
+      infoList.add(info);
     }
-    return roomList;
+    return infoList;
   }
 
   public ArrayList<String> getRoomMembers(String roomId, String password) {
-    return RoomUserTable.getUserListByRoomId(this, roomId, password);
+    return InfoMemberTable.getUserListByRoomId(this, roomId, password);
 
   }
 
   public void insertUser(User user, String password) {
-    UserTable.insert(this, user, password);
+    HotTable.insert(this, user, password);
   }
 
   public long insertMessage(Message message, String password) {

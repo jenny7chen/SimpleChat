@@ -1,7 +1,5 @@
 package com.seveneow.simplechat.view;
 
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -14,16 +12,11 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.hannesdorfmann.mosby.mvp.viewstate.ViewState;
 import com.seveneow.simplechat.R;
 import com.seveneow.simplechat.adapter.RoomListAdapter;
-import com.seveneow.simplechat.model.Message;
-import com.seveneow.simplechat.model.Room;
+import com.seveneow.simplechat.model.Info;
 import com.seveneow.simplechat.presenter.MainPresenter;
 import com.seveneow.simplechat.utils.BaseActivity;
-import com.seveneow.simplechat.utils.DebugLog;
-import com.seveneow.simplechat.utils.RoomManager;
 import com.seveneow.simplechat.view_interface.BasicListMvpView;
-import com.seveneow.simplechat.view_interface.BasicMvpView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends BaseActivity<BasicListMvpView, MainPresenter> implements BasicListMvpView {
@@ -77,7 +70,7 @@ public class MainActivity extends BaseActivity<BasicListMvpView, MainPresenter> 
   @Override
   public void showContent() {
     MainViewState state = (MainViewState) viewState;
-    state.setData((List<Room>) (Object) getData());
+    state.setData((List<Info>) (Object) getData());
     //hide error view here
     progressBar.setVisibility(View.GONE);
     recyclerView.setVisibility(View.VISIBLE);
@@ -111,7 +104,7 @@ public class MainActivity extends BaseActivity<BasicListMvpView, MainPresenter> 
   @Override
   public void setDataToList(List<Object> data) {
     if (adapter != null)
-      adapter.setData((List<Room>) (Object) data);
+      adapter.setData((List<Info>) (Object) data);
   }
 
   @Override
@@ -141,10 +134,10 @@ public class MainActivity extends BaseActivity<BasicListMvpView, MainPresenter> 
     final int STATE_SHOW_ERROR = 2;
 
     int state = STATE_SHOW_CONTENT;
-    List<Room> rooms = null;
+    List<Info> infos = null;
 
-    public void setData(List<Room> rooms) {
-      this.rooms = rooms;
+    public void setData(List<Info> infos) {
+      this.infos = infos;
     }
 
     /**
@@ -164,7 +157,7 @@ public class MainActivity extends BaseActivity<BasicListMvpView, MainPresenter> 
         break;
 
       case STATE_SHOW_CONTENT:
-        presenter.updateData(rooms);
+        presenter.updateData(infos);
         view.showContent();
         break;
       }

@@ -1,10 +1,9 @@
 package com.seveneow.simplechat.utils;
 
-import com.seveneow.simplechat.R;
 import com.seveneow.simplechat.model.FileMessage;
 import com.seveneow.simplechat.model.ImageMessage;
 import com.seveneow.simplechat.model.Message;
-import com.seveneow.simplechat.model.Room;
+import com.seveneow.simplechat.model.Info;
 import com.seveneow.simplechat.model.StickerMessage;
 import com.seveneow.simplechat.model.TextMessage;
 
@@ -13,44 +12,44 @@ import java.net.URLEncoder;
 import java.util.Random;
 
 
-public class MessageGenerator {
-  public static Message getPendingTextMessage(String roomId, String message, int roomType) {
-    TextMessage text = new TextMessage();
-    text.setMessage(message);
-    text.setPending(true);
-    text.setTime(String.valueOf(TimeParser.getCurrentTimeString()));
-    text.setSenderId(Static.userId);
-    text.setRoomId(roomId);
-    text.setShowSender(roomType != Room.TYPE_USER);
-    try {
-      text.setShowText(URLEncoder.encode(message, "UTF-8"));
-    }
-    catch (UnsupportedEncodingException e) {
-      e.printStackTrace();
-      text.setShowText(message);
-    }
-    return text;
+public class MessageFactory {
+
+  public static Message create(String roomId, String messageText, int roomType){
+    return create(roomId, messageText, roomType, Message.TYPE_TEXT, null);
   }
 
-  public static Message getTestImageMessage(BasePresenter presenter, String roomId, int roomType) {
-    ImageMessage image = new ImageMessage();
-    image.setThumbnail(getImageUrl());
-    image.setTime(String.valueOf(TimeParser.getCurrentTimeString()));
-    image.setSenderId(Static.userId);
-    image.setId(image.getTime());
-    image.setRoomId(roomId);
-    image.setPending(true);
-    image.setShowSender(roomType != Room.TYPE_USER);
+  public static Message create(String roomId, int roomType, String thumbnail){
+    return create(roomId, null, roomType, Message.TYPE_IMAGE, thumbnail);
+  }
 
-    String showText = presenter.getString(R.string.message_show_text_image, UserManager.getInstance().getUser(Static.userId).getName());
-    try {
-      image.setShowText(URLEncoder.encode(showText, "UTF-8"));
+  public static Message createTestImage(String roomId, int roomType){
+    return create(roomId, null, roomType, Message.TYPE_IMAGE, getImageUrl());
+  }
+
+  public static Message create(String roomId, String messageText, int roomType, int messageType, String thumbnail) {
+    Message message = new Message();
+    if (messageType == Message.TYPE_TEXT) {
+      message = new TextMessage();
+      ((TextMessage) message).setMessage(messageText);
+      try {
+        message.setShowText(URLEncoder.encode(messageText, "UTF-8"));
+      }
+      catch (UnsupportedEncodingException e) {
+        e.printStackTrace();
+        message.setShowText(messageText);
+      }
     }
-    catch (UnsupportedEncodingException e) {
-      e.printStackTrace();
-      image.setShowText("");
+    else if (messageType == Message.TYPE_IMAGE) {
+      message = new ImageMessage();
+      ((ImageMessage) message).setThumbnail(thumbnail);
     }
-    return image;
+    message.setPending(true);
+    message.setTime(String.valueOf(TimeParser.getCurrentTimeString()));
+    message.setSenderId(Static.userId);
+    message.setRoomId(roomId);
+    message.setShowSender(roomType != Info.TYPE_USER);
+
+    return message;
   }
 
   private static String getImageUrl() {

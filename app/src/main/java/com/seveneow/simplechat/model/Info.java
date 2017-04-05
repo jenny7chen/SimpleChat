@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-public class Room implements Parcelable{
+public class Info implements Parcelable{
   public static final int TYPE_NONE = 0;
   public static final int TYPE_GROUP = 1;
   public static final int TYPE_BOARD = 2;
@@ -31,12 +31,14 @@ public class Room implements Parcelable{
   private ArrayList<Post> posts = new ArrayList<>();
   private String latestMessageShowText = "";
   private String latestMessageShowTime = "";
+  private boolean isFavorite;
+  private boolean hasChat;
 
-  public Room() {
+  public Info() {
 
   }
 
-  public Room(String name, String photo, ArrayList<String> members, ArrayList<Post> posts) {
+  public Info(String name, String photo, ArrayList<String> members, ArrayList<Post> posts) {
     this.name = name;
     this.photo = photo;
     this.members = members;
@@ -150,7 +152,23 @@ public class Room implements Parcelable{
     this.showMessages = showMessages;
   }
 
-  public Room(Parcel in) {
+  public boolean isFavorite() {
+    return isFavorite;
+  }
+
+  public void setFavorite(boolean favorite) {
+    isFavorite = favorite;
+  }
+
+  public boolean hasChat() {
+    return hasChat;
+  }
+
+  public void setHasChat(boolean hasChat) {
+    this.hasChat = hasChat;
+  }
+
+  public Info(Parcel in) {
     this.id = in.readString();
     this.name = in.readString();
     this.type = in.readInt();
@@ -179,12 +197,12 @@ public class Room implements Parcelable{
   }
 
   public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
-    public Room createFromParcel(Parcel in) {
-      return new Room(in);
+    public Info createFromParcel(Parcel in) {
+      return new Info(in);
     }
 
-    public Room[] newArray(int size) {
-      return new Room[size];
+    public Info[] newArray(int size) {
+      return new Info[size];
     }
   };
 

@@ -7,7 +7,7 @@ import net.sqlcipher.database.SQLiteDatabase;
 
 import java.util.ArrayList;
 
-public class RoomUserTable {
+public class InfoMemberTable {
   public static final String NAME = "RoomUser";
 
   private static final String COLUMN_ID = "_id";

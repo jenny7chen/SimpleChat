@@ -7,6 +7,11 @@ import java.util.Map;
 
 public class SystemMessage extends Message {
   private String systemMessage = "";
+  public static final int JOIN_GROUP = 1;
+  public static final int LEAVE_GROUP = 2;
+  public static final int CHANGE_GROUP_NAME = 3;
+  public static final int CHANGE_GROUP_PHOTO = 4;
+  private String actorName = "";
 
   public SystemMessage() {
     super(TYPE_SYSTEM_MESSAGE);
@@ -56,5 +61,10 @@ public class SystemMessage extends Message {
   public SystemMessage(Parcel in) {
     super(in);
     this.systemMessage = in.readString();
+  }
+
+  @Override
+  public String getShowText() {
+    return super.getShowText();
   }
 }

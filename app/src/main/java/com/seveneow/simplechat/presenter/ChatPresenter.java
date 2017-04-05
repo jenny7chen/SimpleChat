@@ -6,7 +6,7 @@ import android.os.Handler;
 
 import com.seveneow.simplechat.R;
 import com.seveneow.simplechat.model.Message;
-import com.seveneow.simplechat.model.Room;
+import com.seveneow.simplechat.model.Info;
 import com.seveneow.simplechat.service.GetDBMessageListService;
 import com.seveneow.simplechat.service.GetServerMessageListService;
 import com.seveneow.simplechat.service.SendMessagesService;
@@ -14,7 +14,7 @@ import com.seveneow.simplechat.utils.BasePresenter;
 import com.seveneow.simplechat.utils.DebugLog;
 import com.seveneow.simplechat.utils.FDBManager;
 import com.seveneow.simplechat.utils.MessageEventListener;
-import com.seveneow.simplechat.utils.MessageGenerator;
+import com.seveneow.simplechat.utils.MessageFactory;
 import com.seveneow.simplechat.utils.RoomManager;
 import com.seveneow.simplechat.utils.RxEvent;
 import com.seveneow.simplechat.utils.Static;
@@ -38,14 +38,14 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
     if (!isViewAttached())
       return;
 
-    Room room = RoomManager.getInstance().getRoomById(roomId);
+    Info info = RoomManager.getInstance().getRoomById(roomId);
 
-    if (room == null) {
+    if (info == null) {
       return;
     }
 
     DebugLog.e("baaa", "enter room : " + roomId);
-    getView().setTitle(room.getName());
+    getView().setTitle(info.getName());
     initMessages();
   }
 
@@ -56,8 +56,8 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
     getView().showLoading();
     //get data here using asynchttp lib
 
-    Room room = RoomManager.getInstance().getRoomById(roomId);
-    if (room.hasMessages()) {
+    Info info = RoomManager.getInstance().getRoomById(roomId);
+    if (info.hasMessages()) {
       onMessagesUpdated();
       onMessagesInit();
       getView().showContent();
@@ -70,7 +70,7 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
     if (!isViewAttached())
       return;
 
-    Message message = MessageGenerator.getPendingTextMessage(roomId, messageText, RoomManager.getInstance().getRoomById(roomId).getType());
+    Message message = MessageFactory.create(roomId, messageText, RoomManager.getInstance().getRoomById(roomId).getType());
     sendMessage(message);
   }
 
@@ -79,7 +79,7 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
     if (!isViewAttached())
       return;
 
-    Message message = MessageGenerator.getTestImageMessage(this, roomId, RoomManager.getInstance().getRoomById(roomId).getType());
+    Message message = MessageFactory.createTestImage(roomId, RoomManager.getInstance().getRoomById(roomId).getType());
     sendMessage(message);
   }
 

@@ -13,7 +13,7 @@ import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 import com.seveneow.simplechat.model.Message;
 import com.seveneow.simplechat.model.Post;
-import com.seveneow.simplechat.model.Room;
+import com.seveneow.simplechat.model.Info;
 import com.seveneow.simplechat.model.User;
 import com.seveneow.simplechat.service.HandleNewMessageService;
 import com.seveneow.simplechat.service.SaveMessageService;
@@ -66,8 +66,8 @@ public class FDBManager {
     databaseRef.child("rooms").child(roomId).addListenerForSingleValueEvent(new ValueEventListener() {
       @Override
       public void onDataChange(DataSnapshot dataSnapshot) {
-        Room room = new RoomParser().parse(dataSnapshot);
-        FDBManager.onGotRoomData(room, context);
+        Info info = new RoomParser().parse(dataSnapshot);
+        FDBManager.onGotRoomData(info, context);
       }
 
       @Override
@@ -77,13 +77,13 @@ public class FDBManager {
     });
   }
 
-  public static void onGotRoomData(Room room, Context context) {
-    DebugLog.e("baaa", "got room data = " + room);
-    if (room == null) {
+  public static void onGotRoomData(Info info, Context context) {
+    DebugLog.e("baaa", "got room data = " + info);
+    if (info == null) {
       return;
     }
     Intent intent = new Intent(context, SaveRoomService.class);
-    intent.putExtra(SaveRoomService.PARAM_ROOMS, room);
+    intent.putExtra(SaveRoomService.PARAM_ROOMS, info);
     context.startService(intent);
   }
 
@@ -116,9 +116,9 @@ public class FDBManager {
     });
   }
 
-  public static void createRoom(Room room) {
+  public static void createRoom(Info info) {
     String roomId = databaseRef.child("rooms").push().getKey();
-    Map<String, Object> pushValues = room.toMap();
+    Map<String, Object> pushValues = info.toMap();
     Map<String, Object> childUpdates = new HashMap<>();
     childUpdates.put("/rooms/" + roomId, pushValues);
     databaseRef.updateChildren(childUpdates);
@@ -164,7 +164,7 @@ public class FDBManager {
     databaseRef.child("rooms").child(roomId).runTransaction(new Transaction.Handler() {
       @Override
       public Transaction.Result doTransaction(MutableData mutableData) {
-        Room p = mutableData.getValue(Room.class);
+        Info p = mutableData.getValue(Info.class);
         if (p == null) {
           return Transaction.success(mutableData);
         }
@@ -185,7 +185,7 @@ public class FDBManager {
     databaseRef.child("rooms").child(roomId).runTransaction(new Transaction.Handler() {
       @Override
       public Transaction.Result doTransaction(MutableData mutableData) {
-        Room p = mutableData.getValue(Room.class);
+        Info p = mutableData.getValue(Info.class);
         if (p == null) {
           return Transaction.success(mutableData);
         }

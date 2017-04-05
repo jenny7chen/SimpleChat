@@ -21,7 +21,6 @@ import com.seveneow.simplechat.adapter.MessageListAdapter;
 import com.seveneow.simplechat.model.Message;
 import com.seveneow.simplechat.presenter.ChatPresenter;
 import com.seveneow.simplechat.utils.BaseActivity;
-import com.seveneow.simplechat.utils.MessageGenerator;
 import com.seveneow.simplechat.view_custom.MessageEditorView;
 import com.seveneow.simplechat.view_interface.BasicListMvpView;
 import com.seveneow.simplechat.view_interface.ChatListMvpView;

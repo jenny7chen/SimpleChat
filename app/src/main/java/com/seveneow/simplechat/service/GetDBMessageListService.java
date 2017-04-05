@@ -5,7 +5,7 @@ import android.content.Intent;
 
 import com.seveneow.simplechat.database.DBHelper;
 import com.seveneow.simplechat.model.Message;
-import com.seveneow.simplechat.model.Room;
+import com.seveneow.simplechat.model.Info;
 import com.seveneow.simplechat.utils.DebugLog;
 import com.seveneow.simplechat.utils.MessageParser;
 import com.seveneow.simplechat.utils.RoomManager;
@@ -28,8 +28,8 @@ public class GetDBMessageListService extends IntentService {
     DebugLog.e("Baaa", "GetDBMessageListService start");
     String roomId = intent.getStringExtra(PARAM_ROOM_ID);
     boolean isInit = intent.getBooleanExtra(PARAM_IS_INIT, false);
-    Room room = RoomManager.getInstance().getRoomById(roomId);
-    if (room == null)
+    Info info = RoomManager.getInstance().getRoomById(roomId);
+    if (info == null)
       return;
 
     //check if save to DB is in processing, if it's running, need to wait until data saving finished.

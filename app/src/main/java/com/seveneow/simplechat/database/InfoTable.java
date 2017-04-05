@@ -2,14 +2,14 @@ package com.seveneow.simplechat.database;
 
 import android.database.Cursor;
 
-import com.seveneow.simplechat.model.Room;
+import com.seveneow.simplechat.model.Info;
 
 import net.sqlcipher.DatabaseUtils;
 import net.sqlcipher.database.SQLiteDatabase;
 
 import java.util.ArrayList;
 
-public class RoomTable {
+public class InfoTable {
   public static final String NAME = "Room";
 
   private static final String COLUMN_ID = "_id";
@@ -19,6 +19,8 @@ public class RoomTable {
   private static final String COLUMN_ROOM_NAME = "_ROOM_NAME";
   private static final String COLUMN_ROOM_TYPE = "_ROOM_TYPE";
   private static final String COLUMN_ROOM_PHOTO = "_ROOM_PHOTO";
+  private static final String COLUMN_IS_FAVORITE = "_ROOM_IS_FAVORITE";
+  private static final String COLUMN_HAS_CHAT = "_ROOM_HAS_CHAT";
 
   private static final String CREATE_ROOM_TABLE = "CREATE TABLE IF NOT EXISTS " + NAME + " (" +
       COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
@@ -28,6 +30,8 @@ public class RoomTable {
       + COLUMN_ROOM_TYPE + " INTEGER DEFAULT 0, "
       + COLUMN_ROOM_PHOTO + " TEXT DEFAULT '', "
       + COLUMN_ROOM_NAME + " TEXT DEFAULT '',"
+      + COLUMN_IS_FAVORITE + " INTEGER DEFAULT 0,"
+      + COLUMN_HAS_CHAT + " INTEGER DEFAULT 0,"
       + "UNIQUE(" + COLUMN_ROOM_ID + ") ON CONFLICT REPLACE)";
 
   public static void onCreate(SQLiteDatabase db) {
@@ -39,17 +43,17 @@ public class RoomTable {
     onCreate(db);
   }
 
-  public static long insert(DBHelper sqlite, Room room, String password) {
-    ArrayList<Room> updateList = new ArrayList<>();
-    updateList.add(room);
+  public static long insert(DBHelper sqlite, Info info, String password) {
+    ArrayList<Info> updateList = new ArrayList<>();
+    updateList.add(info);
     return insert(sqlite, updateList, password);
   }
 
-  public static long insert(DBHelper sqlite, ArrayList<Room> rooms, String password) {
-    return insertOrUpdateRooms(true, sqlite, rooms, password);
+  public static long insert(DBHelper sqlite, ArrayList<Info> infos, String password) {
+    return insertOrUpdateRooms(true, sqlite, infos, password);
   }
 
-  private static synchronized long insertOrUpdateRooms(boolean insert, DBHelper sqlite, ArrayList<Room> rooms, String password) {
+  private static synchronized long insertOrUpdateRooms(boolean insert, DBHelper sqlite, ArrayList<Info> infos, String password) {
     long result = -1;
     DatabaseUtils.InsertHelper ih = new DatabaseUtils.InsertHelper(sqlite.openWritableDB(password), NAME);
     // Get the numeric indexes for each of the columns that we're updating
@@ -60,19 +64,19 @@ public class RoomTable {
     final int roomTypeColumn = ih.getColumnIndex(COLUMN_ROOM_TYPE);
     final int roomPhotoColumn = ih.getColumnIndex(COLUMN_ROOM_PHOTO);
     try {
-      for (Room room : rooms) {
+      for (Info info : infos) {
         if (insert)
           ih.prepareForInsert();
         else
           ih.prepareForReplace();
 
         // Add the data for each column
-        ih.bind(roomIdColumn, room.getId());
-        ih.bind(roomNameColumn, room.getName());
-        ih.bind(roomLatestMessageTimeColumn, room.getLatestMessageTime());
-        ih.bind(roomLatestTextColumn, room.getLatestMessageShowText());
-        ih.bind(roomTypeColumn, room.getType());
-        ih.bind(roomPhotoColumn, room.getPhoto());
+        ih.bind(roomIdColumn, info.getId());
+        ih.bind(roomNameColumn, info.getName());
+        ih.bind(roomLatestMessageTimeColumn, info.getLatestMessageTime());
+        ih.bind(roomLatestTextColumn, info.getLatestMessageShowText());
+        ih.bind(roomTypeColumn, info.getType());
+        ih.bind(roomPhotoColumn, info.getPhoto());
 
         // Insert the row into the database.
         result = ih.execute();

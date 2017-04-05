@@ -4,7 +4,7 @@ import android.app.IntentService;
 import android.content.Intent;
 
 import com.seveneow.simplechat.database.DBHelper;
-import com.seveneow.simplechat.model.Room;
+import com.seveneow.simplechat.model.Info;
 import com.seveneow.simplechat.utils.DebugLog;
 import com.seveneow.simplechat.utils.RoomManager;
 import com.seveneow.simplechat.utils.RoomParser;
@@ -37,10 +37,10 @@ public class GetDBRoomListService extends IntentService {
 
     //get new message list from database
     DBHelper helper = DBHelper.getInstance(this);
-    ArrayList<Room> rooms = helper.getUserRoomList(new RoomParser(), Static.DB_PASS);
-    if (rooms.size() > 0) {
-      DebugLog.e("GetDBRoomListService", "has db rooms return, room list size = " + rooms.size());
-      RoomManager.getInstance().addAllRooms(rooms);
+    ArrayList<Info> infos = helper.getUserRoomList(new RoomParser(), Static.DB_PASS);
+    if (infos.size() > 0) {
+      DebugLog.e("GetDBRoomListService", "has db rooms return, room list size = " + infos.size());
+      RoomManager.getInstance().addAllRooms(infos);
       RxEventSender.notifyRoomListUpdated();
       RxEventSender.notifyRoomListInited();
       return;
