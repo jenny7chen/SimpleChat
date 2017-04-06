@@ -17,6 +17,7 @@ import com.seveneow.simplechat.presenter.MainPresenter;
 import com.seveneow.simplechat.utils.BaseActivity;
 import com.seveneow.simplechat.view_interface.BasicListMvpView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends BaseActivity<BasicListMvpView, MainPresenter> implements BasicListMvpView {
@@ -102,7 +103,7 @@ public class MainActivity extends BaseActivity<BasicListMvpView, MainPresenter> 
   }
 
   @Override
-  public void setDataToList(List<Object> data) {
+  public void setDataToList(ArrayList<Object> data) {
     if (adapter != null)
       adapter.setData((List<Info>) (Object) data);
   }

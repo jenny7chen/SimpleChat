@@ -1,6 +1,6 @@
 package com.seveneow.simplechat.view_interface;
 
-import java.util.List;
+import java.util.ArrayList;
 
 
 public interface BasicListMvpView extends BasicMvpView {
@@ -12,7 +12,7 @@ public interface BasicListMvpView extends BasicMvpView {
 
   public void scrollToBottom();
 
-  public void setDataToList(List<Object> messages);
+  public void setDataToList(ArrayList<Object> messages);
 
   public void notifyChanged(int type, Object... params);
 

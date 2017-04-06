@@ -24,6 +24,7 @@ import com.seveneow.simplechat.view_interface.ChatListMvpView;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public class ChatPresenter extends BasePresenter<ChatListMvpView> {
   ArrayList<Message> messageList = new ArrayList<>();
@@ -156,8 +157,9 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
     if (!isViewAttached())
       return;
 
-    messageList.add(0, message);
-    updateViewData(messageList, true, true);
+    ArrayList<Message> messages = new ArrayList<>();
+    messages.add(message);
+    updateViewData(messages, true, true);
     getView().showContent();
   }
 
@@ -166,27 +168,27 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
       return;
 
     boolean isWholeListUpdate = messages == null || messages.length == 0;
-    this.messageList = RoomManager.getInstance().getRoomById(roomId).getShowMessages();
+    //    this.messageList = RoomManager.getInstance().getRoomById(roomId).getShowMessages();
 
     if (isWholeListUpdate) {
-      updateViewData(messageList, false, false);
+      updateViewData(RoomManager.getInstance().getRoomById(roomId).getShowMessages(), false, false);
       FDBManager.addRoomEventListener(roomId, new MessageEventListener(roomId, this));
     }
     else {
-      List<Message> updatedMessages = Arrays.asList(messages);
-      updateViewData(updatedMessages, true, false);
+      updateViewData(RoomManager.getInstance().getRoomById(roomId).getShowMessages(), true, false);
     }
 
     getView().showContent();
   }
 
-  public synchronized void updateViewData(List<Message> updatedData, boolean isSingleMessage, boolean isInsert) {
+  public synchronized void updateViewData(ArrayList<Message> updatedData, boolean isSingleMessage, boolean isInsert) {
     if (!isViewAttached())
       return;
 
     if (isSingleMessage) {
       boolean isAtBottom = getView().listIsAtBottom();
       if (isInsert) {
+        messageList.add(0, updatedData.get(0));
         getView().notifyChanged(ChatListMvpView.NOTIFY_DATA_INSERT, 0);
         if (isAtBottom || Static.isMessageFromMe(updatedData.get(0)))
           getView().scrollToBottom();
@@ -195,6 +197,9 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
         }
       }
       else {
+        messageList.clear();
+        getView().notifyChanged(BasicListMvpView.NOTIFY_DATA_RANGE_CHANGED, 0, getView().getItemCount(), updatedData.get(0));
+        messageList.addAll(updatedData);
         getView().notifyChanged(BasicListMvpView.NOTIFY_DATA_RANGE_CHANGED, 0, getView().getItemCount(), updatedData.get(0));
         if (isAtBottom) {
           getView().scrollToBottom();
@@ -203,8 +208,12 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
     }
     else {
       //check data is null, when set the list when in first time updating the data or just notify for the same list
-      if (getView().getData() == null)
-        getView().setDataToList((List<Object>) (Object) updatedData);
+      messageList.clear();
+      getView().notifyChanged(BasicListMvpView.NOTIFY_ALL_DATA_CHANGED);
+      messageList.addAll(updatedData);
+      if (getView().getData() == null) {
+        getView().setDataToList((ArrayList<Object>) (Object) messageList);
+      }
       getView().notifyChanged(BasicListMvpView.NOTIFY_ALL_DATA_CHANGED);
     }
   }

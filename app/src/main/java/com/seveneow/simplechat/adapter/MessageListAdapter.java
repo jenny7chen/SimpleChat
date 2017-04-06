@@ -18,11 +18,12 @@ import com.seveneow.simplechat.model.Message;
 import com.seveneow.simplechat.utils.BaseActivity;
 import com.seveneow.simplechat.viewmodel.MessageViewModel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
 public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.Holder> {
-  private List<Message> data = null;
+  private ArrayList<Message> data = null;
   private Context context;
 
   public MessageListAdapter(Context context) {
@@ -103,11 +104,11 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
       return data.get(position).getId().hashCode();
   }
 
-  public List<Message> getData() {
+  public ArrayList<Message> getData() {
     return data;
   }
 
-  public void setData(List<Message> data) {
+  public void setData(ArrayList<Message> data) {
     this.data = data;
   }
 

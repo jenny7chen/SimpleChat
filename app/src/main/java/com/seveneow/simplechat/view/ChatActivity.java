@@ -25,6 +25,7 @@ import com.seveneow.simplechat.view_custom.MessageEditorView;
 import com.seveneow.simplechat.view_interface.BasicListMvpView;
 import com.seveneow.simplechat.view_interface.ChatListMvpView;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -102,7 +103,7 @@ public class ChatActivity extends BaseActivity<ChatListMvpView, ChatPresenter> i
   @Override
   public void showContent() {
     ChatViewState state = (ChatViewState) viewState;
-    state.setData((List<Message>) (Object) getData());
+    state.setData((ArrayList<Message>) (Object) getData());
     //hide error view here
     progressBar.setVisibility(View.GONE);
     recyclerView.setVisibility(View.VISIBLE);
@@ -151,8 +152,8 @@ public class ChatActivity extends BaseActivity<ChatListMvpView, ChatPresenter> i
   }
 
   @Override
-  public List<Object> getData() {
-    return adapter == null ? null : (List<Object>) (Object) adapter.getData();
+  public ArrayList<Object> getData() {
+    return adapter == null ? null : (ArrayList<Object>) (Object) adapter.getData();
   }
 
   @Override
@@ -163,9 +164,9 @@ public class ChatActivity extends BaseActivity<ChatListMvpView, ChatPresenter> i
   }
 
   @Override
-  public void setDataToList(List<Object> messages) {
+  public void setDataToList(ArrayList<Object> messages) {
     if (adapter != null)
-      adapter.setData((List<Message>) (Object) messages);
+      adapter.setData((ArrayList<Message>) (Object) messages);
   }
 
   @Override
@@ -185,9 +186,9 @@ public class ChatActivity extends BaseActivity<ChatListMvpView, ChatPresenter> i
     final int STATE_SHOW_ERROR = 2;
 
     int state = STATE_SHOW_CONTENT;
-    List<Message> messageList = null;
+    ArrayList<Message> messageList = null;
 
-    public void setData(List<Message> messageList) {
+    public void setData(ArrayList<Message> messageList) {
       this.messageList = messageList;
     }
 

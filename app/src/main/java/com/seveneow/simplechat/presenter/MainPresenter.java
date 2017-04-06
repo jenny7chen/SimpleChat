@@ -47,7 +47,7 @@ public class MainPresenter extends BasePresenter<BasicListMvpView> {
     infoList = RoomManager.getInstance().getAllRooms();
 
     if (getView().getData() == null)
-      getView().setDataToList((List<Object>) (Object) infoList);
+      getView().setDataToList((ArrayList<Object>) (Object) infoList);
 
     if (info != null && info.length > 0)
       getView().notifyChanged(BasicListMvpView.NOTIFY_DATA_RANGE_CHANGED, 0, infoList.size(), info[0]);
@@ -58,7 +58,7 @@ public class MainPresenter extends BasePresenter<BasicListMvpView> {
 
   public void updateData(List<Info> infos) {
     this.infoList = (ArrayList<Info>) infos;
-    getView().setDataToList((List<Object>) (Object) infoList);
+    getView().setDataToList((ArrayList<Object>) (Object) infoList);
   }
 
   @Override
