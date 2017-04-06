@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@android:color/white"
     tools:context="com.seveneow.simplechat.view.ChatActivity">
 
     <RelativeLayout
@@ -21,7 +22,7 @@
             android:id="@+id/snackbar_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_above="@+id/message_editor_view">
+            android:layout_alignParentTop="true">
         </android.support.design.widget.CoordinatorLayout>
 
         <com.seveneow.simplechat.view_custom.MessageEditorView

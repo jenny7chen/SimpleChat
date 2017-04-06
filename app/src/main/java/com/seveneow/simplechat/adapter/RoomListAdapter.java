@@ -4,21 +4,21 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
+import android.databinding.DataBindingUtil;
+import android.databinding.ViewDataBinding;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
+import com.seveneow.simplechat.BR;
 import com.seveneow.simplechat.R;
 import com.seveneow.simplechat.model.Info;
 import com.seveneow.simplechat.utils.DebugLog;
-import com.seveneow.simplechat.utils.Static;
 import com.seveneow.simplechat.view.ChatActivity;
+import com.seveneow.simplechat.viewmodel.RoomListViewModel;
 
 import java.util.List;
 
@@ -45,25 +45,28 @@ public class RoomListAdapter extends RecyclerView.Adapter<RoomListAdapter.Holder
   @Override
   public Holder onCreateViewHolder(ViewGroup parent, int viewType) {
     ViewGroup.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-    View view;
-    LayoutInflater inflater = LayoutInflater.from(context);
-    view = inflater.inflate(R.layout.room_list_view, parent, false);
-    view.setLayoutParams(params);
-    return new Holder(view);
+    ViewDataBinding binding = DataBindingUtil.inflate(LayoutInflater
+        .from(parent.getContext()), R.layout.room_list_view, parent, false);
+    Holder holder = new Holder(binding.getRoot());
+    binding.getRoot().setLayoutParams(params);
+    holder.dataBinding = binding;
+    return holder;
   }
 
   @Override
   public void onBindViewHolder(Holder holder, int position, List<Object> payloads) {
-    if (payloads == null || payloads.isEmpty()) {
+    if (payloads.isEmpty()) {
       // payloads is empty, update the whole ViewHolder
       onBindViewHolder(holder, position);
     }
     else {
       //TODO: add partial update here
       // when payloads is not empty, update view
-      Info info = (Info) payloads.get(0);
-      if (info.getId().equals(holder.info.getId())) {
-        onBindViewHolder(holder, position);
+      Info positionData = data.get(position);
+      Info newInfo = (Info) payloads.get(0);
+      if (positionData.getId().equals(newInfo.getId())) {
+        holder.dataBinding.setVariable(BR.RoomListViewModel, new RoomListViewModel(holder.info, context));
+        holder.dataBinding.executePendingBindings();
       }
     }
   }
@@ -72,28 +75,8 @@ public class RoomListAdapter extends RecyclerView.Adapter<RoomListAdapter.Holder
   public void onBindViewHolder(Holder holder, int position) {
     Info info = data.get(position);
     holder.info = info;
-    View view = holder.itemView;
-    view.setVisibility(View.VISIBLE);
-    TextView nameView = (TextView) view.findViewById(R.id.name_view);
-    TextView textView = (TextView) view.findViewById(R.id.text_view);
-
-    if (info.getType() == Info.TYPE_NONE) {
-      DebugLog.e("Baaa", "set gone name = " + info.getName());
-      view.setVisibility(View.GONE);
-    }
-    else if (info.getType() == Info.TYPE_BOARD) {
-      DebugLog.e("Baaa", "set visible name = " + info.getName());
-      textView.setVisibility(View.GONE);
-      view.setVisibility(View.VISIBLE);
-    }
-    else {
-      textView.setVisibility(View.VISIBLE);
-      view.setVisibility(View.VISIBLE);
-    }
-    nameView.setText(info.getName());
-    textView.setText(info.getLatestMessageShowText());
-    ImageView imageView = (ImageView) view.findViewById(R.id.avatar);
-    ImageLoader.getInstance().displayImage(info.getPhoto(), imageView, Static.defaultDisplayImageOptions(R.mipmap.ic_launcher, true));
+    holder.dataBinding.setVariable(BR.RoomListViewModel, new RoomListViewModel(info, context));
+    holder.dataBinding.executePendingBindings();
   }
 
   @Override
@@ -125,6 +108,8 @@ public class RoomListAdapter extends RecyclerView.Adapter<RoomListAdapter.Holder
 
   public class Holder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
     public Info info;
+    public ViewDataBinding dataBinding;
+
 
     public Holder(View itemView) {
       super(itemView);

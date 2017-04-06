@@ -47,7 +47,6 @@ public class GetDBRoomListService extends IntentService {
     }
 
     RxEventSender.notifyRoomListInited();
-    helper.close();
   }
 
 }

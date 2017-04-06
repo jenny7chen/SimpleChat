@@ -54,6 +54,5 @@ public class GetDBMessageListService extends IntentService {
     }
 
     RxEventSender.notifyRoomMessagesInited(roomId);
-    helper.close();
   }
 }

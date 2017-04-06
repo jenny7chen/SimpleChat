@@ -29,6 +29,5 @@ public class SaveRoomService extends IntentService {
     DBHelper helper = DBHelper.getInstance(this);
     long insertId = helper.insertRoom(infoData, Static.DB_PASS);
     RoomManager.getInstance().addOrUpdateRoom(infoData);
-    helper.close();
   }
 }

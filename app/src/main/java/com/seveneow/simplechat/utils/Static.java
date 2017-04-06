@@ -2,11 +2,17 @@ package com.seveneow.simplechat.utils;
 
 import android.app.ActivityManager;
 import android.content.Context;
+import android.databinding.BindingAdapter;
 import android.graphics.Bitmap;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
+import com.seveneow.simplechat.R;
 import com.seveneow.simplechat.model.Message;
 
 /**
@@ -42,11 +48,18 @@ public class Static {
     return imageOptions;
   }
 
-  public static boolean isMessageFromMe(Message message){
+  @BindingAdapter({"bind:image"})
+  public static void displayMessage(ImageView imageView, String imageUrl) {
+    imageView.setImageBitmap(null);
+    ImageLoader.getInstance().displayImage(imageUrl, imageView, Static.defaultDisplayImageOptions(R.mipmap.ic_launcher, true));
+
+  }
+
+  public static boolean isMessageFromMe(Message message) {
     return message.getSenderId() == null || message.getSenderId().isEmpty() || userId.equals(message.getSenderId());
   }
 
-  public static boolean isMessageSentFromLocal(Message message){
+  public static boolean isMessageSentFromLocal(Message message) {
     return message.getDatabaseId() != -1;
   }
 
@@ -58,5 +71,12 @@ public class Static {
       }
     }
     return false;
+  }
+
+  @BindingAdapter("alignParent")
+  public static void setAlignParent(View view, int align) {
+    RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(view.getLayoutParams());
+    layoutParams.addRule(align);
+    view.setLayoutParams(layoutParams);
   }
 }

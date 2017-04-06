@@ -3,6 +3,7 @@ package com.seveneow.simplechat.database;
 import android.database.Cursor;
 
 import com.seveneow.simplechat.model.Info;
+import com.seveneow.simplechat.utils.DebugLog;
 
 import net.sqlcipher.DatabaseUtils;
 import net.sqlcipher.database.SQLiteDatabase;
@@ -129,9 +130,8 @@ public class InfoTable {
         // Insert the row into the database.
         result = ih.execute();
       }
-    }
-    finally {
-      ih.close();
+    }catch (Exception e){
+      DebugLog.printStackTrace(e);
     }
     return result;
   }

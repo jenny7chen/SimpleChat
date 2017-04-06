@@ -35,6 +35,5 @@ public class SendMessagesService extends IntentService {
 
     RoomManager.getInstance().addOrUpdateRoomMessage(roomId, message);
     FDBManager.sendMessage(message.getId(), roomId, message, this);
-    helper.close();
   }
 }
