@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-public class Info implements Parcelable{
+public class Room implements Parcelable{
   public static final int TYPE_NONE = 0;
   public static final int TYPE_GROUP = 1;
   public static final int TYPE_BOARD = 2;
@@ -38,11 +38,11 @@ public class Info implements Parcelable{
   private String creatorId;
   private String boardUrl;
 
-  public Info() {
+  public Room() {
 
   }
 
-  public Info(String name, String photo, ArrayList<String> members, ArrayList<Post> posts) {
+  public Room(String name, String photo, ArrayList<String> members, ArrayList<Post> posts) {
     this.name = name;
     this.photo = photo;
     this.members = members;
@@ -204,7 +204,7 @@ public class Info implements Parcelable{
     this.boardUrl = boardUrl;
   }
 
-  public Info(Parcel in) {
+  public Room(Parcel in) {
     this.id = in.readString();
     this.name = in.readString();
     this.type = in.readInt();
@@ -233,12 +233,12 @@ public class Info implements Parcelable{
   }
 
   public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
-    public Info createFromParcel(Parcel in) {
-      return new Info(in);
+    public Room createFromParcel(Parcel in) {
+      return new Room(in);
     }
 
-    public Info[] newArray(int size) {
-      return new Info[size];
+    public Room[] newArray(int size) {
+      return new Room[size];
     }
   };
 

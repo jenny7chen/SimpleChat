@@ -12,7 +12,7 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.hannesdorfmann.mosby.mvp.viewstate.ViewState;
 import com.seveneow.simplechat.R;
 import com.seveneow.simplechat.adapter.RoomListAdapter;
-import com.seveneow.simplechat.model.Info;
+import com.seveneow.simplechat.model.Room;
 import com.seveneow.simplechat.presenter.MainPresenter;
 import com.seveneow.simplechat.utils.BaseActivity;
 import com.seveneow.simplechat.view_interface.BasicListMvpView;
@@ -71,7 +71,7 @@ public class MainActivity extends BaseActivity<BasicListMvpView, MainPresenter> 
   @Override
   public void showContent() {
     MainViewState state = (MainViewState) viewState;
-    state.setData((List<Info>) (Object) getData());
+    state.setData((List<Room>) (Object) getData());
     //hide error view here
     progressBar.setVisibility(View.GONE);
     recyclerView.setVisibility(View.VISIBLE);
@@ -105,7 +105,7 @@ public class MainActivity extends BaseActivity<BasicListMvpView, MainPresenter> 
   @Override
   public void setDataToList(ArrayList<Object> data) {
     if (adapter != null)
-      adapter.setData((List<Info>) (Object) data);
+      adapter.setData((List<Room>) (Object) data);
   }
 
   @Override
@@ -126,7 +126,7 @@ public class MainActivity extends BaseActivity<BasicListMvpView, MainPresenter> 
 
   @Override
   public int getItemCount() {
-    return 0;
+    return getData() == null ? 0 : getData().size();
   }
 
   public class MainViewState implements ViewState<BasicListMvpView> {
@@ -135,10 +135,10 @@ public class MainActivity extends BaseActivity<BasicListMvpView, MainPresenter> 
     final int STATE_SHOW_ERROR = 2;
 
     int state = STATE_SHOW_CONTENT;
-    List<Info> infos = null;
+    List<Room> rooms = null;
 
-    public void setData(List<Info> infos) {
-      this.infos = infos;
+    public void setData(List<Room> rooms) {
+      this.rooms = rooms;
     }
 
     /**
@@ -158,7 +158,7 @@ public class MainActivity extends BaseActivity<BasicListMvpView, MainPresenter> 
         break;
 
       case STATE_SHOW_CONTENT:
-        presenter.updateData(infos);
+        presenter.updateData(rooms);
         view.showContent();
         break;
       }

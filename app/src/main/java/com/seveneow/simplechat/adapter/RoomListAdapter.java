@@ -15,8 +15,7 @@ import android.widget.Toast;
 
 import com.seveneow.simplechat.BR;
 import com.seveneow.simplechat.R;
-import com.seveneow.simplechat.model.Info;
-import com.seveneow.simplechat.utils.DebugLog;
+import com.seveneow.simplechat.model.Room;
 import com.seveneow.simplechat.view.ChatActivity;
 import com.seveneow.simplechat.viewmodel.RoomListViewModel;
 
@@ -24,7 +23,7 @@ import java.util.List;
 
 
 public class RoomListAdapter extends RecyclerView.Adapter<RoomListAdapter.Holder> {
-  private List<Info> data = null;
+  private List<Room> data = null;
   private Context context;
 
   public RoomListAdapter(Context context) {
@@ -62,10 +61,10 @@ public class RoomListAdapter extends RecyclerView.Adapter<RoomListAdapter.Holder
     else {
       //TODO: add partial update here
       // when payloads is not empty, update view
-      Info positionData = data.get(position);
-      Info newInfo = (Info) payloads.get(0);
-      if (positionData.getId().equals(newInfo.getId())) {
-        holder.dataBinding.setVariable(BR.RoomListViewModel, new RoomListViewModel(holder.info, context));
+      Room positionData = data.get(position);
+      Room newRoom = (Room) payloads.get(0);
+      if (positionData.getId().equals(newRoom.getId())) {
+        holder.dataBinding.setVariable(BR.RoomListViewModel, new RoomListViewModel(holder.room, context));
         holder.dataBinding.executePendingBindings();
       }
     }
@@ -73,9 +72,9 @@ public class RoomListAdapter extends RecyclerView.Adapter<RoomListAdapter.Holder
 
   @Override
   public void onBindViewHolder(Holder holder, int position) {
-    Info info = data.get(position);
-    holder.info = info;
-    holder.dataBinding.setVariable(BR.RoomListViewModel, new RoomListViewModel(info, context));
+    Room room = data.get(position);
+    holder.room = room;
+    holder.dataBinding.setVariable(BR.RoomListViewModel, new RoomListViewModel(room, context));
     holder.dataBinding.executePendingBindings();
   }
 
@@ -97,17 +96,17 @@ public class RoomListAdapter extends RecyclerView.Adapter<RoomListAdapter.Holder
     return data.get(position).getId().hashCode();
   }
 
-  public List<Info> getData() {
+  public List<Room> getData() {
     return data;
   }
 
-  public void setData(List<Info> data) {
+  public void setData(List<Room> data) {
     this.data = data;
   }
 
 
   public class Holder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
-    public Info info;
+    public Room room;
     public ViewDataBinding dataBinding;
 
 
@@ -123,7 +122,7 @@ public class RoomListAdapter extends RecyclerView.Adapter<RoomListAdapter.Holder
       Activity activity = scanForActivity(context);
       if (activity != null) {
         Intent intent = new Intent(activity, ChatActivity.class);
-        intent.putExtra("roomId", info.getId());
+        intent.putExtra("roomId", room.getId());
         activity.startActivity(intent);
       }
     }

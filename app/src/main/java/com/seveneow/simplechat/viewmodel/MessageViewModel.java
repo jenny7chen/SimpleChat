@@ -11,11 +11,13 @@ import android.widget.RelativeLayout;
 
 import com.seveneow.simplechat.R;
 import com.seveneow.simplechat.model.ImageMessage;
-import com.seveneow.simplechat.model.Info;
+import com.seveneow.simplechat.model.Room;
 import com.seveneow.simplechat.model.Message;
 import com.seveneow.simplechat.model.TextMessage;
 import com.seveneow.simplechat.utils.RoomManager;
 import com.seveneow.simplechat.utils.Static;
+import com.seveneow.simplechat.utils.TimeFormat;
+import com.seveneow.simplechat.utils.TimeParser;
 import com.seveneow.simplechat.utils.UserManager;
 
 public class MessageViewModel extends BaseObservable {
@@ -23,6 +25,7 @@ public class MessageViewModel extends BaseObservable {
   private Message nextMessage;
   private Message lastMessage;
   private Context context;
+  private String timeText = null;
 
   public MessageViewModel(Message message, Context context, Message nextMessage, Message lastMessage) {
     this.message = message;
@@ -45,6 +48,10 @@ public class MessageViewModel extends BaseObservable {
     return Static.isMessageFromMe(message) ? RelativeLayout.ALIGN_PARENT_RIGHT : RelativeLayout.ALIGN_PARENT_LEFT;
   }
 
+  public int getAvatarAlign(){
+    return RelativeLayout.ALIGN_PARENT_BOTTOM;
+  }
+
   public Drawable getTextMessageBgResourceId() {
     int drawableId = Static.isMessageFromMe(message) ? R.drawable.chat_bubble_gray : R.drawable.chat_bubble_purple;
     return ContextCompat.getDrawable(context, drawableId);
@@ -52,8 +59,8 @@ public class MessageViewModel extends BaseObservable {
 
   public int getSenderVisibility() {
     boolean visible;
-    Info room = RoomManager.getInstance().getRoomById(message.getRoomId());
-    visible = room != null && room.getType() != Info.TYPE_USER;
+    Room room = RoomManager.getInstance().getRoomById(message.getRoomId());
+    visible = room != null && room.getType() != Room.TYPE_USER;
     if (!visible)
       return View.GONE;
 
@@ -66,7 +73,11 @@ public class MessageViewModel extends BaseObservable {
   }
 
   public String getMessageTime() {
-    return message.getShowTime();
+    if(timeText != null && !timeText.isEmpty()){
+      return timeText;
+    }
+    timeText = TimeParser.getTimeStr(Long.valueOf(message.getTime()), TimeFormat.CHAT_TIME_FORMAT);
+    return timeText;
   }
 
   public String getMessageSender() {

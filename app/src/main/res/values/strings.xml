@@ -5,4 +5,5 @@
     <string name="snack_check_got_message">檢視</string>
     <string name="message_show_text_image">%1$s傳送了圖片</string>
     <string name="message_show_text_sticker">%1$s傳送了貼圖</string>
+
 </resources>

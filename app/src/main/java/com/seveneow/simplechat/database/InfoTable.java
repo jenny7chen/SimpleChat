@@ -2,7 +2,7 @@ package com.seveneow.simplechat.database;
 
 import android.database.Cursor;
 
-import com.seveneow.simplechat.model.Info;
+import com.seveneow.simplechat.model.Room;
 import com.seveneow.simplechat.utils.DebugLog;
 
 import net.sqlcipher.DatabaseUtils;
@@ -57,17 +57,17 @@ public class InfoTable {
     onCreate(db);
   }
 
-  public static long insert(int type, DBHelper sqlite, Info info, String password) {
-    ArrayList<Info> updateList = new ArrayList<>();
-    updateList.add(info);
+  public static long insert(int type, DBHelper sqlite, Room room, String password) {
+    ArrayList<Room> updateList = new ArrayList<>();
+    updateList.add(room);
     return insert(type, sqlite, updateList, password);
   }
 
-  public static long insert(int type, DBHelper sqlite, ArrayList<Info> infos, String password) {
-    return insertOrUpdateRooms(true, type, sqlite, infos, password);
+  public static long insert(int type, DBHelper sqlite, ArrayList<Room> rooms, String password) {
+    return insertOrUpdateRooms(true, type, sqlite, rooms, password);
   }
 
-  private static synchronized long insertOrUpdateRooms(boolean insert, int type, DBHelper sqlite, ArrayList<Info> infos, String password) {
+  private static synchronized long insertOrUpdateRooms(boolean insert, int type, DBHelper sqlite, ArrayList<Room> rooms, String password) {
     long result = -1;
     DatabaseUtils.InsertHelper ih = new DatabaseUtils.InsertHelper(sqlite.openWritableDB(password), NAME);
     // Get the numeric indexes for each of the columns that we're updating
@@ -85,46 +85,46 @@ public class InfoTable {
     final int boardUrlColumn = ih.getColumnIndex(COLUMN_BOARD_URL);
 
     try {
-      for (Info info : infos) {
+      for (Room room : rooms) {
         if (insert)
           ih.prepareForInsert();
         else
           ih.prepareForReplace();
 
         // Add the data for each column
-        ih.bind(infoIdColumn, info.getId());
-        ih.bind(roomNameColumn, info.getName());
-        ih.bind(roomTypeColumn, info.getType());
-        ih.bind(roomPhotoColumn, info.getPhoto());
+        ih.bind(infoIdColumn, room.getId());
+        ih.bind(roomNameColumn, room.getName());
+        ih.bind(roomTypeColumn, room.getType());
+        ih.bind(roomPhotoColumn, room.getPhoto());
 
         if (type == GROUP) {
-          ih.bind(isFavoriteColumn, info.isFavorite());
-          ih.bind(hasChatColumn, info.hasChat());
-          ih.bind(isPublicColumn, info.isPublic());
-          ih.bind(isBlockColumn, info.isBlock());
-          ih.bind(creatorColumn, info.getCreatorId());
+          ih.bind(isFavoriteColumn, room.isFavorite());
+          ih.bind(hasChatColumn, room.hasChat());
+          ih.bind(isPublicColumn, room.isPublic());
+          ih.bind(isBlockColumn, room.isBlock());
+          ih.bind(creatorColumn, room.getCreatorId());
         }
         else if (type == BOARD) {
-          ih.bind(isFavoriteColumn, info.isFavorite());
-          ih.bind(boardUrlColumn, info.getBoardUrl());
+          ih.bind(isFavoriteColumn, room.isFavorite());
+          ih.bind(boardUrlColumn, room.getBoardUrl());
         }
         else if (type == USER || type == FAVORITE) {
-          ih.bind(isFavoriteColumn, info.isFavorite());
+          ih.bind(isFavoriteColumn, room.isFavorite());
         }
         else if (type == CHAT) {
-          ih.bind(roomLatestMessageTimeColumn, info.getLatestMessageTime());
-          ih.bind(roomLatestTextColumn, info.getLatestMessageShowText());
+          ih.bind(roomLatestMessageTimeColumn, room.getLatestMessageTime());
+          ih.bind(roomLatestTextColumn, room.getLatestMessageShowText());
           ih.bind(hasChatColumn, true);
         }
         else {
-          ih.bind(isFavoriteColumn, info.isFavorite());
-          ih.bind(hasChatColumn, info.hasChat());
-          ih.bind(isPublicColumn, info.isPublic());
-          ih.bind(isBlockColumn, info.isBlock());
-          ih.bind(creatorColumn, info.getCreatorId());
-          ih.bind(boardUrlColumn, info.getBoardUrl());
-          ih.bind(roomLatestMessageTimeColumn, info.getLatestMessageTime());
-          ih.bind(roomLatestTextColumn, info.getLatestMessageShowText());
+          ih.bind(isFavoriteColumn, room.isFavorite());
+          ih.bind(hasChatColumn, room.hasChat());
+          ih.bind(isPublicColumn, room.isPublic());
+          ih.bind(isBlockColumn, room.isBlock());
+          ih.bind(creatorColumn, room.getCreatorId());
+          ih.bind(boardUrlColumn, room.getBoardUrl());
+          ih.bind(roomLatestMessageTimeColumn, room.getLatestMessageTime());
+          ih.bind(roomLatestTextColumn, room.getLatestMessageShowText());
         }
 
         // Insert the row into the database.
@@ -211,13 +211,13 @@ public class InfoTable {
       selectArgs = COLUMN_HAS_CHAT + " = 1";
     }
     else if (type == BOARD) {
-      selectArgs = COLUMN_INFO_TYPE + " = " + Info.TYPE_BOARD;
+      selectArgs = COLUMN_INFO_TYPE + " = " + Room.TYPE_BOARD;
     }
     else if (type == GROUP) {
-      selectArgs = COLUMN_INFO_TYPE + " = " + Info.TYPE_GROUP;
+      selectArgs = COLUMN_INFO_TYPE + " = " + Room.TYPE_GROUP;
     }
     else if (type == USER) {
-      selectArgs = COLUMN_INFO_TYPE + " = " + Info.TYPE_USER;
+      selectArgs = COLUMN_INFO_TYPE + " = " + Room.TYPE_USER;
     }
 
     Cursor cursor = db.query(NAME, cols, selectArgs, null, null, null, null);

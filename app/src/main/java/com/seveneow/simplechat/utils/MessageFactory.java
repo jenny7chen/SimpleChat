@@ -3,7 +3,7 @@ package com.seveneow.simplechat.utils;
 import com.seveneow.simplechat.model.FileMessage;
 import com.seveneow.simplechat.model.ImageMessage;
 import com.seveneow.simplechat.model.Message;
-import com.seveneow.simplechat.model.Info;
+import com.seveneow.simplechat.model.Room;
 import com.seveneow.simplechat.model.StickerMessage;
 import com.seveneow.simplechat.model.TextMessage;
 
@@ -47,7 +47,7 @@ public class MessageFactory {
     message.setTime(String.valueOf(TimeParser.getCurrentTimeString()));
     message.setSenderId(Static.userId);
     message.setRoomId(roomId);
-    message.setShowSender(roomType != Info.TYPE_USER);
+    message.setShowSender(roomType != Room.TYPE_USER);
 
     return message;
   }

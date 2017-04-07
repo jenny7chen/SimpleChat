@@ -5,9 +5,10 @@ import android.content.Intent;
 import android.support.annotation.Nullable;
 
 import com.seveneow.simplechat.model.Message;
-import com.seveneow.simplechat.model.Info;
+import com.seveneow.simplechat.model.Room;
 import com.seveneow.simplechat.utils.RoomManager;
 import com.seveneow.simplechat.utils.RxEventSender;
+import com.seveneow.simplechat.viewmodel.MessageViewModel;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -32,8 +33,8 @@ public class HandleNewMessageService extends IntentService {
     ArrayList<Message> messageToBeSaved = new ArrayList<Message>();
     messageToBeSaved.add(message);
 
-    Info info = RoomManager.getInstance().getRoomById(roomId);
-    boolean isAdd = !info.getMessages().containsKey(message.getId());
+    Room room = RoomManager.getInstance().getRoomById(roomId);
+    boolean isAdd = !room.getMessages().containsKey(message.getId());
 
     Intent saveIntent = new Intent(this, SaveMessageService.class);
     saveIntent.putExtra(SaveMessageService.PARAM_ROOM_ID, roomId);
@@ -50,8 +51,8 @@ public class HandleNewMessageService extends IntentService {
     catch (UnsupportedEncodingException e) {
       e.printStackTrace();
     }
-    info.setLatestMessageShowText(text);
-    info.setLatestMessageShowTime(message.getShowTime());
+    room.setLatestMessageShowText(text);
+    room.setLatestMessageShowTime(new MessageViewModel(message, this, null, null).getMessageTime());
     RxEventSender.notifyRoomShowTextUpdate();
   }
 }

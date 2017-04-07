@@ -27,7 +27,6 @@ public class Message implements Parcelable {
   private String id = null;
   private String time = null;
   private String senderId = "";
-  private String showTime = "";
   private String roomId = null;
   private String showText = "";
   private boolean isPending = false;
@@ -97,14 +96,6 @@ public class Message implements Parcelable {
 
   public String getTime() {
     return time;
-  }
-
-  public String getShowTime() {
-    if (showTime != null && !showTime.isEmpty())
-      return showTime;
-
-    showTime = TimeParser.getTimeStr(Long.valueOf(time), TimeFormat.CHAT_TIME_FORMAT);
-    return showTime;
   }
 
   public void setTime(String time) {

@@ -2,7 +2,7 @@ package com.seveneow.simplechat.database;
 
 import android.database.Cursor;
 
-import com.seveneow.simplechat.model.Info;
+import com.seveneow.simplechat.model.Room;
 
 import net.sqlcipher.DatabaseUtils;
 import net.sqlcipher.database.SQLiteDatabase;
@@ -39,17 +39,17 @@ public class FriendListTable {
     onCreate(db);
   }
 
-  public static long insert(DBHelper sqlite, Info info, String password) {
-    ArrayList<Info> updateList = new ArrayList<>();
-    updateList.add(info);
+  public static long insert(DBHelper sqlite, Room room, String password) {
+    ArrayList<Room> updateList = new ArrayList<>();
+    updateList.add(room);
     return insert(sqlite, updateList, password);
   }
 
-  public static long insert(DBHelper sqlite, ArrayList<Info> infos, String password) {
-    return insertOrUpdateRooms(true, sqlite, infos, password);
+  public static long insert(DBHelper sqlite, ArrayList<Room> rooms, String password) {
+    return insertOrUpdateRooms(true, sqlite, rooms, password);
   }
 
-  private static synchronized long insertOrUpdateRooms(boolean insert, DBHelper sqlite, ArrayList<Info> infos, String password) {
+  private static synchronized long insertOrUpdateRooms(boolean insert, DBHelper sqlite, ArrayList<Room> rooms, String password) {
     long result = -1;
     DatabaseUtils.InsertHelper ih = new DatabaseUtils.InsertHelper(sqlite.openWritableDB(password), NAME);
     // Get the numeric indexes for each of the columns that we're updating
@@ -60,19 +60,19 @@ public class FriendListTable {
     final int roomTypeColumn = ih.getColumnIndex(COLUMN_ROOM_TYPE);
     final int roomPhotoColumn = ih.getColumnIndex(COLUMN_ROOM_PHOTO);
     try {
-      for (Info info : infos) {
+      for (Room room : rooms) {
         if (insert)
           ih.prepareForInsert();
         else
           ih.prepareForReplace();
 
         // Add the data for each column
-        ih.bind(roomIdColumn, info.getId());
-        ih.bind(roomNameColumn, info.getName());
-        ih.bind(roomLatestMessageTimeColumn, info.getLatestMessageTime());
-        ih.bind(roomLatestTextColumn, info.getLatestMessageShowText());
-        ih.bind(roomTypeColumn, info.getType());
-        ih.bind(roomPhotoColumn, info.getPhoto());
+        ih.bind(roomIdColumn, room.getId());
+        ih.bind(roomNameColumn, room.getName());
+        ih.bind(roomLatestMessageTimeColumn, room.getLatestMessageTime());
+        ih.bind(roomLatestTextColumn, room.getLatestMessageShowText());
+        ih.bind(roomTypeColumn, room.getType());
+        ih.bind(roomPhotoColumn, room.getPhoto());
 
         // Insert the row into the database.
         result = ih.execute();

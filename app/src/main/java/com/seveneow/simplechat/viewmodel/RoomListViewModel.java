@@ -4,35 +4,35 @@ import android.content.Context;
 import android.databinding.BaseObservable;
 import android.view.View;
 
-import com.seveneow.simplechat.model.Info;
+import com.seveneow.simplechat.model.Room;
 
 public class RoomListViewModel extends BaseObservable {
-  private Info info;
+  private Room room;
   private Context context;
 
-  public RoomListViewModel(Info info, Context context) {
-    this.info = info;
+  public RoomListViewModel(Room room, Context context) {
+    this.room = room;
     this.context = context;
   }
 
   public String getName(){
-    return info.getName();
+    return room.getName();
   }
 
   public String getLatestMessageText(){
-    return info.getLatestMessageShowText();
+    return room.getLatestMessageShowText();
   }
 
   public String getAvatarUrl(){
-    return info.getPhoto();
+    return room.getPhoto();
   }
 
   public int getVisibility(){
-    return info.getType() == Info.TYPE_NONE ? View.GONE : View.VISIBLE;
+    return room.getType() == Room.TYPE_NONE ? View.GONE : View.VISIBLE;
   }
 
   public int getTextVisibility() {
-    return info.getType() == Info.TYPE_BOARD ? View.GONE : View.VISIBLE;
+    return room.getType() == Room.TYPE_BOARD ? View.GONE : View.VISIBLE;
   }
 
 }

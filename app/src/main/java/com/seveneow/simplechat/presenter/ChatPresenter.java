@@ -6,7 +6,7 @@ import android.os.Handler;
 
 import com.seveneow.simplechat.R;
 import com.seveneow.simplechat.model.Message;
-import com.seveneow.simplechat.model.Info;
+import com.seveneow.simplechat.model.Room;
 import com.seveneow.simplechat.service.GetDBMessageListService;
 import com.seveneow.simplechat.service.GetServerMessageListService;
 import com.seveneow.simplechat.service.SendMessagesService;
@@ -22,9 +22,6 @@ import com.seveneow.simplechat.view_interface.BasicListMvpView;
 import com.seveneow.simplechat.view_interface.ChatListMvpView;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
 
 public class ChatPresenter extends BasePresenter<ChatListMvpView> {
   ArrayList<Message> messageList = new ArrayList<>();
@@ -39,14 +36,14 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
     if (!isViewAttached())
       return;
 
-    Info info = RoomManager.getInstance().getRoomById(roomId);
+    Room room = RoomManager.getInstance().getRoomById(roomId);
 
-    if (info == null) {
+    if (room == null) {
       return;
     }
 
     DebugLog.e("baaa", "enter room : " + roomId);
-    getView().setTitle(info.getName());
+    getView().setTitle(room.getName());
     initMessages();
   }
 
@@ -57,8 +54,8 @@ public class ChatPresenter extends BasePresenter<ChatListMvpView> {
     getView().showLoading();
     //get data here using asynchttp lib
 
-    Info info = RoomManager.getInstance().getRoomById(roomId);
-    if (info.hasMessages()) {
+    Room room = RoomManager.getInstance().getRoomById(roomId);
+    if (room.hasMessages()) {
       onMessagesUpdated();
       onMessagesInit();
       getView().showContent();
